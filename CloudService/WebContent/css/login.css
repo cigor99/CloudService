@@ -126,7 +126,7 @@ button:hover {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  padding: 43px 88px 93px 190px;
+  padding: 43px 88px 50px 190px;
 }
 
 .wrap-input {
@@ -211,6 +211,8 @@ input.input-uspas {
   display: -ms-flexbox;
   display: flex;
   flex-wrap: wrap;
+  margin-top: 30px;
+  margin-left: 60px;
 }
 
 .login-form-btn {

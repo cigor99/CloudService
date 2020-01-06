@@ -1,11 +1,24 @@
-$('#login-form').submit(function() {
-    // get all the inputs into an array.
-    var $inputs = $('#login-form :input');
-
-    var values = {};
-    $inputs.each(function() {
-        values[this.name] = $(this).val();
-        console.log(values[this.name])
-    });
-
-});
+$(document).on('submit','#login-form',function(e){
+	e.preventDefault();
+	console.log("try login");
+	
+	var username = $("#username").val();
+	var password = $("#password").val();
+	
+	$.ajax({
+		type:'POST',
+		url: "rest/userServ/validate",
+		dataType: "json",
+		data: {"username" : username, "password" : password},
+		success : function(response){
+			if(response == undefined){
+				alert("Wrong username or password!")
+			}else{
+				alert("Login successful !")
+			}
+		},
+		error : function(){
+			alert("No success :(")
+		}
+	})
+})

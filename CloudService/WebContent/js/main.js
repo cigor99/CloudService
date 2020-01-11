@@ -17,18 +17,17 @@ $(document).on('submit', '#login-form', function(e) {
 			if (response == undefined) {
 				alert("Wrong username or password!")
 			} else {
-				alert("Login successful !")
-				$(location).attr('href', 'hello.html');
+				$(location).attr('href', 'mainPage.html');
 			}
 		},
 		error : function() {
-			alert("No success :(")
+			alert("")
 		}
 	})
 })
 $(document).ready(function(e) {
 	$("#listUsers").click(function(e) {
-		console.log("try listing")
+		console.log("list users")
 
 		$.ajax({
 			type : 'GET',
@@ -38,7 +37,7 @@ $(document).ready(function(e) {
 				printUsers(response);
 			},
 			error : function() {
-				alert("no success")
+				alert("Error")
 			}
 		});
 	});
@@ -46,22 +45,13 @@ $(document).ready(function(e) {
 
 
 function printUsers(users){
-	/*	<table name="tabela" id="tabela" border="2">
-		<tr>
-			<th>email</th>
-		</tr>
-	</table>
-	<script src="js/jquery.min.js"></script>
-	<script src="js/main.js"></script>*/
-	console.log("uso")
 	var tabela = $("#userTable");
+	var tr = 
 	console.log(users);
-	for(let i = 0; i < users.length; i++){
-		tabela.append("<tr><td>"+ users[i].email + "</td></tr>");
-		console.log(i);
-		console.log(users[i]);
-	}
-	//tabela.append("<tr><td>hello</td></tr>")
+	$.each(users, function (key, value) {
+		tabela.append("<tr>" + "<td>"+ value.email+ "</td>" +"<td>"+ value.password+ "</td>" + 
+				"<td>"+ value.name+ "<td>"+ value.surname+ "</td>" + "</td>" +"</tr>")
+	})
 }
 
 

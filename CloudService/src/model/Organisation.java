@@ -3,6 +3,7 @@
  */
 package model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -16,10 +17,10 @@ public class Organisation {
 	// use default if not given
 	private String logo;
 
-	private HashMap<String, User> users;
+	private ArrayList<String> users;
 	private HashMap<String, Resource> resources;
 
-	public Organisation(String name, String description, String logo, HashMap<String, User> users,
+	public Organisation(String name, String description, String logo, ArrayList<String> users,
 			HashMap<String, Resource> resources) {
 		super();
 		this.name = name;
@@ -74,11 +75,11 @@ public class Organisation {
 		this.logo = logo;
 	}
 
-	public HashMap<String, User> getUsers() {
+	public ArrayList<String> getUsers() {
 		return users;
 	}
 
-	public void setUsers(HashMap<String, User> users) {
+	public void setUsers(ArrayList<String> users) {
 		this.users = users;
 	}
 

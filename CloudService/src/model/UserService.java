@@ -50,7 +50,14 @@ public class UserService {
 		if(users == null)
 		{
 			users = new Users(ctx.getRealPath("."));
+			Organisations organisations = new Organisations(ctx.getRealPath("."));
+			for(Organisation o : organisations.getOrganisations().values()) {
+				for(String u : o.getUsers()) {
+					users.getUsers().get(u).setOrganisation(o);
+				}
+			}
 			ctx.setAttribute("users", users);
+			ctx.setAttribute("organisations", organisations);
 		}
 		
 		return users;
@@ -62,5 +69,30 @@ public class UserService {
 	public HashMap<String, User> listUsers() throws JsonParseException, JsonMappingException, IOException {
 		Users users = (Users)ctx.getAttribute("users");
 		return users.getUsers();
+	}
+	
+	@POST
+	@Path("/addNewUser")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public HashMap<String, User> addNewUser(@FormParam("email") String email,@FormParam("password") String password,@FormParam("name") String name,@FormParam("surname") String surname,@FormParam("role") String role,@FormParam("organisation") String organisation) throws JsonParseException, JsonMappingException, IOException {
+		
+		Organisations organisations = (Organisations)ctx.getAttribute("organisations");
+		Users users = (Users)ctx.getAttribute("users");
+		Role r = Role.ADMIN;
+		if(role == "User") {
+			r = Role.USER;
+		}
+		User user = new User(email,password,name,surname,organisations.getOrganisations().get(organisation),r);
+		
+		if(!users.getUsers().containsKey(email)) {
+			organisations.getOrganisations().get(organisation).getUsers().add(email);
+			users.getUsers().put(email, user);
+			ctx.setAttribute("users", users);
+			ctx.setAttribute("organisatons", organisations);
+			return users.getUsers();
+		}
+		
+		return null;
 	}
 }

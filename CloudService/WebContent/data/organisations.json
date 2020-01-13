@@ -1,0 +1,10 @@
+{
+  "Agriteco": {
+    "name": "Agriteco",
+    "description": "Agricultural organisation",
+    "users": [
+      "email1",
+      "email2"
+    ]
+  }
+}

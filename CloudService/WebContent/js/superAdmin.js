@@ -67,17 +67,19 @@ function printUsers(users){
 			"</tr>");
 	
 	$.each(users, function (key, value) {
-		var row = $("<tr></tr>")
-		row.append("<td>" + value.email + "</td>");
-		row.append("<td>" + value.name + "</td>");
-		row.append("<td>" + value.surname + "</td>");
-		if(value.organisation == null){
-			row.append("<td>" + "/"+ "</td>");
-		}else{
-			row.append("<td>" + value.organisation.name+ "</td>");
+		if(value.role!="SUPER_ADMIN"){
+			var row = $("<tr></tr>")
+			row.append("<td>" + value.email + "</td>");
+			row.append("<td>" + value.name + "</td>");
+			row.append("<td>" + value.surname + "</td>");
+			if(value.organisation == null){
+				row.append("<td>" + "/"+ "</td>");
+			}else{
+				row.append("<td>" + value.organisation.name+ "</td>");
+			}
+			
+			table.append(row)
 		}
-		
-		table.append(row)
 	})
 	
 	table.append('<tr><td><input type="submit" id="dodajUsr" name="dodajUsr" value="Add new user"></td></tr>');
@@ -90,7 +92,18 @@ function printUsers(users){
 	$("#dodajUsr").click(function(e){
 		e.preventDefault();
 		console.log("dodajUsr");
-		addNewUser()
+		$.ajax({
+			type : 'GET',
+			url : "rest/orgServ/listOrganisations",
+			dataType : "json",
+			success : function(response){
+				addNewUser(response);
+			},
+			error : function() {
+				alert("Error")
+			}
+		});
+		
 	});
 	
 }
@@ -132,7 +145,7 @@ function printOrganisations(organisations){
 	
 }
 
-function addNewUser(){
+function addNewUser(organisations){
 	var div = $("#edit")
 	
 	div.empty();
@@ -150,19 +163,25 @@ function addNewUser(){
 	var row7 = $("<tr></tr>");
 	
 	row1.append("<td>Email</td>");
-	row1.append("<td><input type=\"text\" name=\"email\" id=\"email\"></td>");
-	
+	row1.append("<td class=\"wrap-input validate-input \" data-validate=\"Email is required\"><input type=\"text\" name=\"email\" id=\"email\"></td>");
+
 	row2.append("<td>Password</td>");
-	row2.append("<td><input type=\"text\" name=\"password\" id=\"password\"></td>");
+	row2.append("<td class=\"wrap-input validate-input \" data-validate=\"Password is required\" ><input type=\"text\" name=\"password\" id=\"password\"></td>");
 	
 	row3.append("<td>Name</td>");
-	row3.append("<td><input type=\"text\" name=\"name\" id=\"name\"></td>");
+	row3.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\" ><input type=\"text\" name=\"name\" id=\"name\"></td>");
 	
 	row4.append("<td>Surname</td>");
-	row4.append("<td><input type=\"text\" name=\"surname\" id=\"surname\"></td>");
+	row4.append("<td class=\"wrap-input validate-input \" data-validate=\"Surname is required\" ><input type=\"text\" name=\"surname\" id=\"surname\"></td>");
 	
 	row5.append("<td>Organisation</td>");
-	row5.append("<td><input type=\"text\" name=\"organisation\" id=\"organisation\"></td>");
+	var selectOrg = $("<select name=\"organisation\" id=\"organisation\"></select>");
+	$.each(organisations, function(key, value){
+		var option = $("<option></option>");
+		option.append(key);
+		selectOrg.append(option);
+	});
+	row5.append(selectOrg);
 	
 	row6.append("<td>Role</td>")
 	var select = $("<select name=\"role\" id=\"role\"></select>")
@@ -201,8 +220,32 @@ function addNewUser(){
 		console.log(organisation)
 		console.log(role)
 		
-		if (email == "" || password == "" || name == "" || surname == "" || organisation == "" ) {
-			alert("All fields must bi filled !");
+		
+		if(email == ''){
+            showValidate($("#email"));
+        }else{
+        	hideValidate($("#email"));
+        }
+		
+		if(password == ''){
+            showValidate($("#password"));
+        }else{
+        	hideValidate($("#password"));
+        }
+		
+		if(name == ''){
+            showValidate($("#name"));
+        }else{
+        	hideValidate($("#name"));
+        }
+		
+		if(surname == ''){
+            showValidate($("#surname"));
+        }else{
+        	hideValidate($("#surname"));
+        }
+		
+		if (email == "" || password == "" || name == "" || surname == "" ) {
 			return;
 		}
 		
@@ -341,5 +384,16 @@ function addNewOrganisation(){
 			}
 		});
 	});
-	
+}
+
+function showValidate(input) {
+    var thisAlert = $(input).parent();
+
+    $(thisAlert).addClass('alert-validate');
+}
+
+function hideValidate(input) {
+    var thisAlert = $(input).parent();
+
+    $(thisAlert).removeClass('alert-validate');
 }

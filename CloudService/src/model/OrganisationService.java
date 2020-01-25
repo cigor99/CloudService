@@ -51,7 +51,6 @@ public class OrganisationService {
 	// Returns HashMap of all organisations
 	// Organisations will be loaded form file if previously weren't
 	
-	// MOZDA DA IZBACIM OVO I DA KORISTIM SAMO GORNJU FUNKCIJU ZA SVE
 	@GET
 	@Path("/listOrganisations")
 	@Produces(MediaType.APPLICATION_JSON)

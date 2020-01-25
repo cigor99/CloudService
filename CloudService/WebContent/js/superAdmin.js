@@ -64,11 +64,13 @@ function printUsers(users){
 			"<th>Name</th>" +
 			"<th>Surname</th>" +
 			"<th>Organisation</th>" +
+			"<th></th>"+
+			"<th></th>"+
 			"</tr>");
-	
 	$.each(users, function (key, value) {
 		if(value.role!="SUPER_ADMIN"){
 			var row = $("<tr></tr>")
+			
 			row.append("<td>" + value.email + "</td>");
 			row.append("<td>" + value.name + "</td>");
 			row.append("<td>" + value.surname + "</td>");
@@ -77,7 +79,8 @@ function printUsers(users){
 			}else{
 				row.append("<td>" + value.organisation.name+ "</td>");
 			}
-			
+
+			row.append("<td>" + "<input class=\"izmeni\" type=\"button\" id=\""+key+"\" value=\"Edit\"></td>")
 			table.append(row)
 		}
 	})
@@ -88,7 +91,7 @@ function printUsers(users){
 	
 	div.append(forma)
 	
-
+	
 	$("#dodajUsr").click(function(e){
 		e.preventDefault();
 		console.log("dodajUsr");
@@ -106,8 +109,32 @@ function printUsers(users){
 		
 	});
 	
+	$(".izmeni").click(function(e){
+		e.preventDefault();
+		$.each(users, function (key, value) {
+			if(key == e.target.id){
+				editUser(value)
+			}
+		})
+	});
+	
 }
 
+function editUser(user){
+	var edit = $("#edit");
+	edit.empty()
+	var forma = $("<form id=\"editUserF\"></form>")
+	var table = $("<table id=\editUserT\" class=\"editUserT\"></table>")
+	var tr = $("<tr></tr>")
+	var td1 =$("<td>Email</td>")
+	var td2=$("<td><input type=\"text\" value=\""+user.email + "\"></td>")
+	
+	tr.append(td1)
+	tr.append(td2)
+	table.append(tr)
+	forma.append(table)
+	edit.append(forma)
+}
 function printOrganisations(organisations){
 	var div = $("#changeable");
 	div.empty();
@@ -212,15 +239,7 @@ function addNewUser(organisations){
 		var surname = $("#surname").val()
 		var organisation = $("#organisation").val()
 		var role = $("#role").val()
-		
-		console.log(email)
-		console.log(password)
-		console.log(name)
-		console.log(surname)
-		console.log(organisation)
-		console.log(role)
-		
-		
+
 		if(email == ''){
             showValidate($("#email"));
         }else{

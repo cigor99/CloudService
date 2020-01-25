@@ -1,10 +1,42 @@
 $(document).ready(function(e) {
+	
+	$("#logOut").click(function(e){
+		e.preventDefault();
+		console.log("log out");
+		
+		$.ajax({
+			type : 'GET',
+			url : "rest/userServ/logOut",
+			success : function(){
+				$(location).attr('href', "login.html")
+			},
+			error : function() {
+				alert("Error")
+			}
+		});
+	});
+	
 	$(document).on('submit', '#login-form', function(e) {
 		e.preventDefault();
 		console.log("try login");
 
+		
 		var username = $("#username").val();
 		var password = $("#password").val();
+		if(username == ''){
+            showValidate($("#username"));
+        }else{
+        	hideValidate($("#username"));
+        }
+		
+		if(password == ''){
+            showValidate($("#password"));
+        }else{
+        	hideValidate($("#password"));
+        }
+        	
+		if(username == '' || password == '')
+			return;
 
 		$.ajax({
 			type : 'POST',
@@ -22,7 +54,7 @@ $(document).ready(function(e) {
 				}
 			},
 			error : function() {
-				alert("")
+				alert("Error")
 			}
 		});
 	});
@@ -40,6 +72,18 @@ function whereToGo(user){
 		alert("error")
 	}
 	
+}
+
+function showValidate(input) {
+    var thisAlert = $(input).parent();
+
+    $(thisAlert).addClass('alert-validate');
+}
+
+function hideValidate(input) {
+    var thisAlert = $(input).parent();
+
+    $(thisAlert).removeClass('alert-validate');
 }
 
 

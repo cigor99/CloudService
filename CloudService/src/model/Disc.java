@@ -10,13 +10,13 @@ package model;
 public class Disc extends Resource {
 	// mandatory
 	private DiscType type;
-	private float capacity;
+	private int capacity;
 	
 	private String vmName;
 
 	
 	
-	public Disc(String name, DiscType t, float cap, String vm) {
+	public Disc(String name, DiscType t, int cap, String vm) {
 		super(name);
 		this.type = t;
 		this.capacity = cap;
@@ -31,11 +31,11 @@ public class Disc extends Resource {
 		this.type = type;
 	}
 
-	public float getCapacity() {
+	public int getCapacity() {
 		return capacity;
 	}
 
-	public void setCapacity(float capacity) {
+	public void setCapacity(int capacity) {
 		this.capacity = capacity;
 	}
 

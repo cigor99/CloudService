@@ -3,6 +3,7 @@
  */
 package model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -15,23 +16,23 @@ public class VM extends Resource {
 	// mandatory
 	private VMCategory category;
 	private int numCPUCores;
-	private float ramCapacity;
+	private int ramCapacity;
 	private int numGPUCores;
 	
 	private HashMap<String, Disc> discs;
-	private LinkedHashMap<Date, Date> activityList;
+	private ArrayList<Activity> activityList;
 	
 	public VM() {
 	}
 	
-	public VM(String name, VMCategory cat, int numCpu, float ram, int numGpu) {
+	public VM(String name, VMCategory cat, int numCpu, int ram, int numGpu) {
 		super(name);
 		this.category = cat;
 		this.numCPUCores = numCpu;
 		this.ramCapacity = ram;
 		this.numGPUCores = numGpu;
 		this.discs = new HashMap<String, Disc>();
-		this.activityList = new LinkedHashMap<Date, Date>();
+		this.activityList = new ArrayList<Activity>();
 	}
 
 	@Override
@@ -56,11 +57,11 @@ public class VM extends Resource {
 		this.numCPUCores = numCPUCores;
 	}
 
-	public float getRamCapacity() {
+	public int getRamCapacity() {
 		return ramCapacity;
 	}
 
-	public void setRamCapacity(float ramCapacity) {
+	public void setRamCapacity(int ramCapacity) {
 		this.ramCapacity = ramCapacity;
 	}
 
@@ -80,11 +81,11 @@ public class VM extends Resource {
 		this.discs = discs;
 	}
 
-	public LinkedHashMap<Date, Date> getActivityList() {
+	public ArrayList<Activity> getActivityList() {
 		return activityList;
 	}
 
-	public void setActivityList(LinkedHashMap<Date, Date> activityList) {
+	public void setActivityList(ArrayList<Activity> activityList) {
 		this.activityList = activityList;
 	}
 	

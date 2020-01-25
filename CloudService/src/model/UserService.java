@@ -38,7 +38,7 @@ public class UserService {
 		{
 			if(email.equals(username) && users.get(email).getPassword().equals(password))
 			{
-				ctx.setAttribute("currentUser", users.get(email));
+				request.getSession().setAttribute("currentUser", users.get(email));
 				return users.get(email);
 			}
 		}
@@ -75,8 +75,16 @@ public class UserService {
 	@Path("/redirect")
 	@Produces(MediaType.APPLICATION_JSON)
 	public User getCurrentUser() {
-		User usr = (User) ctx.getAttribute("currentUser");
+		User usr = (User) request.getSession().getAttribute("currentUser");
 		return usr;
+	}
+	
+	@GET
+	@Path("/logOut")
+	public void logOut()
+	{
+		request.getSession().setAttribute("currentUser", null);
+		request.getSession().invalidate();
 	}
 	
 	@POST

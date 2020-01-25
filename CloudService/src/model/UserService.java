@@ -30,7 +30,7 @@ public class UserService {
 	@Path("/validate")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public User validate(@FormParam("username") String username, @FormParam("password") String password) throws JsonParseException, JsonMappingException, IOException
+	public User validate(@FormParam("username") String username, @FormParam("password") String password)
 	{
 		HashMap<String, User> users = getUsers().getUsers();
 				
@@ -38,14 +38,14 @@ public class UserService {
 		{
 			if(email.equals(username) && users.get(email).getPassword().equals(password))
 			{
-				request.getSession().setAttribute("currentUser", users.get(email));
+				ctx.setAttribute("currentUser", users.get(email));
 				return users.get(email);
 			}
 		}
 		return null;
 	}
 
-	private Users getUsers() throws JsonParseException, JsonMappingException, IOException {
+	private Users getUsers() {
 		Users users = (Users) ctx.getAttribute("users");
 		if(users == null)
 		{
@@ -66,16 +66,24 @@ public class UserService {
 	@GET
 	@Path("/getUsers")
 	@Produces(MediaType.APPLICATION_JSON)
-	public HashMap<String, User> listUsers() throws JsonParseException, JsonMappingException, IOException {
+	public HashMap<String, User> listUsers(){
 		Users users = (Users)ctx.getAttribute("users");
 		return users.getUsers();
+	}
+	
+	@GET
+	@Path("/redirect")
+	@Produces(MediaType.APPLICATION_JSON)
+	public User getCurrentUser() {
+		User usr = (User) ctx.getAttribute("currentUser");
+		return usr;
 	}
 	
 	@POST
 	@Path("/addNewUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public HashMap<String, User> addNewUser(@FormParam("email") String email,@FormParam("password") String password,@FormParam("name") String name,@FormParam("surname") String surname,@FormParam("role") String role,@FormParam("organisation") String organisation) throws JsonParseException, JsonMappingException, IOException {
+	public HashMap<String, User> addNewUser(@FormParam("email") String email,@FormParam("password") String password,@FormParam("name") String name,@FormParam("surname") String surname,@FormParam("role") String role,@FormParam("organisation") String organisation){
 		
 		Organisations organisations = (Organisations)ctx.getAttribute("organisations");
 		Users users = (Users)ctx.getAttribute("users");

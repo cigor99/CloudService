@@ -1,5 +1,6 @@
 package model;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -25,6 +26,7 @@ public class UserService {
 	
 	@Context
 	ServletContext ctx;
+	
 	
 	@POST
 	@Path("/validate")
@@ -126,6 +128,8 @@ public class UserService {
 			users.getUsers().put(email, user);
 			ctx.setAttribute("users", users);
 			ctx.setAttribute("organisatons", organisations);
+			users.WriteToFile(ctx.getRealPath("."));
+			//users.WriteToFile(ctx.getRealPath("."));
 			return listUsers();
 		}
 		
@@ -156,6 +160,7 @@ public class UserService {
 		
 		ctx.setAttribute("users", users);
 		
+		users.WriteToFile(ctx.getRealPath("."));
 		return listUsers();
 	}
 	
@@ -174,7 +179,10 @@ public class UserService {
 		
 		org.getUsers().remove(email);
 		
-		return users.getUsers();
+		
+		users.WriteToFile(ctx.getRealPath("."));
+		//users.WriteToFile(ctx.getRealPath("."));
+		return listUsers();
 	}
 	
 }

@@ -92,4 +92,9 @@ public class Organisation {
 		this.resources = resources;
 	}
 
+	@Override
+	public String toString() {
+		return "Organisation [name=" + name + ", description=" + description + ", logo=" + logo + "]";
+	}
+
 }

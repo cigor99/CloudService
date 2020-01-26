@@ -1,12 +1,16 @@
+var currentUser;
+
 // Checks if there is a user that is logged in
 // If not returns to the login page
 $.ajax({
 		type: 'GET',
-		url: "rest/userServ/redirect",
+		url: "rest/userServ/getCurrentUser",
 		success : function(response){
 			if(response == undefined){
 				alert("You have to log in");
 				$(location).attr('href', "login.html");
+			}else{
+				currentUser = response
 			}
 			
 		},
@@ -16,9 +20,7 @@ $.ajax({
 	});
 
 $(document).ready(function(e){
-	
 
-	
 	// When clicking the button for listing organisations
 	// Gets all organisations from server
 	$("#listOrgsSA").click(function(e) {
@@ -65,12 +67,16 @@ function printUsers(users){
 	
 	var table = $("<table id=\dodataTabela\" class=\"dodataTabela\"></table>")
 	
-	table.append("<tr>" +
-			"<th>Email</th>" +
-			"<th>Name</th>" +
-			"<th>Surname</th>" +
-			"<th>Organisation</th>" +
-			"</tr>");
+	var header = $("<tr></tr>")
+	
+	header.append("<th>Email</th>")
+	header.append("<th>Name</th>")
+	header.append("<th>Surname</th>")
+	
+	if(currentUser.role=="SUPER_ADMIN"){
+		header.append("<th>Organisation</th>")
+	}
+	table.append(header)
 	$.each(users, function (key, value) {
 		if(value.role!="SUPER_ADMIN"){
 			var row = $("<tr id=\""+key+"\" class=\"edit\"></tr>")
@@ -78,10 +84,12 @@ function printUsers(users){
 			row.append("<td id=\""+key+"\">" + value.email + "</td>");
 			row.append("<td id=\""+key+"\">" + value.name + "</td>");
 			row.append("<td id=\""+key+"\">" + value.surname + "</td>");
-			if(value.organisation == null){
-				row.append("<td id=\""+key+"\">" + "/"+ "</td>");
-			}else{
-				row.append("<td id=\""+key+"\">" + value.organisation.name+ "</td>");
+			if(currentUser.role=="SUPER_ADMIN"){
+				if(value.organisation == null){
+					row.append("<td id=\""+key+"\">" + "/"+ "</td>");
+				}else{
+					row.append("<td id=\""+key+"\">" + value.organisation.name+ "</td>");
+				}
 			}
 			table.append(row)
 		}
@@ -339,7 +347,7 @@ function addNewUser(organisations){
 	
 	row4.append("<td>Surname</td>");
 	row4.append("<td class=\"wrap-input validate-input \" data-validate=\"Surname is required\" ><input class=\"input-data\" type=\"text\" name=\"surname\" id=\"surname\"></td>");
-	
+
 	row5.append("<td>Organisation</td>");
 	var selectOrg = $("<select name=\"organisation\" id=\"organisation\"></select>");
 	$.each(organisations, function(key, value){
@@ -363,7 +371,8 @@ function addNewUser(organisations){
 	table.append(row2);
 	table.append(row3);
 	table.append(row4);
-	table.append(row5);
+	if(currentUser.role=="SUPER_ADMIN")
+		table.append(row5);
 	table.append(row6);
 	table.append(row7);
 	
@@ -405,6 +414,11 @@ function addNewUser(organisations){
 		
 		if (email == "" || password == "" || name == "" || surname == "" ) {
 			return;
+		}
+		
+		
+		if(currentUser.role=="ADMIN"){
+			organisation = currentUser.organisation.name
 		}
 		
 		$.ajax({

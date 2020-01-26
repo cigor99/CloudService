@@ -62,17 +62,37 @@ public class UserService {
 		
 		return users;
 	}
-	
+
 	@GET
 	@Path("/getUsers")
 	@Produces(MediaType.APPLICATION_JSON)
 	public HashMap<String, User> listUsers(){
+		User curr = (User) request.getSession().getAttribute("currentUser");
+		
 		Users users = (Users)ctx.getAttribute("users");
-		return users.getUsers();
+		
+		if(curr.getRole().equals(Role.SUPER_ADMIN))
+		{
+			return users.getUsers();
+		}else {
+			HashMap<String, User> orgUsers = new HashMap<String, User>();
+			for(String email : users.getUsers().keySet()) {
+				if(users.getUsers().get(email).getRole().equals(Role.SUPER_ADMIN))
+				{
+					continue;
+				}
+				if(curr.getOrganisation().getName().equals(users.getUsers().get(email).getOrganisation().getName()))
+				{
+					orgUsers.put(email,users.getUsers().get(email));
+				}
+			}
+			return orgUsers;
+		}
+		
 	}
 	
 	@GET
-	@Path("/redirect")
+	@Path("/getCurrentUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	public User getCurrentUser() {
 		User usr = (User) request.getSession().getAttribute("currentUser");
@@ -106,7 +126,7 @@ public class UserService {
 			users.getUsers().put(email, user);
 			ctx.setAttribute("users", users);
 			ctx.setAttribute("organisatons", organisations);
-			return users.getUsers();
+			return listUsers();
 		}
 		
 		return null;
@@ -136,7 +156,7 @@ public class UserService {
 		
 		ctx.setAttribute("users", users);
 		
-		return users.getUsers();
+		return listUsers();
 	}
 	
 	@POST

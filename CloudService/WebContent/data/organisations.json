@@ -3,14 +3,14 @@
     "name" : "Organisation2",
     "description" : "This is an organisation",
     "logo" : "path to logo",
-    "users" : [ "email1", "email2" ],
+    "users" : [ "email1" ],
     "resources" : { }
   },
   "Organisation1" : {
     "name" : "Organisation1",
     "description" : "This is an organisation",
     "logo" : "path to logo",
-    "users" : [ "email1", "email2" ],
+    "users" : [ "email2" ],
     "resources" : { }
   }
 }

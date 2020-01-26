@@ -71,7 +71,7 @@ function whereToGo(user){
 	if(user.role=="SUPER_ADMIN"){
 		$(location).attr('href', 'superAdmin.html');
 	}else if(user.role=="ADMIN"){
-		$(location).attr('href', 'admin.html');
+		$(location).attr('href', 'superAdmin.html');
 	}else if(user.role=="USER"){
 		$(location).attr('href', 'user.html');
 	}else{

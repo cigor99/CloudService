@@ -69,18 +69,16 @@ function printUsers(users){
 			"</tr>");
 	$.each(users, function (key, value) {
 		if(value.role!="SUPER_ADMIN"){
-			var row = $("<tr></tr>")
+			var row = $("<tr id=\""+key+"\" class=\"edit\"></tr>")
 			
-			row.append("<td>" + value.email + "</td>");
-			row.append("<td>" + value.name + "</td>");
-			row.append("<td>" + value.surname + "</td>");
+			row.append("<td id=\""+key+"\">" + value.email + "</td>");
+			row.append("<td id=\""+key+"\">" + value.name + "</td>");
+			row.append("<td id=\""+key+"\">" + value.surname + "</td>");
 			if(value.organisation == null){
-				row.append("<td>" + "/"+ "</td>");
+				row.append("<td id=\""+key+"\">" + "/"+ "</td>");
 			}else{
-				row.append("<td>" + value.organisation.name+ "</td>");
+				row.append("<td id=\""+key+"\">" + value.organisation.name+ "</td>");
 			}
-
-			row.append("<td><input type=\"submit\" value=\"Edit\" class=\"izmenaKorisnika\" id=\""+key+"\"></td>")
 			table.append(row)
 		}
 	})
@@ -91,6 +89,15 @@ function printUsers(users){
 	
 	div.append(forma)
 	
+	$("tr.edit").click(function(e){
+		e.preventDefault();
+		$.each(users, function (key, value) {
+			if(key == e.target.id){
+				console.log(key)
+				editUser(value)
+			}
+		})
+	});
 	
 	$("#dodajUsr").click(function(e){
 		e.preventDefault();
@@ -108,16 +115,6 @@ function printUsers(users){
 		});
 		
 	});
-	
-	$(".izmenaKorisnika").click(function(e){
-		e.preventDefault();
-		$.each(users, function (key, value) {
-			if(key == e.target.id){
-				editUser(value)
-			}
-		})
-	});
-	
 }
 
 function editUser(user){
@@ -161,6 +158,9 @@ function editUser(user){
 	row7.append("<td><input id =\"editUser\" type=\"button\" value=\"Save Changes\"></td>");
 	row7.append("<td><input id =\"discardUser\" type=\"button\" value=\"Discard Changes\"></td>");
 	
+	var row8 = $("<tr></tr>")
+	row8.append("<td align=\"center\" colspan=\"2\"><input id =\"deleteUser\" type=\"button\" value=\"Delete user\"></td>");
+	
 	table.append(row1)
 	table.append(row2)
 	table.append(row3)
@@ -168,12 +168,34 @@ function editUser(user){
 	table.append(row5)
 	table.append(row6)
 	table.append(row7)
+	table.append(row8)
 	
 	forma.append(table)
 	
 	div.append(forma)
 	
+	$("#deleteUser").click(function(e){
+		e.preventDefault();
+		console.log("delete user")
+		var email = $("#email").val()
+		var organisation = $("#organisation").val()
+		$.ajax({
+			type : "POST",
+			url : "rest/userServ/deleteUser",
+			dataType : "json",
+			data : {
+				"email" : email,
+				"organisation" : organisation
+			},
+			success : function(response){
+				$("#edit").empty();
+				printUsers(response);
+			}
+		});
+	});
+	
 	$("#discardUser").click(function(e){
+		e.preventDefault();
 		$.ajax({
 			type : "GET",
 			url : "rest/userServ/getUsers",

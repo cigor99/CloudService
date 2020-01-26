@@ -118,7 +118,6 @@ public class UserService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, User> editUser(@FormParam("email") String email,@FormParam("password") String password,@FormParam("name") String name,@FormParam("surname") String surname,@FormParam("role") String role){
 		
-		//Organisations organisations = (Organisations)ctx.getAttribute("organisations");
 		Users users = (Users)ctx.getAttribute("users");
 		Role r = Role.ADMIN;
 		if(role == "User") {
@@ -139,4 +138,23 @@ public class UserService {
 		
 		return users.getUsers();
 	}
+	
+	@POST
+	@Path("/deleteUser")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public HashMap<String, User> deleteUser(@FormParam("email") String email,@FormParam("organisation") String organisation)
+	{
+		Users users = (Users)ctx.getAttribute("users");
+		users.getUsers().remove(email);
+		
+		Organisations organisations = (Organisations) ctx.getAttribute("organisations");
+		
+		Organisation org = organisations.getOrganisations().get(organisation);
+		
+		org.getUsers().remove(email);
+		
+		return users.getUsers();
+	}
+	
 }

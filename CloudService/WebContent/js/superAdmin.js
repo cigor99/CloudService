@@ -80,7 +80,7 @@ function printUsers(users){
 				row.append("<td>" + value.organisation.name+ "</td>");
 			}
 
-			row.append("<td>" + "<input class=\"izmeni\" type=\"button\" id=\""+key+"\" value=\"Edit\"></td>")
+			row.append("<td><input type=\"submit\" value=\"Edit\" class=\"izmenaKorisnika\" id=\""+key+"\"></td>")
 			table.append(row)
 		}
 	})
@@ -109,7 +109,7 @@ function printUsers(users){
 		
 	});
 	
-	$(".izmeni").click(function(e){
+	$(".izmenaKorisnika").click(function(e){
 		e.preventDefault();
 		$.each(users, function (key, value) {
 			if(key == e.target.id){
@@ -121,19 +121,121 @@ function printUsers(users){
 }
 
 function editUser(user){
-	var edit = $("#edit");
-	edit.empty()
-	var forma = $("<form id=\"editUserF\"></form>")
-	var table = $("<table id=\editUserT\" class=\"editUserT\"></table>")
-	var tr = $("<tr></tr>")
-	var td1 =$("<td>Email</td>")
-	var td2=$("<td><input type=\"text\" value=\""+user.email + "\"></td>")
+	var div = $("#edit");
+	div.empty()
 	
-	tr.append(td1)
-	tr.append(td2)
-	table.append(tr)
+	var forma = $("<form id=\"editUserF\"></form>")
+	
+	var table = $("<table id=\editUserT\" class=\"editUserT\"></table>")
+	
+	var row1 = $("<tr></tr>")
+	row1.append("<td>Email</td>")
+	row1.append("<td><input name=\"email\" id=\"email\" type=\"text\" value=\""+user.email + "\" readonly></td>")
+	
+	var row2 = $("<tr></tr>")
+	row2.append("<td>Password</td>")
+	row2.append("<td class=\"wrap-input validate-input \" data-validate=\"Password is required\"><input name=\"password\" id=\"password\" type=\"text\" value=\""+user.password + "\"> </td>")
+	
+	var row3 = $("<tr></tr>")
+	row3.append("<td>Name</td>")
+	row3.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\"><input name=\"name\" id=\"name\" type=\"text\" value=\""+user.name + "\"> </td>")
+	
+	var row4 = $("<tr></tr>")
+	row4.append("<td>Surname</td>")
+	row4.append("<td class=\"wrap-input validate-input \" data-validate=\"Surname is required\"><input name=\"surname\" id=\"surname\" type=\"text\" value=\""+user.surname + "\"> </td>")
+	
+	var row5 = $("<tr></tr>")
+	row5.append("<td>Organisation</td>")
+	row5.append("<td><input name=\"organisation\" id=\"organisation\" type=\"text\" value=\""+user.organisation.name + "\" readonly></td>")
+	
+	var row6 = $("<tr></tr>")
+	row6.append("<td>Role</td>")
+	var select = $("<select name=\"role\" id=\"role\"></select>")
+	var option1 = $("<option value=\"User\">User</option>")
+	select.append(option1)
+	var option2 = $("<option value=\"Admin\">Admin</option>")
+	select.append(option2)
+	row6.append(select);
+	
+	var row7 = $("<tr></tr>")
+	row7.append("<td><input id =\"editUser\" type=\"button\" value=\"Save Changes\"></td>");
+	row7.append("<td><input id =\"discardUser\" type=\"button\" value=\"Discard Changes\"></td>");
+	
+	table.append(row1)
+	table.append(row2)
+	table.append(row3)
+	table.append(row4)
+	table.append(row5)
+	table.append(row6)
+	table.append(row7)
+	
 	forma.append(table)
-	edit.append(forma)
+	
+	div.append(forma)
+	
+	$("#discardUser").click(function(e){
+		$.ajax({
+			type : "GET",
+			url : "rest/userServ/getUsers",
+			dataType : "json",
+			success : function(response){
+				$("#edit").empty();
+				printUsers(response);
+			}
+		});
+	});
+	
+	$("#editUser").click(function(e){
+		e.preventDefault();
+		console.log("editUser");
+		var email = $("#email").val()
+		var password = $("#password").val()
+		var name = $("#name").val()
+		var surname = $("#surname").val()
+		var role = $("#role").val()
+
+		if(password == ''){
+            showValidate($("#password"));
+        }else{
+        	hideValidate($("#password"));
+        }
+		
+		if(name == ''){
+            showValidate($("#name"));
+        }else{
+        	hideValidate($("#name"));
+        }
+		
+		if(surname == ''){
+            showValidate($("#surname"));
+        }else{
+        	hideValidate($("#surname"));
+        }
+		
+		if (password == "" || name == "" || surname == "" ) {
+			return;
+		}
+		
+		$.ajax({
+			type : "POST",
+			url : "rest/userServ/editUser",
+			dataType : "json",
+			data : {
+				"email" : email,
+	        	"password" : password,
+	        	"name" : name,
+	        	"surname" : surname,
+	        	"role" : role
+			},
+			success : function(response){
+				if (response != undefined) {
+					$("#edit").empty();
+					printUsers(response);
+				}
+			}
+		});
+		
+	});
 }
 function printOrganisations(organisations){
 	var div = $("#changeable");

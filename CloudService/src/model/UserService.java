@@ -111,4 +111,32 @@ public class UserService {
 		
 		return null;
 	}
+	
+	@POST
+	@Path("/editUser")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public HashMap<String, User> editUser(@FormParam("email") String email,@FormParam("password") String password,@FormParam("name") String name,@FormParam("surname") String surname,@FormParam("role") String role){
+		
+		//Organisations organisations = (Organisations)ctx.getAttribute("organisations");
+		Users users = (Users)ctx.getAttribute("users");
+		Role r = Role.ADMIN;
+		if(role == "User") {
+			r = Role.USER;
+		}
+		
+		User user = users.getUsers().get(email);
+		user.setName(name);
+		user.setSurname(surname);
+		user.setPassword(password);
+		user.setRole(r);
+		
+		System.out.println(user);
+		
+		users.getUsers().put(email, user);
+		
+		ctx.setAttribute("users", users);
+		
+		return users.getUsers();
+	}
 }

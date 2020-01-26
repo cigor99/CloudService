@@ -79,4 +79,15 @@ public class Users {
 		System.out.println("Upisao");
 	}
 
+	@Override
+	public String toString() {
+		String line = "==============================\n";
+		for(User u : users.values()) {
+			line+=u.toString()+"\n";
+		}
+		return line+"============================\n";
+	}
+	
+	
+
 }

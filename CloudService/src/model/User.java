@@ -50,7 +50,7 @@ public class User {
 	@Override
 	public String toString() {
 		return "User [email=" + email + ", password=" + password + ", name=" + name + ", surname=" + surname
-				+ ", organisation=" + organisation + ", role=" + role + "]";
+				+ "]";
 	}
 	public String getEmail() {
 		return email;

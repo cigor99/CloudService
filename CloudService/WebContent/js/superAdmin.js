@@ -19,6 +19,7 @@ $.ajax({
 		}
 	});
 
+
 $(document).ready(function(e){
 
 	// When clicking the button for listing organisations
@@ -37,6 +38,13 @@ $(document).ready(function(e){
 		});
 	});
 	
+	
+	$("#updateProfile").click(function(e){
+		console.log("update profile kliknut")
+		call();
+	})
+	
+	
 	// When clicking the button for listing all users
 	// Gets all users form server
 	$("#listUsersSA").click(function(e) {
@@ -54,6 +62,23 @@ $(document).ready(function(e){
 			}
 		});
 	});
+	
+	$("#showOrg").click(function(e){
+		console.log("show organisation")
+		$.ajax({
+			type : 'GET',
+			url : "rest/orgServ/getMyOrg",
+			dataType : "json",
+			success : function(response){
+				if(response != undefined){
+					editOrganisation(response);
+				}
+			},
+			error : function() {
+				alert("Error")
+			}
+		});
+	})
 	
 });
 
@@ -601,11 +626,30 @@ function editOrganisation(organisation){
 			success : function(response){
 				if (response != undefined) {
 					$("#edit").empty();
-					printOrganisations(response);
+					if(currentUser.role == "SUPER_ADMIN")
+						printOrganisations(response);
+					else{
+						alert("Changes have been saved")
+						getMyOrganisation()
+					}
 				}
 			}
 		});
 		
+	});
+}
+
+function getMyOrganisation(){
+	$.ajax({
+		type : 'GET',
+		url : "rest/orgServ/getMyOrg",
+		dataType : "json",
+		success : function(response){
+			editOrganisation(response)
+		},
+		error : function() {
+			alert("Error")
+		}
 	});
 }
 
@@ -619,4 +663,25 @@ function hideValidate(input) {
     var thisAlert = $(input).parent();
 
     $(thisAlert).removeClass('alert-validate');
+}
+
+
+function call(){
+	$.ajax({
+		type: 'GET',
+		url: "rest/userServ/getCurrentUser",
+		success : function(response){
+			if(response == undefined){
+				alert("You have to log in");
+				$(location).attr('href', "login.html");
+			}else{
+				console.log("call() prosao")
+				updateProfile(response)
+			}
+			
+		},
+		error:function(){
+			alert("error")
+		}
+	});
 }

@@ -13,6 +13,15 @@ import java.io.IOException;
  */
 public class Logger {
 
+	public String line = "";
+	
+	
+	
+	public Logger() {
+		super();
+		this.line = "";
+	}
+
 	public static void log(String data) {
         File file = new File("log.txt");
         FileWriter fr = null;
@@ -30,5 +39,14 @@ public class Logger {
             }
         }
     }
+	
+	public void append(String data) {
+		line +=data + "\n";
+	}
+	
+	public void logAll() {
+		log(line);
+		line = "";
+	}
 	
 }

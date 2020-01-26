@@ -58,6 +58,21 @@ public class OrganisationService {
 		return getOrganisations().getOrganisations();
 	}
 	
+	// Returns organisation for current user
+	@GET
+	@Path("/getMyOrg")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Organisation getMyOrganisation() {
+		Organisations organisations = (Organisations) ctx.getAttribute("organisations");
+		User current = (User) request.getSession().getAttribute("currentUser");
+		for(Organisation org : organisations.getOrganisations().values()) {
+			if(current.getOrganisation().equals(org)) {
+				return org;
+			}
+		}
+		return null;
+	}
+	
 	// Returns HashMap of all organisations
 	// Creates and adds new organisation to the map
 	@POST

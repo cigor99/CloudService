@@ -1,3 +1,5 @@
+// Checks if there is a user that is logged in
+// If not returns to the login page
 $.ajax({
 		type: 'GET',
 		url: "rest/userServ/redirect",
@@ -15,9 +17,11 @@ $.ajax({
 
 $(document).ready(function(e){
 	
-	$("#listOrgsSA").click(function(e) {
-		console.log("list organisations")
 
+	
+	// When clicking the button for listing organisations
+	// Gets all organisations from server
+	$("#listOrgsSA").click(function(e) {
 		$.ajax({
 			type : 'GET',
 			url : "rest/orgServ/listOrganisations",
@@ -31,7 +35,8 @@ $(document).ready(function(e){
 		});
 	});
 	
-	
+	// When clicking the button for listing all users
+	// Gets all users form server
 	$("#listUsersSA").click(function(e) {
 		console.log("list users")
 
@@ -50,6 +55,7 @@ $(document).ready(function(e){
 	
 });
 
+// Prints the table of all users
 function printUsers(users){
 	var div = $("#changeable");
 	div.empty();
@@ -64,8 +70,6 @@ function printUsers(users){
 			"<th>Name</th>" +
 			"<th>Surname</th>" +
 			"<th>Organisation</th>" +
-			"<th></th>"+
-			"<th></th>"+
 			"</tr>");
 	$.each(users, function (key, value) {
 		if(value.role!="SUPER_ADMIN"){
@@ -121,7 +125,7 @@ function editUser(user){
 	var div = $("#edit");
 	div.empty()
 	
-	var forma = $("<form id=\"editUserF\"></form>")
+	var forma = $("<form class=\"data-form\" id=\"editUserF\"></form>")
 	
 	var table = $("<table id=\editUserT\" class=\"editUserT\"></table>")
 	
@@ -131,15 +135,15 @@ function editUser(user){
 	
 	var row2 = $("<tr></tr>")
 	row2.append("<td>Password</td>")
-	row2.append("<td class=\"wrap-input validate-input \" data-validate=\"Password is required\"><input name=\"password\" id=\"password\" type=\"text\" value=\""+user.password + "\"> </td>")
+	row2.append("<td class=\"wrap-input validate-input \" data-validate=\"Password is required\"><input class=\"input-data\" name=\"password\" id=\"password\" type=\"text\" value=\""+user.password + "\"> </td>")
 	
 	var row3 = $("<tr></tr>")
 	row3.append("<td>Name</td>")
-	row3.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\"><input name=\"name\" id=\"name\" type=\"text\" value=\""+user.name + "\"> </td>")
+	row3.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\"><input class=\"input-data\" name=\"name\" id=\"name\" type=\"text\" value=\""+user.name + "\"> </td>")
 	
 	var row4 = $("<tr></tr>")
 	row4.append("<td>Surname</td>")
-	row4.append("<td class=\"wrap-input validate-input \" data-validate=\"Surname is required\"><input name=\"surname\" id=\"surname\" type=\"text\" value=\""+user.surname + "\"> </td>")
+	row4.append("<td class=\"wrap-input validate-input \" data-validate=\"Surname is required\"><input class=\"input-data\" name=\"surname\" id=\"surname\" type=\"text\" value=\""+user.surname + "\"> </td>")
 	
 	var row5 = $("<tr></tr>")
 	row5.append("<td>Organisation</td>")
@@ -259,6 +263,8 @@ function editUser(user){
 		
 	});
 }
+
+// Prints table of all organisations
 function printOrganisations(organisations){
 	var div = $("#changeable");
 	div.empty();
@@ -275,10 +281,10 @@ function printOrganisations(organisations){
 			"</tr>");
 	
 	$.each(organisations, function(key, value){
-		var row = $("<tr></tr>")
-		row.append("<td>" + value.name + "</td>");
-		row.append("<td>" + value.description + "</td>");
-		row.append("<td>" + value.logo + "</td>");
+		var row = $("<tr id=\""+key+"\" class=\"edit\"></tr>")
+		row.append("<td id=\""+key+"\">" + value.name + "</td>");
+		row.append("<td id=\""+key+"\">" + value.description + "</td>");
+		row.append("<td id=\""+key+"\">" + value.logo + "</td>");
 		table.append(row)
 	});
 	
@@ -286,6 +292,16 @@ function printOrganisations(organisations){
 	forma.append(table)
 	
 	div.append(forma)
+	
+	$("tr.edit").click(function(e){
+		e.preventDefault();
+		$.each(organisations, function (key, value) {
+			if(key == e.target.id){
+				console.log(key)
+				editOrganisation(value)
+			}
+		})
+	});
 	
 	$("#dodajOrg").click(function(e){
 		e.preventDefault();
@@ -300,8 +316,7 @@ function addNewUser(organisations){
 	var div = $("#edit")
 	
 	div.empty();
-	
-	var forma2 = $("<form id=\"forma2\"></form>");
+	var forma2 = $("<form class=\"data-form\" id=\"forma2\"></form>");
 	
 	let table = $("<table class=\"dodataTabela\"></table>");
 	
@@ -314,16 +329,16 @@ function addNewUser(organisations){
 	var row7 = $("<tr></tr>");
 	
 	row1.append("<td>Email</td>");
-	row1.append("<td class=\"wrap-input validate-input \" data-validate=\"Email is required\"><input type=\"text\" name=\"email\" id=\"email\"></td>");
+	row1.append("<td class=\"wrap-input validate-input \" data-validate=\"Email is required\"><input class=\"input-data\" type=\"text\" name=\"email\" id=\"email\"></td>");
 
 	row2.append("<td>Password</td>");
-	row2.append("<td class=\"wrap-input validate-input \" data-validate=\"Password is required\" ><input type=\"text\" name=\"password\" id=\"password\"></td>");
+	row2.append("<td class=\"wrap-input validate-input \" data-validate=\"Password is required\" ><input class=\"input-data\" type=\"text\" name=\"password\" id=\"password\"></td>");
 	
 	row3.append("<td>Name</td>");
-	row3.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\" ><input type=\"text\" name=\"name\" id=\"name\"></td>");
+	row3.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\" ><input class=\"input-data\" type=\"text\" name=\"name\" id=\"name\"></td>");
 	
 	row4.append("<td>Surname</td>");
-	row4.append("<td class=\"wrap-input validate-input \" data-validate=\"Surname is required\" ><input type=\"text\" name=\"surname\" id=\"surname\"></td>");
+	row4.append("<td class=\"wrap-input validate-input \" data-validate=\"Surname is required\" ><input class=\"input-data\" type=\"text\" name=\"surname\" id=\"surname\"></td>");
 	
 	row5.append("<td>Organisation</td>");
 	var selectOrg = $("<select name=\"organisation\" id=\"organisation\"></select>");
@@ -434,59 +449,32 @@ function getAllUsers(){
 
 function addNewOrganisation(){
 	var div = $("#edit")
-	
 	div.empty();
 	
-	var forma2 = $("<form id=\"forma2\"></form>");
+	var forma2 = $("<form class=\"data-form\" id=\"forma2\"></form>");
 	
 	let table = $("<table class=\"dodataTabela\"></table>");
 	
 	var row1 = $("<tr></tr>");
 	var row2 = $("<tr></tr>");
 	var row3 = $("<tr></tr>");
-	//var row4 = $("<tr></tr>");
-	//var row5 = $("<tr></tr>");
 	var row6 = $("<tr></tr>");
 	
 	row1.append("<td>Name</td>");
-	row1.append("<td><input type=\"text\" name=\"name\" id=\"name\"></td>");
+	row1.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\"><input class=\"input-data\" type=\"text\" name=\"name\" id=\"name\"></td>");
 	
 	row2.append("<td>Description</td>");
 	row2.append("<td><input type=\"text\" name=\"description\" id=\"description\"></td>");
 	
 	row3.append("<td>Logo</td>");
 	row3.append("<td><input type=\"text\" name=\"logo\" id=\"logo\"></td>");
-	/*
-	row4.append("<td>Users</td>");
-	var selectUsr = $("<select name=\"users\" id=\"users\"></select>")
-	var users = getAllUsers();
-	$.each(users, function(key, value){
-		var option = $("<otpion></option>");
-		option.append(key);
-		selectUsr.append(option);
-	});
-	var td = $("<td></td>");
-	/////////============================DA LI OVO MOZE BEZ td
-	td.append(selectUsr);
-	row4.append(td);
 	
-	row5.append("<td>Resources</td>");
-	var selectRes = $("<select name=\"resources\" id=\"resources\"></select>")
-	for(let i = 0; i < 3; i++){
-		var optionRes = $("<otpion></option>");
-		optionRes.append("/");
-	}
-	row5.append(td);
-	
-*/
 	
 	row6.append("<td><input type=\"submit\" value=\"Add\"></td>");
 	
 	table.append(row1);
 	table.append(row2);
 	table.append(row3);
-	//table.append(row4);
-	//table.append(row5);
 	table.append(row6);
 	
 	forma2.append(table);
@@ -497,35 +485,113 @@ function addNewOrganisation(){
 		var name = $("#name").val()
 		var description = $("#description").val()
 		var logo = $("#logo").val()
-		//var users = $("#users").val()
-		//var resources = $("#resources").val()
 		
-		console.log(name)
-		console.log(description)
-		console.log(logo)
-		//console.log(users)
-		//console.log(resources)
+		if(name == ''){
+            showValidate($("#name"));
+        }else{
+        	hideValidate($("#name"));
+        }
 		
-		if (name == "" || description == "" || logo == "" ){//|| users == "" || resources == "" ) {
-			alert("All fields must bi filled !");
+		if (name == ""){
 			return;
+		}
+		
+		if(logo == ""){
+			logo = "default logo"
 		}
 		
 		$.ajax({
 			type : "POST",
-			url : "rest/orgServ/addNewOrganisation",
+			url : "rest/orgServ/addNewOrg",
 			dataType : "json",
-			data : {},
+			data : {
+				"name" : name,
+				"description" : description,
+				"logo" : logo
+			},
 			success : function(response){
 				if (response == undefined) {
 					alert("Organisation with given name already exists!");
 				} else {
 					$("#edit").empty();
-					printUsers(response);
+					printOrganisations(response);
 					
 				}
 			}
 		});
+	});
+}
+
+function editOrganisation(organisation){
+	var div = $("#edit");
+	div.empty()
+	
+	var forma = $("<form class=\"data-form\" id=\"editOrgF\"></form>")
+	
+	var table = $("<table id=\editOrgT\" class=\"editOrgT\"></table>")
+	
+	var row1 = $("<tr></tr>")
+	row1.append("<td>Name</td>")
+	row1.append("<td><input name=\"name\" id=\"name\" type=\"text\" value=\""+organisation.name + "\" readonly></td>")
+	
+	var row2 = $("<tr></tr>")
+	row2.append("<td>Description</td>")
+	row2.append("<td><input name=\"description\" id=\"description\" type=\"text\" value=\""+organisation.description + "\"> </td>")
+	
+	var row3 = $("<tr></tr>")
+	row3.append("<td>Logo</td>")
+	row3.append("<td><input name=\"logo\" id=\"logo\" type=\"text\" value=\""+organisation.logo + "\"> </td>")
+	
+	var row7 = $("<tr></tr>")
+	row7.append("<td><input id =\"editOrg\" type=\"button\" value=\"Save Changes\"></td>");
+	row7.append("<td><input id =\"discardOrg\" type=\"button\" value=\"Discard Changes\"></td>");
+	
+	table.append(row1)
+	table.append(row2)
+	table.append(row3)
+	table.append(row7)
+	
+	forma.append(table)
+	
+	div.append(forma)
+	
+	$("#discardOrg").click(function(e){
+		e.preventDefault();
+		$.ajax({
+			type : "GET",
+			url : "rest/orgServ/listOrganisations",
+			dataType : "json",
+			success : function(response){
+				$("#edit").empty();
+				printOrganisations(response);
+			}
+		});
+	});
+	
+	$("#editOrg").click(function(e){
+		e.preventDefault();
+		console.log("edit organisation");
+		var name = $("#name").val()
+		var description = $("#description").val()
+		var logo = $("#logo").val()
+		
+		$.ajax({
+			type : "POST",
+			url : "rest/orgServ/editOrg",
+			dataType : "json",
+			data : {
+				"name" : name,
+	        	"description" : description,
+	        	"logo" : logo,
+	        },
+			success : function(response){
+				if (response != undefined) {
+					$("#edit").empty();
+					printOrganisations(response);
+				}
+			}
+		});
+		
 	});
 }
 

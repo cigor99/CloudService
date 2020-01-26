@@ -16,6 +16,12 @@ $(document).ready(function(e) {
 		});
 	});
 	
+	$('.login-form .input-uspas').each(function(){
+        $(this).focus(function(){
+           hideValidate(this);
+        });
+    });
+	
 	$(document).on('submit', '#login-form', function(e) {
 		e.preventDefault();
 		console.log("try login");

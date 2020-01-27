@@ -19,7 +19,6 @@ $.ajax({
 		}
 	});
 
-
 $(document).ready(function(e){
 
 	// Gets map of organisations from server
@@ -207,13 +206,21 @@ function editUser(user){
 	table.append(row3)
 	table.append(row4)
 	table.append(row5)
-	table.append(row6)
+	if(currentUser.role!="ADMIN")
+		table.append(row6)
 	table.append(row7)
 	table.append(row8)
 	
 	forma.append(table)
 	
 	div.append(forma)
+	
+	
+	$('.data-form .input-data').each(function(){
+	    $(this).focus(function(){
+	       hideValidate(this);
+	    });
+	});
 	
 	// Deletes selected user
 	// Gets map of users
@@ -264,7 +271,8 @@ function editUser(user){
 		var name = $("#name").val()
 		var surname = $("#surname").val()
 		var role = $("#role").val()
-
+		if(currentUser.role == "ADMIN")
+			role = "ADMIN"
 		if(password == ''){
             showValidate($("#password"));
         }else{
@@ -541,6 +549,13 @@ function addNewOrganisation(){
 	forma2.append(table);
 	div.append(forma2);
 	
+
+	$('.data-form .input-data').each(function(){
+	    $(this).focus(function(){
+	       hideValidate(this);
+	    });
+	});
+	
 	// Tries to add a new organisation
 	// If successful gets map of organisations and calls function for printing
 	// if failed makes alert
@@ -593,7 +608,7 @@ function editOrganisation(organisation){
 	var div = $("#edit");
 	div.empty()
 	
-	var forma = $("<form class=\"data-form\" id=\"editOrgF\"></form>")
+	var forma = $("<form id=\"editOrgF\"></form>")
 	
 	var table = $("<table id=\editOrgT\" class=\"editOrgT\"></table>")
 	
@@ -621,7 +636,6 @@ function editOrganisation(organisation){
 	forma.append(table)
 	
 	div.append(forma)
-	
 	
 	// Discards changes
 	// Gets map of organisations
@@ -725,3 +739,4 @@ function call(){
 		}
 	});
 }
+

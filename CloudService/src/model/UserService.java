@@ -1,7 +1,5 @@
 package model;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 
 import javax.servlet.ServletContext;
@@ -15,8 +13,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 @Path("userServ")
 public class UserService {
@@ -128,8 +124,9 @@ public class UserService {
 			users.getUsers().put(email, user);
 			ctx.setAttribute("users", users);
 			ctx.setAttribute("organisatons", organisations);
+			
 			users.WriteToFile(ctx.getRealPath("."));
-			//users.WriteToFile(ctx.getRealPath("."));
+			organisations.WriteToFile(ctx.getRealPath("."));
 			return listUsers();
 		}
 		
@@ -192,7 +189,7 @@ public class UserService {
 		
 		ctx.setAttribute("users", users);
 		request.getSession().setAttribute("currentUser", user);
-		//users.WriteToFile(ctx.getRealPath("."));
+		users.WriteToFile(ctx.getRealPath("."));
 		return user;
 	}
 	
@@ -213,7 +210,7 @@ public class UserService {
 		
 		
 		users.WriteToFile(ctx.getRealPath("."));
-		//users.WriteToFile(ctx.getRealPath("."));
+		organisations.WriteToFile(ctx.getRealPath("."));
 		return listUsers();
 	}
 	

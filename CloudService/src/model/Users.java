@@ -4,19 +4,14 @@
 package model;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 /**
@@ -38,7 +33,7 @@ public class Users {
 		try {
 			users = gson.fromJson(new FileReader(realPath + sep+ "data"+ sep + "users.json"), new TypeToken<HashMap<String, User>>(){}.getType());
 		} catch (Exception e) {
-			Logger.log("greska u usrima");
+			Logger.log("greska u userima");
 		}
 		this.users = users;
 	}
@@ -66,16 +61,16 @@ public class Users {
 		try {
 			writer1.flush();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			Logger.log("error");
 			e.printStackTrace();
 		}
 		try {
 			writer1.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			Logger.log("error");
 			e.printStackTrace();
 		}
-		
+
 		System.out.println("Upisao");
 	}
 
@@ -83,7 +78,7 @@ public class Users {
 	public String toString() {
 		String line = "==============================\n";
 		for(User u : users.values()) {
-			line+=u.toString()+"\n";
+			line += u.toString() + "\n";
 		}
 		return line+"============================\n";
 	}

@@ -3,7 +3,6 @@
  */
 package model;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,8 +17,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 /**
  * @author Igor
@@ -80,12 +77,13 @@ public class OrganisationService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, Organisation> addNewOrg(@FormParam("name") String name, @FormParam("description") String description, @FormParam("logo") String logo){
-		Users users = (Users) ctx.getAttribute("users");
 		Organisations organisations = (Organisations) ctx.getAttribute("organisations");
 		Organisation org = new Organisation(name, description, logo, new ArrayList<String>(), new HashMap<String, Resource>());
 		if(!organisations.getOrganisations().containsKey(name)) {
 			organisations.getOrganisations().put(name, org);
 			ctx.setAttribute("organisations", organisations);
+
+			organisations.WriteToFile(ctx.getRealPath("."));
 			return organisations.getOrganisations();
 		}
 		
@@ -111,7 +109,8 @@ public class OrganisationService {
 
 		organisations.getOrganisations().put(name, org);
 		ctx.setAttribute("organisations", organisations);
-		
+
+		organisations.WriteToFile(ctx.getRealPath("."));
 		return organisations.getOrganisations();
 	}
 

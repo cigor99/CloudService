@@ -169,12 +169,11 @@ public class UserService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public User updateProfile(@FormParam("oldEmail") String oldEmail, @FormParam("email") String email,@FormParam("password") String password, @FormParam("name") String name,@FormParam("surname") String surname){		
-		Logger logger = new Logger();
+		
 		Users users = (Users)ctx.getAttribute("users");
-		logger.append(users.toString());
-		logger.append("------------------------------");
+		
 		User user = users.getUsers().get(oldEmail);
-		logger.append("user koji se menja\n"+user.toString());
+		
 		
 		if(!oldEmail.equals(email)) {
 			for(String u : users.getUsers().keySet()) {
@@ -188,12 +187,9 @@ public class UserService {
 		user.setPassword(password);
 		user.setEmail(email);
 		
-		logger.append("----------------------------");
-		logger.append("novi user:\n" + user.toString());
-		System.out.println(user);
 		users.getUsers().remove(oldEmail);
 		users.getUsers().put(email, user);
-		logger.logAll();
+		
 		ctx.setAttribute("users", users);
 		request.getSession().setAttribute("currentUser", user);
 		//users.WriteToFile(ctx.getRealPath("."));

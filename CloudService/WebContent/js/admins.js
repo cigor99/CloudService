@@ -22,9 +22,9 @@ $.ajax({
 
 $(document).ready(function(e){
 
-	// When clicking the button for listing organisations
-	// Gets all organisations from server
-	$("#listOrgsSA").click(function(e) {
+	// Gets map of organisations from server
+	// Calls function for pritning those organisations
+	$("#listOrgs").click(function(e) {
 		$.ajax({
 			type : 'GET',
 			url : "rest/orgServ/listOrganisations",
@@ -38,18 +38,15 @@ $(document).ready(function(e){
 		});
 	});
 	
-	
+	// Calls function for 
 	$("#updateProfile").click(function(e){
-		console.log("update profile kliknut")
 		call();
 	})
 	
 	
-	// When clicking the button for listing all users
-	// Gets all users form server
-	$("#listUsersSA").click(function(e) {
-		console.log("list users")
-
+	// Gets map of users form server
+	// Calls function for printing
+	$("#listUsers").click(function(e) {
 		$.ajax({
 			type : 'GET',
 			url : "rest/userServ/getUsers",
@@ -63,8 +60,9 @@ $(document).ready(function(e){
 		});
 	});
 	
+	// Gets current admins organisation
+	// Calls edit menu for that organisation
 	$("#showOrg").click(function(e){
-		console.log("show organisation")
 		$.ajax({
 			type : 'GET',
 			url : "rest/orgServ/getMyOrg",
@@ -82,7 +80,8 @@ $(document).ready(function(e){
 	
 });
 
-// Prints the table of all users
+// Receives a map of users
+// Prints the table of users
 function printUsers(users){
 	var div = $("#changeable");
 	div.empty();
@@ -126,19 +125,22 @@ function printUsers(users){
 	
 	div.append(forma)
 	
+	// When clicking on a table row
+	// Open edit menu for that row
 	$("tr.edit").click(function(e){
 		e.preventDefault();
 		$.each(users, function (key, value) {
 			if(key == e.target.id){
-				console.log(key)
 				editUser(value)
 			}
 		})
 	});
 	
+	
+	// Gets all organisations
+	// Calls function for adding new users
 	$("#dodajUsr").click(function(e){
 		e.preventDefault();
-		console.log("dodajUsr");
 		$.ajax({
 			type : 'GET',
 			url : "rest/orgServ/listOrganisations",
@@ -154,6 +156,8 @@ function printUsers(users){
 	});
 }
 
+// Receives user to edit
+// Opens menu for editing
 function editUser(user){
 	var div = $("#edit");
 	div.empty()
@@ -211,9 +215,11 @@ function editUser(user){
 	
 	div.append(forma)
 	
+	// Deletes selected user
+	// Gets map of users
+	// Calls function for printing map of users
 	$("#deleteUser").click(function(e){
 		e.preventDefault();
-		console.log("delete user")
 		var email = $("#email").val()
 		var organisation = $("#organisation").val()
 		$.ajax({
@@ -231,6 +237,9 @@ function editUser(user){
 		});
 	});
 	
+	// Discards entered changes
+	// Gets map of users
+	// Calls function for printing map of users
 	$("#discardUser").click(function(e){
 		e.preventDefault();
 		$.ajax({
@@ -244,9 +253,12 @@ function editUser(user){
 		});
 	});
 	
+	
+	// Edits data for selected user
+	// Gets map of users
+	// Calls function for printing map of users
 	$("#editUser").click(function(e){
 		e.preventDefault();
-		console.log("editUser");
 		var email = $("#email").val()
 		var password = $("#password").val()
 		var name = $("#name").val()
@@ -297,7 +309,8 @@ function editUser(user){
 	});
 }
 
-// Prints table of all organisations
+// Receives map of organisations
+// Prints the table of  oforganisations
 function printOrganisations(organisations){
 	var div = $("#changeable");
 	div.empty();
@@ -326,25 +339,28 @@ function printOrganisations(organisations){
 	
 	div.append(forma)
 	
+	// When clicking on a table row
+	// Open edit menu for that row
 	$("tr.edit").click(function(e){
 		e.preventDefault();
 		$.each(organisations, function (key, value) {
 			if(key == e.target.id){
-				console.log(key)
 				editOrganisation(value)
 			}
 		})
 	});
 	
+	//Opens menu for adding new organisations
 	$("#dodajOrg").click(function(e){
 		e.preventDefault();
-		console.log("dodajOrg");
 		addNewOrganisation()
 	});
 		
 	
 }
 
+// Receives map of organisations
+// Prints manu for adding new users
 function addNewUser(organisations){
 	var div = $("#edit")
 	
@@ -403,6 +419,10 @@ function addNewUser(organisations){
 	
 	forma2.append(table);
 	div.append(forma2);
+	
+	// Tries to add a new user
+	// If successful gets map of users and calls function for printing
+	// if failed makes alert
 	
 	$("#forma2").submit(function(e){
 		e.preventDefault()
@@ -472,6 +492,7 @@ function addNewUser(organisations){
 	
 }
 
+// Gets map of users and returns it
 function getAllUsers(){
 	$.ajax({
 		type : 'GET',
@@ -486,6 +507,7 @@ function getAllUsers(){
 	});
 }
 
+// Prints menu for adding new organisations
 function addNewOrganisation(){
 	var div = $("#edit")
 	div.empty();
@@ -519,6 +541,9 @@ function addNewOrganisation(){
 	forma2.append(table);
 	div.append(forma2);
 	
+	// Tries to add a new organisation
+	// If successful gets map of organisations and calls function for printing
+	// if failed makes alert
 	$("#forma2").submit(function(e){
 		e.preventDefault()
 		var name = $("#name").val()
@@ -561,6 +586,9 @@ function addNewOrganisation(){
 	});
 }
 
+
+// Receives organisation to edit
+// Prints edit menu
 function editOrganisation(organisation){
 	var div = $("#edit");
 	div.empty()
@@ -594,6 +622,10 @@ function editOrganisation(organisation){
 	
 	div.append(forma)
 	
+	
+	// Discards changes
+	// Gets map of organisations
+	// Calls function for printing
 	$("#discardOrg").click(function(e){
 		e.preventDefault();
 		$.ajax({
@@ -607,9 +639,12 @@ function editOrganisation(organisation){
 		});
 	});
 	
+	// Edits data for selected organisation
+	// Gets map of organisations
+	// If current user is a super_admin calls function for printing all organisations
+	// if current user is an admin alerts him and calls function for printing his organisation 
 	$("#editOrg").click(function(e){
 		e.preventDefault();
-		console.log("edit organisation");
 		var name = $("#name").val()
 		var description = $("#description").val()
 		var logo = $("#logo").val()
@@ -639,6 +674,8 @@ function editOrganisation(organisation){
 	});
 }
 
+// Gets organisation for current user
+// Calls function for editing organisation
 function getMyOrganisation(){
 	$.ajax({
 		type : 'GET',
@@ -653,19 +690,23 @@ function getMyOrganisation(){
 	});
 }
 
+// Receives where to add class alert-validate
 function showValidate(input) {
     var thisAlert = $(input).parent();
 
     $(thisAlert).addClass('alert-validate');
 }
 
+// Receives where to remove class alert validate
 function hideValidate(input) {
     var thisAlert = $(input).parent();
 
     $(thisAlert).removeClass('alert-validate');
 }
 
-
+// Checks if there is a logged in user
+// If no alerts and returns to login page
+// If yes gets current user and calls function for editing profile 
 function call(){
 	$.ajax({
 		type: 'GET',
@@ -675,7 +716,6 @@ function call(){
 				alert("You have to log in");
 				$(location).attr('href', "login.html");
 			}else{
-				console.log("call() prosao")
 				updateProfile(response)
 			}
 			

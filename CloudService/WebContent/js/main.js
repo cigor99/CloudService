@@ -1,5 +1,6 @@
 $(document).ready(function(e) {
 	
+	//STA
 	$("#logOut").click(function(e){
 		e.preventDefault();
 		console.log("log out");
@@ -69,9 +70,9 @@ $(document).ready(function(e) {
 
 function whereToGo(user){
 	if(user.role=="SUPER_ADMIN"){
-		$(location).attr('href', 'superAdmin.html');
+		$(location).attr('href', 'super_admin.html');
 	}else if(user.role=="ADMIN"){
-		$(location).attr('href', 'admin.html');
+		$(location).attr('href', 'super_admin.html');
 	}else if(user.role=="USER"){
 		$(location).attr('href', 'user.html');
 	}else{

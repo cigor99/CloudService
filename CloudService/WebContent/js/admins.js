@@ -1,51 +1,24 @@
 var currentUser;
 
-// Checks if there is a user that is logged in
-// If not returns to the login page
-$.ajax({
-		type: 'GET',
-		url: "rest/userServ/getCurrentUser",
-		success : function(response){
-			if(response == undefined){
-				alert("You have to log in");
-				$(location).attr('href', "login.html");
-			}else{
-				currentUser = response
-			}
-			
-		},
-		error:function(){
-			alert("error")
-		}
-	});
-
 $(document).ready(function(e){
 
-	// Gets map of organisations from server
-	// Calls function for pritning those organisations
-	$("#listOrgs").click(function(e) {
-		$.ajax({
-			type : 'GET',
-			url : "rest/orgServ/listOrganisations",
-			dataType : "json",
-			success : function(response){
-				printOrganisations(response);
-			},
-			error : function() {
-				alert("Error")
-			}
-		});
+	// Checks if there is a user that is logged in
+	// If not returns to the login page
+	checkIfLogged()
+	
+	//Calls function for viewing profile
+	$('a[href="#viewProfile"]').click(function(){
+		alert("View profile")
 	});
 	
-	// Calls function for 
-	$("#updateProfile").click(function(e){
-		call();
-	})
-	
+	//Calls function for viewing VMs
+	$('a[href="#viewVMs"]').click(function(){
+		alert("View VMS")
+	});
 	
 	// Gets map of users form server
 	// Calls function for printing
-	$("#listUsers").click(function(e) {
+	$('a[href="#viewUsers"]').click(function(){
 		$.ajax({
 			type : 'GET',
 			url : "rest/userServ/getUsers",
@@ -57,11 +30,42 @@ $(document).ready(function(e){
 				alert("Error")
 			}
 		});
+	}); 
+	
+
+	// Gets map of organisations from server
+	// Calls function for pritning those organisations
+	$('a[href="#viewOrganisations"]').click(function(){
+		if(currentUser.role=="ADMIN")
+			getMyOrganisation()
+		else{
+			$.ajax({
+				type : 'GET',
+				url : "rest/orgServ/listOrganisations",
+				dataType : "json",
+				success : function(response){
+					printOrganisations(response);
+				},
+				error : function() {
+					alert("Error")
+				}
+			});
+		}
+	}); 
+	
+	//Calls function for viewing VMs
+	$('a[href="#viewDiscs"]').click(function(){
+		alert("View Discs")
+	});
+	
+	//Calls function for viewing VMs
+	$('a[href="#viewCategories"]').click(function(){
+		alert("View Categories")
 	});
 	
 	// Gets current admins organisation
 	// Calls edit menu for that organisation
-	$("#showOrg").click(function(e){
+	/*$("#showOrg").click(function(e){
 		$.ajax({
 			type : 'GET',
 			url : "rest/orgServ/getMyOrg",
@@ -75,22 +79,18 @@ $(document).ready(function(e){
 				alert("Error")
 			}
 		});
-	})
+	})*/
 	
 });
 
 // Receives a map of users
 // Prints the table of users
 function printUsers(users){
-	var div = $("#changeable");
-	div.empty();
-	$("#edit").empty();
+	var edit = $("#fillEditForm")
+	edit.empty()
 	
-	var forma = $("<form id=\"forma1\"></form>")
-	
-	var table = $("<table id=\dodataTabela\" class=\"dodataTabela\"></table>")
-	
-	var header = $("<tr></tr>")
+	var header = $("#fillHeader")
+	header.empty()
 	
 	header.append("<th>Email</th>")
 	header.append("<th>Name</th>")
@@ -99,7 +99,14 @@ function printUsers(users){
 	if(currentUser.role=="SUPER_ADMIN"){
 		header.append("<th>Organisation</th>")
 	}
+	
+	var table = $("#fillTable")
+	
 	table.append(header)
+	
+	var body = $("#fillBody")
+	body.empty()
+	
 	$.each(users, function (key, value) {
 		if(value.role!="SUPER_ADMIN"){
 			var row = $("<tr id=\""+key+"\" class=\"edit\"></tr>")
@@ -114,18 +121,15 @@ function printUsers(users){
 					row.append("<td id=\""+key+"\">" + value.organisation.name+ "</td>");
 				}
 			}
-			table.append(row)
+			body.append(row)
 		}
 	})
 	
-	table.append('<tr><td><input type="submit" id="dodajUsr" name="dodajUsr" value="Add new user"></td></tr>');
+	body.append('<tr><td><input type="submit" id="dodajUsr" name="dodajUsr" value="Add new user"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>');
+
+	table.append(body)
 	
-	forma.append(table)
-	
-	div.append(forma)
-	
-	// When clicking on a table row
-	// Open edit menu for that row
+
 	$("tr.edit").click(function(e){
 		e.preventDefault();
 		$.each(users, function (key, value) {
@@ -158,10 +162,8 @@ function printUsers(users){
 // Receives user to edit
 // Opens menu for editing
 function editUser(user){
-	var div = $("#edit");
-	div.empty()
-	
-	var forma = $("<form class=\"data-form\" id=\"editUserF\"></form>")
+	var forma = $("#fillEditForm")
+	forma.empty();
 	
 	var table = $("<table id=\editUserT\" class=\"editUserT\"></table>")
 	
@@ -212,15 +214,6 @@ function editUser(user){
 	table.append(row8)
 	
 	forma.append(table)
-	
-	div.append(forma)
-	
-	
-	$('.data-form .input-data').each(function(){
-	    $(this).focus(function(){
-	       hideValidate(this);
-	    });
-	});
 	
 	// Deletes selected user
 	// Gets map of users
@@ -320,32 +313,33 @@ function editUser(user){
 // Receives map of organisations
 // Prints the table of  oforganisations
 function printOrganisations(organisations){
-	var div = $("#changeable");
-	div.empty();
-	$("#edit").empty();
+	var edit = $("#fillEditForm")
+	edit.empty()
 	
-	var forma = $("<form id=\"forma1\"></form>")
+	var header = $("#fillHeader");
+	header.empty();
 	
-	var table = $("<table id=\"dodataTabela\" class=\"dodataTabela\"></table>")
+	header.append("<th>Name</th>")
+	header.append("<th>Description</th>")
+	header.append("<th>Logo</th>")
 	
-	table.append("<tr>" +
-			"<th>Name</th>" +
-			"<th>Description</th>" +
-			"<th>Logo</th>"+
-			"</tr>");
+	var table = $("#fillTable")
+	table.append(header)
+	
+	var body = $("#fillBody")
+	body.empty()
 	
 	$.each(organisations, function(key, value){
 		var row = $("<tr id=\""+key+"\" class=\"edit\"></tr>")
 		row.append("<td id=\""+key+"\">" + value.name + "</td>");
 		row.append("<td id=\""+key+"\">" + value.description + "</td>");
 		row.append("<td id=\""+key+"\">" + value.logo + "</td>");
-		table.append(row)
+		body.append(row)
 	});
 	
-	table.append('<tr><td><input type="submit" id ="dodajOrg" value="Add new organisation"></td></tr>')
-	forma.append(table)
-	
-	div.append(forma)
+	body.append('<tr><td><input type="submit" id ="dodajOrg" value="Add new organisation"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>')
+
+	table.append(body)
 	
 	// When clicking on a table row
 	// Open edit menu for that row
@@ -370,12 +364,11 @@ function printOrganisations(organisations){
 // Receives map of organisations
 // Prints manu for adding new users
 function addNewUser(organisations){
-	var div = $("#edit")
+	var forma = $("#fillEditForm")
 	
-	div.empty();
-	var forma2 = $("<form class=\"data-form\" id=\"forma2\"></form>");
+	forma.empty();
 	
-	let table = $("<table class=\"dodataTabela\"></table>");
+	var table = $("<table class=\"dodataTabela\"></table>");
 	
 	var row1 = $("<tr></tr>");
 	var row2 = $("<tr></tr>");
@@ -414,7 +407,7 @@ function addNewUser(organisations){
 	select.append(option2)
 	row6.append(select);
 	
-	row7.append("<td><input type=\"submit\" value=\"Add\"></td>");
+	row7.append("<td><input id=\"addUser\" type=\"submit\" value=\"Add new User\"></td>");
 	
 	table.append(row1);
 	table.append(row2);
@@ -425,14 +418,12 @@ function addNewUser(organisations){
 	table.append(row6);
 	table.append(row7);
 	
-	forma2.append(table);
-	div.append(forma2);
+	forma.append(table);
 	
 	// Tries to add a new user
 	// If successful gets map of users and calls function for printing
 	// if failed makes alert
-	
-	$("#forma2").submit(function(e){
+	$("#addUser").click(function(e){
 		e.preventDefault()
 		var email = $("#email").val()
 		var password = $("#password").val()
@@ -517,17 +508,16 @@ function getAllUsers(){
 
 // Prints menu for adding new organisations
 function addNewOrganisation(){
-	var div = $("#edit")
-	div.empty();
 	
-	var forma2 = $("<form class=\"data-form\" id=\"forma2\"></form>");
+	var forma = $("#fillEditForm")
+	forma.empty();
 	
-	let table = $("<table class=\"dodataTabela\"></table>");
+	var table = $("<table class=\"dodataTabela\"></table>");
 	
 	var row1 = $("<tr></tr>");
 	var row2 = $("<tr></tr>");
 	var row3 = $("<tr></tr>");
-	var row6 = $("<tr></tr>");
+	var row4 = $("<tr></tr>");
 	
 	row1.append("<td>Name</td>");
 	row1.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\"><input class=\"input-data\" type=\"text\" name=\"name\" id=\"name\"></td>");
@@ -539,27 +529,19 @@ function addNewOrganisation(){
 	row3.append("<td><input type=\"text\" name=\"logo\" id=\"logo\"></td>");
 	
 	
-	row6.append("<td><input type=\"submit\" value=\"Add\"></td>");
+	row4.append("<td><input type=\"submit\" value=\"Add\"></td>");
 	
 	table.append(row1);
 	table.append(row2);
 	table.append(row3);
-	table.append(row6);
+	table.append(row4);
 	
-	forma2.append(table);
-	div.append(forma2);
-	
-
-	$('.data-form .input-data').each(function(){
-	    $(this).focus(function(){
-	       hideValidate(this);
-	    });
-	});
+	forma.append(table);
 	
 	// Tries to add a new organisation
 	// If successful gets map of organisations and calls function for printing
 	// if failed makes alert
-	$("#forma2").submit(function(e){
+	$("#fillEditForm").submit(function(e){
 		e.preventDefault()
 		var name = $("#name").val()
 		var description = $("#description").val()
@@ -605,10 +587,8 @@ function addNewOrganisation(){
 // Receives organisation to edit
 // Prints edit menu
 function editOrganisation(organisation){
-	var div = $("#edit");
-	div.empty()
-	
-	var forma = $("<form id=\"editOrgF\"></form>")
+	var forma = $("#fillEditForm")
+	forma.empty()
 	
 	var table = $("<table id=\editOrgT\" class=\"editOrgT\"></table>")
 	
@@ -624,18 +604,16 @@ function editOrganisation(organisation){
 	row3.append("<td>Logo</td>")
 	row3.append("<td><input name=\"logo\" id=\"logo\" type=\"text\" value=\""+organisation.logo + "\"> </td>")
 	
-	var row7 = $("<tr></tr>")
-	row7.append("<td><input id =\"editOrg\" type=\"button\" value=\"Save Changes\"></td>");
-	row7.append("<td><input id =\"discardOrg\" type=\"button\" value=\"Discard Changes\"></td>");
+	var row4 = $("<tr></tr>")
+	row4.append("<td><input id =\"editOrg\" type=\"button\" value=\"Save Changes\"></td>");
+	row4.append("<td><input id =\"discardOrg\" type=\"button\" value=\"Discard Changes\"></td>");
 	
 	table.append(row1)
 	table.append(row2)
 	table.append(row3)
-	table.append(row7)
+	table.append(row4)
 	
 	forma.append(table)
-	
-	div.append(forma)
 	
 	// Discards changes
 	// Gets map of organisations
@@ -721,7 +699,7 @@ function hideValidate(input) {
 // Checks if there is a logged in user
 // If no alerts and returns to login page
 // If yes gets current user and calls function for editing profile 
-function call(){
+function checkIfLogged(){
 	$.ajax({
 		type: 'GET',
 		url: "rest/userServ/getCurrentUser",
@@ -730,12 +708,12 @@ function call(){
 				alert("You have to log in");
 				$(location).attr('href', "login.html");
 			}else{
-				updateProfile(response)
+				currentUser=response
 			}
 			
 		},
 		error:function(){
-			alert("error")
+			alert("Error")
 		}
 	});
 }

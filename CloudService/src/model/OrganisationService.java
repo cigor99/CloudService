@@ -3,6 +3,7 @@
  */
 package model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -70,6 +71,17 @@ public class OrganisationService {
 		return null;
 	}
 	
+	private String makeLogoPath(String fakePath) {
+		String sep = File.separator;
+		String[] token = fakePath.split("fakepath");
+		String path = "data" + "/" + "logos";
+		if(token.length==1)
+			return path + "/" + "default.jpg";
+		else
+			return path + token[1];
+	}
+	
+	
 	// Returns HashMap of all organisations
 	// Creates and adds new organisation to the map
 	@POST
@@ -78,7 +90,7 @@ public class OrganisationService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, Organisation> addNewOrg(@FormParam("name") String name, @FormParam("description") String description, @FormParam("logo") String logo){
 		Organisations organisations = (Organisations) ctx.getAttribute("organisations");
-		Organisation org = new Organisation(name, description, logo, new ArrayList<String>(), new HashMap<String, Resource>());
+		Organisation org = new Organisation(name, description, makeLogoPath(logo), new ArrayList<String>(), new HashMap<String, Resource>());
 		if(!organisations.getOrganisations().containsKey(name)) {
 			organisations.getOrganisations().put(name, org);
 			ctx.setAttribute("organisations", organisations);
@@ -86,7 +98,6 @@ public class OrganisationService {
 			organisations.WriteToFile(ctx.getRealPath("."));
 			return organisations.getOrganisations();
 		}
-		
 		return null;
 		
 	}

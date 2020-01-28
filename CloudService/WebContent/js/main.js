@@ -25,8 +25,6 @@ $(document).ready(function(e) {
 	
 	$(document).on('submit', '#login-form', function(e) {
 		e.preventDefault();
-		console.log("try login");
-
 		
 		var username = $("#username").val();
 		var password = $("#password").val();

@@ -1,3 +1,11 @@
+img {
+  border: 1px solid #ddd; /* Gray border */
+  border-radius: 4px;  /* Rounded border */
+  padding: 5px; /* Some padding */
+  width: 52px; /* Set a small width */
+  height: 52px;
+}
+
 .validate-input {
   position: relative;
 }

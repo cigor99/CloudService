@@ -26,12 +26,13 @@ public class Organisations {
 		super();
 	}
 	
+	
 	public Organisations(String realPath){
 		String sep = File.separator;
 		Gson gson = new Gson();
 		HashMap<String, Organisation> organisations = null;
 		try {
-			organisations = gson.fromJson(new FileReader(realPath + sep+ "data"+ sep + "organisations.json"), new TypeToken<HashMap<String, Organisation>>(){}.getType());
+			organisations = gson.fromJson(new FileReader(realPath + sep + "data" + sep + "organisations.json"), new TypeToken<HashMap<String, Organisation>>(){}.getType());
 		} catch (Exception e) {
 			Logger.log("grska u organizacijama");
 		}

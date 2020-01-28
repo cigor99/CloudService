@@ -1,1 +1,0 @@
-User [email=email3, password=pass3, name=Name3, surname=Surname3, organisation=null, role=SUPER_ADMIN]

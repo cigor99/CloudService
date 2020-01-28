@@ -23,7 +23,6 @@ public class UserService {
 	@Context
 	ServletContext ctx;
 	
-	
 	@POST
 	@Path("/validate")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)

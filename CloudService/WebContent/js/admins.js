@@ -333,7 +333,11 @@ function printOrganisations(organisations){
 		var row = $("<tr id=\""+key+"\" class=\"edit\"></tr>")
 		row.append("<td id=\""+key+"\">" + value.name + "</td>");
 		row.append("<td id=\""+key+"\">" + value.description + "</td>");
-		row.append("<td id=\""+key+"\">" + value.logo + "</td>");
+		var img = $('<img src="' +value.logo +'">')
+		var rowLogo= $("<td id=\""+key+"\"></td>");
+		rowLogo.append(img);
+		row.append(rowLogo)
+		//row.append("<td id=\""+key+"\">" + value.logo + "</td>");
 		body.append(row)
 	});
 	
@@ -481,7 +485,6 @@ function addNewUser(organisations){
 				if (response == undefined) {
 					alert("User with given email already exists!");
 				} else {
-					$("#edit").empty();
 					printUsers(response);
 					
 				}
@@ -526,10 +529,10 @@ function addNewOrganisation(){
 	row2.append("<td><input type=\"text\" name=\"description\" id=\"description\"></td>");
 	
 	row3.append("<td>Logo</td>");
-	row3.append("<td><input type=\"text\" name=\"logo\" id=\"logo\"></td>");
+	row3.append("<td><input type=\"file\" name=\"logo\" id=\"logo\"></td>");
 	
 	
-	row4.append("<td><input type=\"submit\" value=\"Add\"></td>");
+	row4.append("<td><input id=\"addOrganisation\" type=\"submit\" value=\"Add\"></td>");
 	
 	table.append(row1);
 	table.append(row2);
@@ -541,11 +544,12 @@ function addNewOrganisation(){
 	// Tries to add a new organisation
 	// If successful gets map of organisations and calls function for printing
 	// if failed makes alert
-	$("#fillEditForm").submit(function(e){
+	$("#addOrganisation").click(function(e){
 		e.preventDefault()
 		var name = $("#name").val()
 		var description = $("#description").val()
 		var logo = $("#logo").val()
+		console.log(logo);
 		
 		if(name == ''){
             showValidate($("#name"));
@@ -574,7 +578,6 @@ function addNewOrganisation(){
 				if (response == undefined) {
 					alert("Organisation with given name already exists!");
 				} else {
-					$("#edit").empty();
 					printOrganisations(response);
 					
 				}
@@ -602,7 +605,7 @@ function editOrganisation(organisation){
 	
 	var row3 = $("<tr></tr>")
 	row3.append("<td>Logo</td>")
-	row3.append("<td><input name=\"logo\" id=\"logo\" type=\"text\" value=\""+organisation.logo + "\"> </td>")
+	row3.append("<td><input name=\"logo\" id=\"logo\" type=\"file\" value=\""+organisation.logo + "\"> </td>")
 	
 	var row4 = $("<tr></tr>")
 	row4.append("<td><input id =\"editOrg\" type=\"button\" value=\"Save Changes\"></td>");
@@ -626,7 +629,11 @@ function editOrganisation(organisation){
 			dataType : "json",
 			success : function(response){
 				$("#edit").empty();
-				printOrganisations(response);
+				if(currentUser.role == "SUPER_ADMIN")
+					printOrganisations(response);
+				else{
+					getMyOrganisation()
+				}
 			}
 		});
 	});

@@ -75,15 +75,15 @@ function addNewCategory(categories){
 	
 	var row2 = $("<tr></tr>")
 	row2.append("<td>Core number</td>")
-	row2.append("<td class=\"wrap-input validate-input \" data-validate=\"Core number is required\"><input class=\"input-data\" type=\"text\" name=\"core\" id=\"core\"></td>")
+	row2.append("<td class=\"wrap-input validate-input \" data-validate=\"Core number is required\" data-error=\"Core number must be greater than 0\"<input class=\"input-data\" type=\"text\" name=\"core\" id=\"core\"></td>")
 	
 	var row3 = $("<tr></tr>")
 	row3.append("<td>RAM capacity</td>")
-	row3.append("<td class=\"wrap-input validate-input \" data-validate=\"RAM capacity is required\"><input class=\"input-data\" type=\"text\" name=\"ram\" id=\"ram\"></td>")
+	row3.append("<td class=\"wrap-input validate-input \" data-validate=\"RAM capacity is required\"  data-error=\"RAM capacity must be greater or equal to 0\"><input class=\"input-data\" type=\"text\" name=\"ram\" id=\"ram\"></td>")
 
 	var row4 = $("<tr></tr>")
 	row4.append("<td>GPU</td>")
-	row4.append("<td><input class=\"input-data\" type=\"text\" name=\"gpu\" id=\"gpu\"></td>")
+	row4.append("<td><input class=\"input-data\" data-error=\"GPU number must be greater or equal to 0\" type=\"text\" name=\"gpu\" id=\"gpu\"></td>")
 
 	var row5 = $("<tr></tr>")
 	row5.append("<td><input id=\"add\" type=\"submit\" value=\"Add\"></td>");
@@ -95,6 +95,13 @@ function addNewCategory(categories){
 	table.append(row5)
 	
 	form.append(table)
+	
+	// When inputs with these classes get into focus, alert disappears
+	$('.data-form .input-data').each(function(){
+        $(this).focus(function(){
+           hideValidate(this);
+        });
+    });
 	
 	$("#add").click(function(e){
 		e.preventDefault()
@@ -159,11 +166,11 @@ function editVMCategory(category){
 	
 	var row2 = $("<tr></tr>")
 	row2.append("<td>Core number</td>")
-	row2.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Core number is required\"><input class=\"input-data\" type=\"text\" name=\"core\" id=\"core\" value = \"" + category.numCPUCores + "\"></td>")
+	row2.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Core number is required\" data-error=\"Core number must be greater than 0\"><input class=\"input-data\" type=\"text\" name=\"core\" id=\"core\" value = \"" + category.numCPUCores + "\"></td>")
 	
 	var row3 = $("<tr></tr>")
 	row3.append("<td>RAM capacity</td>")
-	row3.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"RAM capacity is required\"><input class=\"input-data\" type=\"text\" name=\"ram\" id=\"ram\" value = \"" + category.ramCapacity + "\"></td>")
+	row3.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"RAM capacity is required\" data-error=\"RAM capacity must be greater or equal to 0\"><input class=\"input-data\" type=\"text\" name=\"ram\" id=\"ram\" value = \"" + category.ramCapacity + "\"></td>")
 
 	var row4 = $("<tr></tr>")
 	row4.append("<td>GPU</td>")
@@ -268,5 +275,19 @@ function editVMCategory(category){
 			}
 		});
 	});
+}
+
+
+function showError(input){
+	var thisError = $(input).parent();
+	
+	$(thisError).addClass('alert-error');
+}
+
+
+function hideError(input){
+	var thisError = $(input).parent();
+	
+	$(thisError).removeClass('alert-error');
 }
 

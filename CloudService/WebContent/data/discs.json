@@ -1,0 +1,20 @@
+{
+  "Disc3": {
+    "type": "SSD",
+    "capacity": 8,
+    "vmName": "",
+    "name": "Disc3"
+  },
+  "Disc2": {
+    "type": "HDD",
+    "capacity": 4,
+    "vmName": "",
+    "name": "Disc2"
+  },
+  "Disc1": {
+    "type": "SSD",
+    "capacity": 16,
+    "vmName": "",
+    "name": "Disc1"
+  }
+}

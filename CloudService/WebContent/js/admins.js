@@ -53,11 +53,6 @@ $(document).ready(function(e){
 		}
 	}); 
 	
-	//Calls function for viewing VMs
-	$('a[href="#viewDiscs"]').click(function(){
-		alert("View Discs")
-	});
-	
 	// Gets current admins organisation
 	// Calls edit menu for that organisation
 	$('a[href="#viewMyOrganisation"]').click(function(e){
@@ -215,6 +210,13 @@ function editUser(user){
 	table.append(row8)
 	
 	forma.append(table)
+	
+	// When inputs with these classes get into focus, alert disappears
+	$('.data-form .input-data').each(function(){
+        $(this).focus(function(){
+           hideValidate(this);
+        });
+    });
 	
 	// Deletes selected user
 	// Gets map of users
@@ -430,6 +432,13 @@ function addNewUser(organisations){
 	
 	forma.append(table);
 	
+	// When inputs with these classes get into focus, alert disappears
+	$('.data-form .input-data').each(function(){
+        $(this).focus(function(){
+           hideValidate(this);
+        });
+    });
+	
 	// Tries to add a new user
 	// If successful gets map of users and calls function for printing
 	// if failed makes alert
@@ -546,6 +555,13 @@ function addNewOrganisation(){
 	table.append(row4);
 	
 	forma.append(table);
+	
+	// When inputs with these classes get into focus, alert disappears
+	$('.data-form .input-data').each(function(){
+        $(this).focus(function(){
+           hideValidate(this);
+        });
+    });
 	
 	// Tries to add a new organisation
 	// If successful gets map of organisations and calls function for printing

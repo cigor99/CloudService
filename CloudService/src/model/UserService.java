@@ -113,7 +113,7 @@ public class UserService {
 		Organisations organisations = (Organisations)ctx.getAttribute("organisations");
 		Users users = (Users)ctx.getAttribute("users");
 		Role r = Role.ADMIN;
-		if(role == "User") {
+		if(role == "USER") {
 			r = Role.USER;
 		}
 		User user = new User(email,password,name,surname,organisations.getOrganisations().get(organisation),r);

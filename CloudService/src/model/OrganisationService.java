@@ -116,7 +116,7 @@ public class OrganisationService {
 		Organisation org = organisations.getOrganisations().get(name);
 		org.setName(name);
 		org.setDescription(description);
-		org.setLogo(logo);
+		org.setLogo( makeLogoPath(logo));
 
 		organisations.getOrganisations().put(name, org);
 		ctx.setAttribute("organisations", organisations);

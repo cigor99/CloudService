@@ -58,14 +58,9 @@ $(document).ready(function(e){
 		alert("View Discs")
 	});
 	
-	//Calls function for viewing VMs
-	$('a[href="#viewCategories"]').click(function(){
-		alert("View Categories")
-	});
-	
 	// Gets current admins organisation
 	// Calls edit menu for that organisation
-	/*$("#showOrg").click(function(e){
+	$('a[href="#viewMyOrganisation"]').click(function(e){
 		$.ajax({
 			type : 'GET',
 			url : "rest/orgServ/getMyOrg",
@@ -79,7 +74,7 @@ $(document).ready(function(e){
 				alert("Error")
 			}
 		});
-	})*/
+	})
 	
 });
 
@@ -125,7 +120,13 @@ function printUsers(users){
 		}
 	})
 	
-	body.append('<tr><td><input type="submit" id="dodajUsr" name="dodajUsr" value="Add new user"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>');
+	if(currentUser.role=="SUPER_ADMIN"){
+		body.append('<tr><td><input type="submit" id="dodajUsr" name="dodajUsr" value="Add new user"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>');
+	}else{
+		body.append('<tr><td><input type="submit" id="dodajUsr" name="dodajUsr" value="Add new user"></td><td>&nbsp;</td><td>&nbsp;</td></tr>');
+	}
+		
+	
 
 	table.append(body)
 	
@@ -222,6 +223,11 @@ function editUser(user){
 		e.preventDefault();
 		var email = $("#email").val()
 		var organisation = $("#organisation").val()
+		if(currentUser.email == user.email){
+			alert("ERROR 400 : You can not delete yourself !!!")
+			return
+		}
+			
 		$.ajax({
 			type : "POST",
 			url : "rest/userServ/deleteUser",
@@ -602,6 +608,7 @@ function editOrganisation(organisation){
 	var row2 = $("<tr></tr>")
 	row2.append("<td>Description</td>")
 	row2.append("<td><input name=\"description\" id=\"description\" type=\"text\" value=\""+organisation.description + "\"> </td>")
+	
 	
 	var row3 = $("<tr></tr>")
 	row3.append("<td>Logo</td>")

@@ -46,8 +46,6 @@ public class CategoryService {
 	{
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
 		
-		System.out.println(categories.getVmCategories());
-		
 		if(categories.getVmCategories().containsKey(name))
 			return null;
 		
@@ -55,10 +53,49 @@ public class CategoryService {
 		
 		categories.getVmCategories().put(name, vmc);
 		
-		System.out.println(categories.getVmCategories());
+		return categories.getVmCategories();
+		
+	}
+	
+	@POST
+	@Path("/editVMCategory")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public HashMap<String, VMCategory> editVMCategory(@FormParam("oldName") String oldName, @FormParam("newName") String newName, @FormParam("core") String core,@FormParam("ram") String ram,@FormParam("gpu") String gpu)
+	{
+		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
+		
+		if(!newName.equals(oldName))
+		{
+			if(categories.getVmCategories().containsKey(newName))
+				return null;
+		}
+		
+		VMCategory vmc = categories.getVmCategories().get(oldName);
+		
+		vmc.setName(newName);
+		vmc.setNumCPUCores(Integer.parseInt(core));
+		vmc.setNumGPUCores(Integer.parseInt(gpu));
+		vmc.setRamCapacity(Integer.parseInt(ram));
+		
 		
 		return categories.getVmCategories();
 		
 	}
 	
+	@POST
+	@Path("/deleteCategory")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public HashMap<String, VMCategory> deleteCategory(@FormParam("oldName") String oldName)
+	{
+		System.out.println("Hello");
+		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
+		
+		categories.getVmCategories().remove(oldName);
+		
+		System.out.println(categories.getVmCategories());
+		return categories.getVmCategories();
+		
+	}
 }

@@ -4,7 +4,7 @@
     "password": "pass3",
     "name": "Name3",
     "surname": "Surname3",
-    "role": "SUPER_ADMIN"
+    "role": "ADMIN"
   },
   "email2": {
     "email": "email2",
@@ -19,5 +19,19 @@
     "name": "Name1",
     "surname": "Surname1",
     "role": "ADMIN"
+  },
+  "admin": {
+    "email": "admin",
+    "password": "admin",
+    "name": "Admin",
+    "surname": "Admin",
+    "role": "SUPER_ADMIN"
+  },
+  "email4": {
+    "email": "email4",
+    "password": "pass4",
+    "name": "Name4",
+    "surname": "Surname4",
+    "role": "USER"
   }
 }

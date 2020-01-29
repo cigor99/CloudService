@@ -72,7 +72,6 @@ public class Organisations {
 			Logger.log("Error");
 			e.printStackTrace();
 		}
-		System.out.println("Upisao");
 	}
 
 	@Override

@@ -40,16 +40,39 @@ public class DiscService {
 		else {
 			HashMap<String, Disc> available = new HashMap<String, Disc>();
 			Organisation o = curr.getOrganisation();
-			for(Resource r : o.getResources().values()) {
-				if(discs.getDiscs().containsKey(r.getName())) {
-					available.put(r.getName(), (Disc) r);
+			for(String r : o.getResources()) {
+				if(discs.getDiscs().containsKey(r)) {
+					available.put(r, discs.getDiscs().get(r));
 				}
 			}
 			return available;
 		}
-		
 	}
 	
+	
+	private HashMap<String, VM> getVMs()
+	{
+		VMs vms = (VMs) ctx.getAttribute("vms");
+		
+		if(vms == null)
+		{
+			vms = new VMs(ctx.getRealPath("."));
+			ctx.setAttribute("vms", vms);
+		}
+		
+		User curr = (User) request.getSession().getAttribute("currentUser");
+		
+		if(curr.getRole().equals(Role.SUPER_ADMIN))
+			return vms.getVms();
+		
+		HashMap<String, VM> orgVM = new HashMap<String, VM>();
+		for(String r : curr.getOrganisation().getResources()) {
+			if(vms.getVms().containsKey(r))
+				orgVM.put(r, vms.getVms().get(r));
+		}
+		
+		return orgVM;
+	}
 	
 	@POST
 	@Path("/addDisc")
@@ -61,21 +84,6 @@ public class DiscService {
 		
 		if(discs.getDiscs().containsKey(name))
 			return null;
-		/* OVO TI GARANT NE TREBA SAMO SI GLUP
-		boolean exists = true;
-		if(!vmName.equals("")) {
-			exists = false;
-			VMs vms = (VMs) ctx.getAttribute("vms");
-			for(VM vm : vms.getVms().values()) {
-				if(vm.getName().equals(vmName)) {
-					exists = true;
-				}
-			}
-		}
-		if(!exists)
-			return null;
-		
-		*/
 		
 		DiscType dt = DiscType.HDD;
 		if(discType.equals("SSD"))
@@ -83,10 +91,69 @@ public class DiscService {
 		
 		Disc disc = new Disc(name, dt, Integer.parseInt(capacity), vmName);
 		discs.getDiscs().put(name, disc);
-		discs.WriteToFile(ctx.getRealPath("."));
 		
-		return discs.getDiscs();
+		User curr = (User) request.getSession().getAttribute("currentUser");
+		if(curr.getRole().equals(Role.SUPER_ADMIN))
+			return discs.getDiscs();
+		
+		Organisation o = curr.getOrganisation(); 
+		HashMap<String, VM> vms = getVMs();
+		
+		
+		for(String r : o.getResources()) {
+			if(r.equals(vmName))
+			{
+				vms.get(vmName).getDiscs().put(name, disc);
+				
+			}
+		}
+		
+		o.getResources().add(name);
+		
+		return getDiscs();
 	}
 	
+	@POST
+	@Path("/editDisc")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public HashMap<String, Disc> editVMCategory(@FormParam("oldName") String oldName, @FormParam("newName") String newName, @FormParam("discType") String discType,@FormParam("capacity") String capacity,@FormParam("vmName") String vmName)
+	{
+		Discs discs = (Discs) ctx.getAttribute("discs");
+		
+		if(!newName.equals(oldName))
+		{
+			if(discs.getDiscs().containsKey(newName))
+				return null;
+		}
+		
+		Disc d = discs.getDiscs().get(oldName);
+		
+		d.setName(newName);
+		if(discType.equals("SSD"))
+			d.setType(DiscType.SSD);
+		else
+			d.setType(DiscType.HDD);
+		
+		d.setCapacity(Integer.parseInt(capacity));
+		
+		return discs.getDiscs();
+		
+	}
+	
+	@POST
+	@Path("/deleteDisc")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public HashMap<String, Disc> deleteCategory(@FormParam("oldName") String oldName)
+	{
+		
+		Discs discs = (Discs) ctx.getAttribute("discs");
+		
+		discs.getDiscs().remove(oldName);
+		
+		return discs.getDiscs();
+		
+	}
 	
 }

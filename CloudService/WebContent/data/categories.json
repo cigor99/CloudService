@@ -1,20 +1,14 @@
 {
-  "Cat1" : {
-  	"name" : "Cat1",
-  	"numCPUCores" : "4",
-  	"ramCapacity" : "16",
-  	"numGPUCores" : "0"
+  "Cat2": {
+    "name": "Cat2",
+    "numCPUCores": 16,
+    "ramCapacity": 256,
+    "numGPUCores": 0
   },
-  "Cat2" : {
-  	"name" : "Cat2",
-  	"numCPUCores" : "16",
-  	"ramCapacity" : "256",
-  	"numGPUCores" : "0"
-  },
-  "Cat3" : {
-  	"name" : "Cat3",
-  	"numCPUCores" : "8",
-  	"ramCapacity" : "128",
-  	"numGPUCores" : "4"
+  "Cat1": {
+    "name": "Cat1",
+    "numCPUCores": 4,
+    "ramCapacity": 16,
+    "numGPUCores": 0
   }
 }

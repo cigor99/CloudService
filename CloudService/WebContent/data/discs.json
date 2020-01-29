@@ -2,19 +2,19 @@
   "Disc3": {
     "type": "SSD",
     "capacity": 8,
-    "vmName": "",
+    "vmName": "VM2",
     "name": "Disc3"
   },
   "Disc2": {
     "type": "HDD",
     "capacity": 4,
-    "vmName": "",
+    "vmName": "VM1",
     "name": "Disc2"
   },
   "Disc1": {
     "type": "SSD",
     "capacity": 16,
-    "vmName": "",
+    "vmName": "VM1",
     "name": "Disc1"
   }
 }

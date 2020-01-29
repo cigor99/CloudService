@@ -30,7 +30,6 @@ function printDiscs(discs){
 	body.empty()
 	
 	header.append("<th>Name</th>")
-	//header.append("<th>Disc type</th>")
 	header.append("<th>Capacity</th>")
 	header.append("<th>VM Name</th>")
 	
@@ -38,7 +37,6 @@ function printDiscs(discs){
 		var row = $("<tr id=\""+key+"\" class=\"editDisc\"></tr>")
 		
 		row.append("<td id=\"" + key + "\">" + value.name + "</td>")
-		//row.append("<td id=\"" + key + "\">" + value.type + "</td>")
 		row.append("<td id=\"" + key + "\">" + value.capacity + "</td>")
 		row.append("<td id=\"" + key + "\">" + value.vmName + "</td>")
 		
@@ -48,21 +46,33 @@ function printDiscs(discs){
 	if(currentUser.role!="USER")
 		body.append("<tr><td><input type=\"submit\" id=\"addDisc\" name=\"addDisc\" value=\"Add new Disc\"></td><td>&nbsp;</td><td>&nbsp;</td></tr>");
 
+	
 	$("#addDisc").click(function(e){
-		addNewDisc(discs)
+		e.preventDefault();
+		$.ajax({
+			type : 'GET',
+			url : "rest/vmServ/getVMs",
+			dataType : "json",
+			success : function(response){
+				addNewDisc(response);
+			},
+			error : function() {
+				alert("Error")
+			}
+		});
 	});
 	
 	$("tr.editDisc").click(function(e){
 		e.preventDefault();
 		$.each(discs, function(key, value){
 			if(key==e.target.id){
-				editVMCategory(value)
+				editDisc(value)
 			}
 		});
 	});
 }
 
-function addNewDisc(discs){
+function addNewDisc(vms){
 	var form = $("#fillEditForm")
 	form.empty();
 	
@@ -86,15 +96,18 @@ function addNewDisc(discs){
 	row3.append("<td>Capacity</td>")
 	row3.append("<td class=\"wrap-input validate-input \" data-validate=\"Capacity is required\"  data-error=\"Core number must be greater than 0\"><input class=\"input-data\" type=\"number\" name=\"capacity\" id=\"capacity\"></td>")
 
-	
-	
-	// ========================================== DODATI LISTU VMA
 	var row4 = $("<tr></tr>")
-	row4.append("<td>VM Name</td>")
-	row4.append("<td><input class=\"input-data\" type=\"text\" name=\"vmName\" id=\"vmName\"></td>")
+	row4.append("<td>VM</td>");
+	var selectVM = $("<select name=\"vmName\" id=\"vmName\"></select>");
+	$.each(vms, function(key, value){
+		var option = $("<option></option>");
+		option.append(key);
+		selectVM.append(option);
+	});
+	row4.append(selectVM);
 
 	var row5 = $("<tr></tr>")
-	row5.append("<td><input id=\"add\" type=\"submit\" value=\"Add\"></td>");
+	row5.append("<td><input id=\"add\" type=\"button\" value=\"Add\"></td>");
 
 	table.append(row1)
 	table.append(row2)
@@ -164,7 +177,7 @@ function addNewDisc(discs){
 	});
 }
 
-function editDiscs(disc){
+function editDisc(disc){
 	var form = $("#fillEditForm")
 	form.empty()
 	
@@ -172,41 +185,53 @@ function editDiscs(disc){
 	
 	var row1 = $("<tr></tr>")
 	row1.append("<td>Name</td>")
-	row1.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Name is required\"><input class=\"input-data\" type=\"text\" name=\"name\" id=\"name\" value = \"" + disc.name + "\"></td>")
-	
+	if(currentUser.role!="USER")
+		row1.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Name is required\"><input class=\"input-data\" type=\"text\" name=\"name\" id=\"name\" value = \"" + disc.name + "\"></td>")
+	else
+		row1.append("<td colspan=\"2\" ><input class=\"input-data\" type=\"text\" name=\"name\" id=\"name\" value = \"" + disc.name + "\" readonly ></td>")
 	var row2 = $("<tr></tr>")
-	row2.append("<td>Core number</td>")
-	var td = $("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Disc type is required\"></td>")
-	var select = $("<select id=\"discType\" name=\"discType\"></select>")
-	var option1 = $("<option value=\"SSD\">SSD</option>")
-	var option2 = $("<option value=\"HDD\">HDD</option>")
-	
-	// VIDI KAKO SE OVO REDJA
-	if(disc.type == "SSD"){
-		select.append(option1)
-		select.append(option2)
+	row2.append("<td>Disc type</td>")
+	var td = $("<td colspan=\"2\"></td>")
+	if(currentUser.role!="USER"){
+		var select = $("<select id=\"discType\" name=\"discType\"></select>")
+		var option1 = $("<option value=\"SSD\">SSD</option>")
+		var option2 = $("<option value=\"HDD\">HDD</option>")
+		
+		if(disc.type == "SSD"){
+			select.append(option1)
+			select.append(option2)
+		}else{
+			select.append(option2)
+			select.append(option1)
+		}
+		td.append(select)
+		row2.append(td)
 	}else{
-		select.append(option2)
-		select.append(option1)
+		row2.append("<td colspan=\"2\"><input class=\"input-data\" type=\"text\" name=\"discTypeU\" id=\"discTypeU\" value = \"" + disc.type + "\" readonly></td>")
 	}
-	td.append(select)
-	row2.append(td)
+	
 	
 	var row3 = $("<tr></tr>")
 	row3.append("<td>Capacity</td>")
-	row3.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Capacity is required\" data-error=\"Capacity must be greater or equal to 0\"><input class=\"input-data\" type=\"text\" name=\"capacity\" id=\"capacity\" value = \"" + disc.capacity + "\"></td>")
-
+	
+	if(currentUser.role!="USER")
+		row3.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Capacity is required\" data-error=\"Capacity must be greater or equal to 0\"><input class=\"input-data\" type=\"text\" name=\"capacity\" id=\"capacity\" value = \"" + disc.capacity + "\"></td>")
+	else
+		row3.append("<td colspan=\"2\"><input class=\"input-data\" type=\"text\" name=\"capacity\" id=\"capacity\" value = \"" + disc.capacity + "\" readonly></td>")
+		
 	var row4 = $("<tr></tr>")
 	row4.append("<td>VM</td>")
-	row4.append("<td colspan=\"2\"><input class=\"input-data\" type=\"text\" name=\"vmName\" id=\"vmName\" value = \"" + disc.vmName + "\"></td>")
+	row4.append("<td colspan=\"2\"><input class=\"input-data\" type=\"text\" name=\"vmName\" id=\"vmName\" value = \"" + disc.vmName + "\" readonly></td>")
 
 	var row5 = $("<tr></tr>")
-	row5.append("<td><input id =\"save\" type=\"button\" value=\"Save Changes\"></td>");
-	row5.append("<td><input id =\"discard\" type=\"button\" value=\"Discard Changes\"></td>");
-	row5.append("<td><input id =\"delete\" type=\"button\" value=\"Delete\"></td>");
+	if(currentUser.role!="USER"){
+		row5.append("<td><input id =\"save\" type=\"button\" value=\"Save Changes\"></td>");
+		row5.append("<td><input id =\"discard\" type=\"button\" value=\"Discard Changes\"></td>");
+	}
 	
+	if(currentUser.role=="SUPER_ADMIN")
+		row5.append("<td><input id =\"delete\" type=\"button\" value=\"Delete\"></td>");
 	
-
 	table.append(row1)
 	table.append(row2)
 	table.append(row3)
@@ -273,7 +298,7 @@ function editDiscs(disc){
 	});
 	
 	$("#delete").click(function(e){
-		/*e.preventDefault();
+		e.preventDefault();
 		var oldName = disc.name
 		$.ajax({
 			type : 'POST',
@@ -288,8 +313,7 @@ function editDiscs(disc){
 			error : function(){
 				alert("Error")
 			}
-		});*/
-		alert("delete deez nuts haa goteeem")
+		});
 	});
 }
 

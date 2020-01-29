@@ -19,10 +19,10 @@ public class Organisation {
 	private String logo;
 
 	private ArrayList<String> users;
-	private HashMap<String, Resource> resources;
+	private ArrayList<String> resources;
 
 	public Organisation(String name, String description, String logo, ArrayList<String> users,
-			HashMap<String, Resource> resources) {
+			ArrayList<String> resources) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -84,11 +84,11 @@ public class Organisation {
 		this.users = users;
 	}
 
-	public HashMap<String, Resource> getResources() {
+	public ArrayList<String> getResources() {
 		return resources;
 	}
 
-	public void setResources(HashMap<String, Resource> resources) {
+	public void setResources(ArrayList<String> resources) {
 		this.resources = resources;
 	}
 

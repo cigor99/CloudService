@@ -90,7 +90,7 @@ public class OrganisationService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, Organisation> addNewOrg(@FormParam("name") String name, @FormParam("description") String description, @FormParam("logo") String logo){
 		Organisations organisations = (Organisations) ctx.getAttribute("organisations");
-		Organisation org = new Organisation(name, description, makeLogoPath(logo), new ArrayList<String>(), new HashMap<String, Resource>());
+		Organisation org = new Organisation(name, description, makeLogoPath(logo), new ArrayList<String>(),new  ArrayList<String>());
 		if(!organisations.getOrganisations().containsKey(name)) {
 			organisations.getOrganisations().put(name, org);
 			ctx.setAttribute("organisations", organisations);

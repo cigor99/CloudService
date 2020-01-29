@@ -62,8 +62,6 @@ public class Discs {
 			Logger.log("error");
 			e.printStackTrace();
 		}
-
-		System.out.println("Upisao");
 	}
 
 	public HashMap<String, Disc> getDiscs() {

@@ -1,16 +1,29 @@
 {
-  "Organisation2" : {
-    "name" : "Organisation2",
-    "description" : "This is an organisation",
-    "logo" : "path to logo",
-    "users" : [ "email1" ],
-    "resources" : { }
+  "Organisation2": {
+    "name": "Organisation2",
+    "description": "Biomedical organisation",
+    "logo": "data/logos\\logo1.jpg",
+    "users": [
+      "email3",
+      "email4"
+    ],
+    "resources": [
+      "VM2",
+      "Disc3"
+    ]
   },
-  "Organisation1" : {
-    "name" : "Organisation1",
-    "description" : "This is an organisation",
-    "logo" : "path to logo",
-    "users" : [ "email2" ],
-    "resources" : { }
+  "Organisation1": {
+    "name": "Organisation1",
+    "description": "Agricultural organisation",
+    "logo": "data/logos\\logo4.jpg",
+    "users": [
+      "email1",
+      "email2"
+    ],
+    "resources": [
+      "VM1",
+      "Disc1",
+      "Disc2"
+    ]
   }
 }

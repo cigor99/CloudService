@@ -89,12 +89,10 @@ public class CategoryService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, VMCategory> deleteCategory(@FormParam("oldName") String oldName)
 	{
-		System.out.println("Hello");
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
 		
 		categories.getVmCategories().remove(oldName);
 		
-		System.out.println(categories.getVmCategories());
 		return categories.getVmCategories();
 		
 	}

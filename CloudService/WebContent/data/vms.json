@@ -1,0 +1,48 @@
+{
+  "VM2": {
+    "category": {
+      "name": "Cat2",
+      "numCPUCores": 16,
+      "ramCapacity": 256,
+      "numGPUCores": 0
+    },
+    "numCPUCores": 16,
+    "ramCapacity": 256,
+    "numGPUCores": 0,
+    "discs": {
+      "Disc3": {
+        "type": "SSD",
+        "capacity": 16.0,
+        "vmName": "VM2",
+        "name": "Disc1"
+      }
+    },
+    "name": "VM2"
+  },
+  "VM1": {
+    "category": {
+      "name": "Cat1",
+      "numCPUCores": 4,
+      "ramCapacity": 16,
+      "numGPUCores": 0
+    },
+    "numCPUCores": 4,
+    "ramCapacity": 16,
+    "numGPUCores": 0,
+    "discs": {
+      "Disc2": {
+        "type": "HDD",
+        "capacity": 4.0,
+        "vmName": "VM1",
+        "name": "Disc2"
+      },
+      "Disc1": {
+        "type": "SSD",
+        "capacity": 8.0,
+        "vmName": "VM1",
+        "name": "Disc3"
+      }
+    },
+    "name": "VM1"
+  }
+}

@@ -12,6 +12,7 @@ import java.util.HashMap;
  */
 public class VM extends Resource {
 	// mandatory
+	private Organisation organisation;
 	private VMCategory category;
 	private int numCPUCores;
 	private int ramCapacity;
@@ -23,20 +24,23 @@ public class VM extends Resource {
 	public VM() {
 	}
 	
-	public VM(String name, VMCategory cat, int numCpu, int ram, int numGpu) {
+	public VM(String name, Organisation organisation, VMCategory category, int numCPUCores, int ramCapacity,
+			int numGPUCores, HashMap<String, Disc> discs, ArrayList<Activity> activityList) {
 		super(name);
-		this.category = cat;
-		this.numCPUCores = numCpu;
-		this.ramCapacity = ram;
-		this.numGPUCores = numGpu;
-		this.discs = new HashMap<String, Disc>();
-		this.activityList = new ArrayList<Activity>();
+		this.organisation = organisation;
+		this.category = category;
+		this.numCPUCores = numCPUCores;
+		this.ramCapacity = ramCapacity;
+		this.numGPUCores = numGPUCores;
+		this.discs = discs;
+		this.activityList = activityList;
 	}
 
 	@Override
 	public String toString() {
-		return "VM [category=" + category + ", numCPUCores=" + numCPUCores + ", ramCapacity=" + ramCapacity
-				+ ", numGPUCores=" + numGPUCores + ", discs=" + discs + ", activityList=" + activityList + "]";
+		return "VM [organisation=" + organisation + ", category=" + category + ", numCPUCores=" + numCPUCores
+				+ ", ramCapacity=" + ramCapacity + ", numGPUCores=" + numGPUCores + ", discs=" + discs
+				+ ", activityList=" + activityList + "]";
 	}
 
 	public VMCategory getCategory() {
@@ -86,6 +90,13 @@ public class VM extends Resource {
 	public void setActivityList(ArrayList<Activity> activityList) {
 		this.activityList = activityList;
 	}
-	
+
+	public Organisation getOrganisation() {
+		return organisation;
+	}
+
+	public void setOrganisation(Organisation organisation) {
+		this.organisation = organisation;
+	}
 	
 }

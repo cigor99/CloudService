@@ -9,18 +9,23 @@ package model;
  */
 public class Disc extends Resource {
 	// mandatory
+	private Organisation organisation;
 	private DiscType type;
 	private int capacity;
-	
 	private String vmName;
 
 	
-	
-	public Disc(String name, DiscType t, int cap, String vm) {
+
+	public Disc() {
+		super();
+	}
+
+	public Disc(String name, Organisation organisation, DiscType type, int capacity, String vmName) {
 		super(name);
-		this.type = t;
-		this.capacity = cap;
-		this.vmName = vm;
+		this.organisation = organisation;
+		this.type = type;
+		this.capacity = capacity;
+		this.vmName = vmName;
 	}
 
 	public DiscType getType() {
@@ -45,5 +50,13 @@ public class Disc extends Resource {
 
 	public void setVmName(String vmName) {
 		this.vmName = vmName;
+	}
+
+	public Organisation getOrganisation() {
+		return organisation;
+	}
+
+	public void setOrganisation(Organisation organisation) {
+		this.organisation = organisation;
 	}
 }

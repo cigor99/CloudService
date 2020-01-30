@@ -83,6 +83,30 @@ public class CategoryService {
 		
 	}
 	
+	private HashMap<String, VM> getVMs()
+	{
+		VMs vms = (VMs) ctx.getAttribute("vms");
+		
+		if(vms == null)
+		{
+			vms = new VMs(ctx.getRealPath("."));
+			ctx.setAttribute("vms", vms);
+		}
+		
+		User curr = (User) request.getSession().getAttribute("currentUser");
+		
+		if(curr.getRole().equals(Role.SUPER_ADMIN))
+			return vms.getVms();
+		
+		HashMap<String, VM> orgVM = new HashMap<String, VM>();
+		for(String r : curr.getOrganisation().getResources()) {
+			if(vms.getVms().containsKey(r))
+				orgVM.put(r, vms.getVms().get(r));
+		}
+		
+		return orgVM;
+	}
+	
 	@POST
 	@Path("/deleteCategory")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -91,6 +115,13 @@ public class CategoryService {
 	{
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
 		
+		VMCategory cat = categories.getVmCategories().get(oldName);
+		
+		HashMap<String, VM> vms = getVMs();
+		for(VM vm: vms.values()) {
+			if(vm.getCategory().getName().equals(cat.getName()))
+				return null;
+		}
 		categories.getVmCategories().remove(oldName);
 		
 		return categories.getVmCategories();

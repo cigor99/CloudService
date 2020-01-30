@@ -1,39 +1,36 @@
 function updateProfile(user){
-	let div = $("#changeable");
-	div.empty();
-	console.log(user.email)
+	var form = $("#fillEditForm");
+	form.empty();
 	
-	let forma2 = $("<form id=\"forma2\"></form>");
+	var table = $("<table></table>");
 	
-	let table = $("<table></table>");
-	
-	let row1 = $("<tr></tr>");
-	let row2 = $("<tr></tr>");
-	let row3 = $("<tr></tr>");
-	let row4 = $("<tr></tr>");
-	let row5 = $("<tr></tr>");
-	let row6 = $("<tr></tr>");
-	let row7 = $("<tr></tr>");
+	var row1 = $("<tr></tr>");
+	var row2 = $("<tr></tr>");
+	var row3 = $("<tr></tr>");
+	var row4 = $("<tr></tr>");
+	var row5 = $("<tr></tr>");
+	var row6 = $("<tr></tr>");
+	var row7 = $("<tr></tr>");
 	
 	row1.append("<td>Email</td>");
-	row1.append("<td class=\"wrap-input validate-input \" data-validate=\"Email is required\"><input type=\"text\" name=\"email\" id=\"email\"></td>")
+	row1.append("<td class=\"wrap-input validate-input \" data-validate=\"Email is required\"><input class=\"input-data\" type=\"text\" name=\"email\" id=\"email\"></td>")
 	
 	row2.append("<td>New Password</td>");
-	row2.append("<td class=\"wrap-input validate-input \" data-validate=\"Password is required\"><input type=\"text\" name=\"password\" id=\"password\"></td>");
+	row2.append("<td class=\"wrap-input validate-input \" data-validate=\"Password is required\"><input class=\"input-data\" type=\"text\" name=\"password\" id=\"password\"></td>");
 	
 	row3.append("<td>Repeat Password</td>");
-	row3.append("<td class=\"wrap-input validate-input \" data-validate=\"Retype password\" ><input type=\"text\" name=\"rep-password\" id=\"rep-password\"></td>");
+	row3.append("<td class=\"wrap-input validate-input \" data-validate=\"Retype password\" ><input class=\"input-data\" type=\"text\" name=\"rep-password\" id=\"rep-password\"></td>");
 	
 	row4.append("<td>Name</td>");
-	row4.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\" ><input type=\"text\" name=\"name\" id=\"name\"></td>");
+	row4.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\" ><input class=\"input-data\" type=\"text\" name=\"name\" id=\"name\"></td>");
 	
 	row5.append("<td>Surname</td>");
-	row5.append("<td class=\"wrap-input validate-input \" data-validate=\"Surname is required\" ><input type=\"text\" name=\"surname\" id=\"surname\"></td>");
+	row5.append("<td class=\"wrap-input validate-input \" data-validate=\"Surname is required\" ><input class=\"input-data\" type=\"text\" name=\"surname\" id=\"surname\"></td>");
 	
 	row6.append("<td>Organisation</td>");
-	row6.append("<td><input type=\"text\" name=\"organisation\" id=\"organisation\"></td>");
+	row6.append("<td><input type=\"text\" name=\"organisation\" id=\"organisation\" readonly></td>");
 	
-	row7.append("<td><input type=\"submit\" value=\"Update\"></td>");
+	row7.append("<td><input id=\"updateProfile\" type=\"button\" value=\"Update\"></td>");
 	
 	table.append(row1);
 	table.append(row2);
@@ -44,10 +41,8 @@ function updateProfile(user){
 		table.append(row6);
 	table.append(row7);
 	
-	forma2.append(table);
-	div.append(forma2);
+	form.append(table);
 	
-	console.log("trazi da popuni")
 	$("#email").val(user.email);
 	var oldEmail = $("#email").val();
 	$("#password").val(user.password);
@@ -56,14 +51,28 @@ function updateProfile(user){
 	if(user.role != "SUPER_ADMIN")
 		$("#organisation").val(user.organisation.name);
 	
+	// When inputs get into focus, alert disappears
+	$('.input-data').each(function(){
+		$(this).focus(function(){
+	           hideValidate(this);
+	    });
+	});
 	
-	$("#forma2").submit(function(e){
+	//// When inputs lose focus, and are empty alert appears
+	$('.input-data').each(function(){
+		$(this).focusout(function(){
+	           if(($("#"+this.id + "")).val()=="")
+	        	   showValidate(this)
+	     });
+    });
+	
+	$("#updateProfile").click(function(e){
 		e.preventDefault();
-		let email = $("#email").val();
-		let password = $("#password").val();
-		let repPass = $("#rep-password").val();
-		let name = $("#name").val();
-		let surname = $("#surname").val();
+		var email = $("#email").val();
+		var password = $("#password").val();
+		var repPass = $("#rep-password").val();
+		var name = $("#name").val();
+		var surname = $("#surname").val();
 		
 		if(email == ''){
             showValidate($("#email"));
@@ -102,16 +111,11 @@ function updateProfile(user){
 		
 		if(password != repPass){
 			alert("Passwords don't match")
+			if(password == '')
+				showValidate($("#password"))
 			showValidate($("#rep-password"))
-			showValidate($("#password"))
+			return
 		}
-		
-		console.log("pred slanje")
-		console.log(oldEmail)
-		console.log(email)
-		console.log(password)
-		console.log(name)
-		console.log(surname)
 		
 		$.ajax({
 			type : "POST",
@@ -129,8 +133,6 @@ function updateProfile(user){
 				if (response == undefined) {
 					alert("User with given email already exists!");
 				} else {
-					console.log("uspeo")
-					$("#changeable").empty();
 					alert("Profile updated")
 				}
 			}

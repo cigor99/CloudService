@@ -1,5 +1,18 @@
 {
   "VM2": {
+    "organisation": {
+      "name": "Organisation2",
+      "description": "Biomedical organisation",
+      "logo": "data/logos\\logo1.jpg",
+      "users": [
+        "email3",
+        "email4"
+      ],
+      "resources": [
+        "VM2",
+        "Disc3"
+      ]
+    },
     "category": {
       "name": "Cat2",
       "numCPUCores": 16,
@@ -11,6 +24,19 @@
     "numGPUCores": 0,
     "discs": {
       "Disc3": {
+        "organisation": {
+          "name": "Organisation2",
+          "description": "Biomedical organisation",
+          "logo": "data/logos\\logo1.jpg",
+          "users": [
+            "email3",
+            "email4"
+          ],
+          "resources": [
+            "VM2",
+            "Disc3"
+          ]
+        },
         "type": "SSD",
         "capacity": 8,
         "vmName": "VM2",
@@ -20,6 +46,20 @@
     "name": "VM2"
   },
   "VM1": {
+    "organisation": {
+      "name": "Organisation1",
+      "description": "Agricultural organisation",
+      "logo": "data/logos\\logo4.jpg",
+      "users": [
+        "email1",
+        "email2"
+      ],
+      "resources": [
+        "VM1",
+        "Disc1",
+        "Disc2"
+      ]
+    },
     "category": {
       "name": "Cat1",
       "numCPUCores": 4,
@@ -31,12 +71,40 @@
     "numGPUCores": 0,
     "discs": {
       "Disc2": {
+        "organisation": {
+          "name": "Organisation1",
+          "description": "Agricultural organisation",
+          "logo": "data/logos\\logo4.jpg",
+          "users": [
+            "email1",
+            "email2"
+          ],
+          "resources": [
+            "VM1",
+            "Disc1",
+            "Disc2"
+          ]
+        },
         "type": "HDD",
         "capacity": 4,
         "vmName": "VM1",
         "name": "Disc2"
       },
       "Disc1": {
+        "organisation": {
+          "name": "Organisation1",
+          "description": "Agricultural organisation",
+          "logo": "data/logos\\logo4.jpg",
+          "users": [
+            "email1",
+            "email2"
+          ],
+          "resources": [
+            "VM1",
+            "Disc1",
+            "Disc2"
+          ]
+        },
         "type": "SSD",
         "capacity": 16,
         "vmName": "VM1",

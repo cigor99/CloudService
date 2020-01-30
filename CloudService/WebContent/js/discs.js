@@ -32,6 +32,7 @@ function printDiscs(discs){
 	header.append("<th>Name</th>")
 	header.append("<th>Capacity</th>")
 	header.append("<th>VM Name</th>")
+	header.append("<th>Organisation</th>")
 	
 	$.each(discs, function(key,value){
 		var row = $("<tr id=\""+key+"\" class=\"editDisc\"></tr>")
@@ -39,12 +40,13 @@ function printDiscs(discs){
 		row.append("<td id=\"" + key + "\">" + value.name + "</td>")
 		row.append("<td id=\"" + key + "\">" + value.capacity + "</td>")
 		row.append("<td id=\"" + key + "\">" + value.vmName + "</td>")
+		row.append("<td id=\"" + key + "\">" + value.organisation.name + "</td>")
 		
 		body.append(row)
 	});
 	
 	if(currentUser.role!="USER")
-		body.append("<tr><td><input type=\"submit\" id=\"addDisc\" name=\"addDisc\" value=\"Add new Disc\"></td><td>&nbsp;</td><td>&nbsp;</td></tr>");
+		body.append("<tr><td><input type=\"submit\" id=\"addDisc\" name=\"addDisc\" value=\"Add new Disc\"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
 
 	
 	$("#addDisc").click(function(e){
@@ -210,7 +212,6 @@ function editDisc(disc){
 		row2.append("<td colspan=\"2\"><input class=\"input-data\" type=\"text\" name=\"discTypeU\" id=\"discTypeU\" value = \"" + disc.type + "\" readonly></td>")
 	}
 	
-	
 	var row3 = $("<tr></tr>")
 	row3.append("<td>Capacity</td>")
 	
@@ -221,8 +222,23 @@ function editDisc(disc){
 		
 	var row4 = $("<tr></tr>")
 	row4.append("<td>VM</td>")
-	row4.append("<td colspan=\"2\"><input class=\"input-data\" type=\"text\" name=\"vmName\" id=\"vmName\" value = \"" + disc.vmName + "\" readonly></td>")
-
+	
+	$.ajax({
+			type : 'GET',
+			url : "rest/discServ/getVMs",
+			success : function(response){
+				$.each(response, function(key,value){
+					var selectVM = $("<select name=\"vmName\" id=\"vmName\"></select>");
+					$.each(response, function(key, value){
+						var option = $("<option></option>");
+						option.append(key);
+						selectVM.append(option);
+					});
+					row4.append(selectVM);
+				});
+			}
+		});
+	
 	var row5 = $("<tr></tr>")
 	if(currentUser.role!="USER"){
 		row5.append("<td><input id =\"save\" type=\"button\" value=\"Save Changes\"></td>");
@@ -245,7 +261,8 @@ function editDisc(disc){
 		var name = $("#name").val()
 		var discType = $("#discType").val()
 		var capacity = $("#capacity").val()
-		var vmName = $("#vmName").val()
+		var newVMname = $("#vmName").val()
+		var oldVMname = disc.vmName;
 		
 		if(name == ''){
             showValidate($("#name"));
@@ -271,7 +288,8 @@ function editDisc(disc){
 				"newName" : name,
 				"discType" : discType,
 				"capacity" : capacity,
-				"vmName" : vmName
+				"oldVMname" : oldVMname,
+				"newVMname" : newVMname
 			},
 			success : function(response){
 				if(response==undefined)

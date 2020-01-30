@@ -1,6 +1,5 @@
 $(document).ready(function(e) {
 	
-	//STA
 	$("#logOut").click(function(e){
 		e.preventDefault();
 		console.log("log out");
@@ -20,6 +19,13 @@ $(document).ready(function(e) {
 	$('.login-form .input-uspas').each(function(){
         $(this).focus(function(){
            hideValidate(this);
+        });
+    });
+	
+	$('.login-form .input-uspas').each(function(){
+        $(this).focusout(function(){
+           if(($("#"+this.id + "")).val()=="")
+        	   showValidate(this)
         });
     });
 	

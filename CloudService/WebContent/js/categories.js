@@ -75,15 +75,15 @@ function addNewCategory(categories){
 	
 	var row2 = $("<tr></tr>")
 	row2.append("<td>Core number</td>")
-	row2.append("<td class=\"wrap-input validate-input \" data-validate=\"Core number is required\" data-error=\"Core number must be greater than 0\"<input class=\"input-data\" type=\"text\" name=\"core\" id=\"core\"></td>")
+	row2.append("<td><input class=\"input-data\" type=\"number\" min=\"1\" max=\"256\" name=\"core\" id=\"core\"></td>")
 	
 	var row3 = $("<tr></tr>")
 	row3.append("<td>RAM capacity</td>")
-	row3.append("<td class=\"wrap-input validate-input \" data-validate=\"RAM capacity is required\"  data-error=\"RAM capacity must be greater or equal to 0\"><input class=\"input-data\" type=\"text\" name=\"ram\" id=\"ram\"></td>")
+	row3.append("<td><input class=\"input-data\" type=\"number\" min=\"1\" max=\"256\" name=\"ram\" id=\"ram\"></td>")
 
 	var row4 = $("<tr></tr>")
 	row4.append("<td>GPU</td>")
-	row4.append("<td><input class=\"input-data\" data-error=\"GPU number must be greater or equal to 0\" type=\"text\" name=\"gpu\" id=\"gpu\"></td>")
+	row4.append("<td><input type=\"number\" min=\"0\" max=\"256\" name=\"gpu\" id=\"gpu\"></td>")
 
 	var row5 = $("<tr></tr>")
 	row5.append("<td><input id=\"add\" type=\"submit\" value=\"Add\"></td>");
@@ -268,7 +268,10 @@ function editVMCategory(category){
 				"oldName" : oldName
 			},
 			success : function(response){
-				printCategories(response)
+				if(response==undefined)
+					alert("VM category has VMs attached to it")
+				else
+					printCategories(response)
 			},
 			error : function(){
 				alert("Error")

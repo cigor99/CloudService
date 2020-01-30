@@ -40,17 +40,20 @@ public class DiscService {
 		else {
 			HashMap<String, Disc> available = new HashMap<String, Disc>();
 			Organisation o = curr.getOrganisation();
-			for(String r : o.getResources()) {
-				if(discs.getDiscs().containsKey(r)) {
-					available.put(r, discs.getDiscs().get(r));
+			for(Disc d : discs.getDiscs().values()) {
+				if(d.getOrganisation().getName().equals(o.getName())) {
+					available.put(d.getName(), d);
 				}
+					
 			}
 			return available;
 		}
 	}
 	
-	
-	private HashMap<String, VM> getVMs()
+	@GET
+	@Path("/getVMs")
+	@Produces(MediaType.APPLICATION_JSON)
+	public HashMap<String, VM> getVMs()
 	{
 		VMs vms = (VMs) ctx.getAttribute("vms");
 		
@@ -78,7 +81,7 @@ public class DiscService {
 	@Path("/addDisc")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public HashMap<String, Disc> addVMCategory(@FormParam("name") String name, @FormParam("discType") String discType, @FormParam("capacity") String capacity, @FormParam("vmName") String vmName)
+	public HashMap<String, Disc> addDisc(@FormParam("name") String name, @FormParam("discType") String discType, @FormParam("capacity") String capacity, @FormParam("vmName") String vmName)
 	{
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
@@ -89,26 +92,25 @@ public class DiscService {
 		if(discType.equals("SSD"))
 			dt = DiscType.SSD;
 		
-		Disc disc = new Disc(name, dt, Integer.parseInt(capacity), vmName);
+		User curr = (User) request.getSession().getAttribute("currentUser");
+		
+		Disc disc = null;
+		if(curr.getRole().equals(Role.SUPER_ADMIN))
+			disc = new Disc(name, null, dt, Integer.parseInt(capacity), vmName);
+		else {
+			disc = new Disc(name, curr.getOrganisation(), dt, Integer.parseInt(capacity), vmName);
+			curr.getOrganisation().getResources().add(name);
+		}
+		
 		discs.getDiscs().put(name, disc);
 		
-		User curr = (User) request.getSession().getAttribute("currentUser");
 		if(curr.getRole().equals(Role.SUPER_ADMIN))
 			return discs.getDiscs();
 		
 		Organisation o = curr.getOrganisation(); 
 		HashMap<String, VM> vms = getVMs();
 		
-		
-		for(String r : o.getResources()) {
-			if(r.equals(vmName))
-			{
-				vms.get(vmName).getDiscs().put(name, disc);
-				
-			}
-		}
-		
-		o.getResources().add(name);
+		vms.get(vmName).getDiscs().put(name, disc);
 		
 		return getDiscs();
 	}
@@ -117,7 +119,7 @@ public class DiscService {
 	@Path("/editDisc")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public HashMap<String, Disc> editVMCategory(@FormParam("oldName") String oldName, @FormParam("newName") String newName, @FormParam("discType") String discType,@FormParam("capacity") String capacity,@FormParam("vmName") String vmName)
+	public HashMap<String, Disc> editVMCategory(@FormParam("oldName") String oldName, @FormParam("newName") String newName, @FormParam("discType") String discType,@FormParam("capacity") String capacity,@FormParam("oldVMname") String oldVMname,@FormParam("newVMname") String newVMname)
 	{
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
@@ -137,6 +139,22 @@ public class DiscService {
 		
 		d.setCapacity(Integer.parseInt(capacity));
 		
+		d.setVmName(newName);
+		
+		//izmenjen u discs
+		discs.getDiscs().remove(oldName);
+		discs.getDiscs().put(newName, d);
+		
+		//izmenjen u org resources
+		Organisation o = d.getOrganisation();
+		o.getResources().remove(oldName);
+		o.getResources().add(newName);
+		
+		//izmenjen u vm 
+		HashMap<String, VM> vms = getVMs();
+		vms.get(oldVMname).getDiscs().remove(oldName);
+		vms.get(newVMname).getDiscs().put(newName, d);
+		
 		return discs.getDiscs();
 		
 	}
@@ -150,7 +168,19 @@ public class DiscService {
 		
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
+		Disc d = discs.getDiscs().get(oldName);
+		
+		//obrisan iz diskova
 		discs.getDiscs().remove(oldName);
+		
+		//obrisan iz resources
+		Organisation o = d.getOrganisation();
+		o.getResources().remove(oldName);
+		
+		//obrisan iz vm
+		HashMap<String, VM> vms = getVMs();
+		vms.get(d.getVmName()).getDiscs().remove(d);
+		
 		
 		return discs.getDiscs();
 		

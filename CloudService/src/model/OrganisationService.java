@@ -108,18 +108,22 @@ public class OrganisationService {
 	@Path("/editOrg")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public HashMap<String, Organisation> editOrganisation(@FormParam("name") String name, @FormParam("description") String description, @FormParam("logo") String logo){
+	public HashMap<String, Organisation> editOrganisation(@FormParam("oldName") String oldName,@FormParam("name") String name, @FormParam("description") String description, @FormParam("logo") String logo){
 		Organisations organisations = (Organisations) ctx.getAttribute("organisations");
-		if(!organisations.getOrganisations().containsKey(name)) {
-			return null;
+		
+		if(!oldName.equals(name)) {
+			if(organisations.getOrganisations().containsKey(name)) {
+				return null;
+			}
 		}
-		Organisation org = organisations.getOrganisations().get(name);
+		
+		Organisation org = organisations.getOrganisations().get(oldName);
+		organisations.getOrganisations().remove(oldName);
 		org.setName(name);
 		org.setDescription(description);
 		org.setLogo( makeLogoPath(logo));
-
+		
 		organisations.getOrganisations().put(name, org);
-		ctx.setAttribute("organisations", organisations);
 
 		organisations.WriteToFile(ctx.getRealPath("."));
 		return organisations.getOrganisations();

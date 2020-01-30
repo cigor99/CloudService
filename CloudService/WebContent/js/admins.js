@@ -6,9 +6,11 @@ $(document).ready(function(e){
 	// If not returns to the login page
 	checkIfLogged()
 	
+	printVMS()
+		
 	//Calls function for viewing profile
 	$('a[href="#viewProfile"]').click(function(){
-		alert("View profile")
+		updateProfile(currentUser)
 	});
 	
 	//Calls function for viewing VMs
@@ -72,6 +74,10 @@ $(document).ready(function(e){
 	})
 	
 });
+
+function printVMS(){
+	alert("Print VMS")
+}
 
 // Receives a map of users
 // Prints the table of users
@@ -165,27 +171,27 @@ function editUser(user){
 	
 	var row1 = $("<tr></tr>")
 	row1.append("<td>Email</td>")
-	row1.append("<td><input name=\"email\" id=\"email\" type=\"text\" value=\""+user.email + "\" readonly></td>")
+	row1.append("<td colspan=\"2\" ><input name=\"email\" id=\"email\" type=\"text\" value=\""+user.email + "\" readonly></td>")
 	
 	var row2 = $("<tr></tr>")
 	row2.append("<td>Password</td>")
-	row2.append("<td class=\"wrap-input validate-input \" data-validate=\"Password is required\"><input class=\"input-data\" name=\"password\" id=\"password\" type=\"text\" value=\""+user.password + "\"> </td>")
+	row2.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Password is required\"><input class=\"input-data\" name=\"password\" id=\"password\" type=\"text\" value=\""+user.password + "\"> </td>")
 	
 	var row3 = $("<tr></tr>")
 	row3.append("<td>Name</td>")
-	row3.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\"><input class=\"input-data\" name=\"name\" id=\"name\" type=\"text\" value=\""+user.name + "\"> </td>")
+	row3.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Name is required\"><input class=\"input-data\" name=\"name\" id=\"name\" type=\"text\" value=\""+user.name + "\"> </td>")
 	
 	var row4 = $("<tr></tr>")
 	row4.append("<td>Surname</td>")
-	row4.append("<td class=\"wrap-input validate-input \" data-validate=\"Surname is required\"><input class=\"input-data\" name=\"surname\" id=\"surname\" type=\"text\" value=\""+user.surname + "\"> </td>")
+	row4.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Surname is required\"><input class=\"input-data\" name=\"surname\" id=\"surname\" type=\"text\" value=\""+user.surname + "\"> </td>")
 	
 	var row5 = $("<tr></tr>")
 	row5.append("<td>Organisation</td>")
-	row5.append("<td><input name=\"organisation\" id=\"organisation\" type=\"text\" value=\""+user.organisation.name + "\" readonly></td>")
+	row5.append("<td colspan=\"2\" ><input name=\"organisation\" id=\"organisation\" type=\"text\" value=\""+user.organisation.name + "\" readonly></td>")
 	
 	var row6 = $("<tr></tr>")
 	row6.append("<td>Role</td>")
-	var select = $("<select name=\"role\" id=\"role\"></select>")
+	var select = $("<select colspan=\"2\"  name=\"role\" id=\"role\"></select>")
 	var option1 = $("<option value=\"User\">User</option>")
 	select.append(option1)
 	var option2 = $("<option value=\"Admin\">Admin</option>")
@@ -195,9 +201,7 @@ function editUser(user){
 	var row7 = $("<tr></tr>")
 	row7.append("<td><input id =\"editUser\" type=\"button\" value=\"Save Changes\"></td>");
 	row7.append("<td><input id =\"discardUser\" type=\"button\" value=\"Discard Changes\"></td>");
-	
-	var row8 = $("<tr></tr>")
-	row8.append("<td align=\"center\" colspan=\"2\"><input id =\"deleteUser\" type=\"button\" value=\"Delete user\"></td>");
+	row7.append("<td><input id =\"deleteUser\" type=\"button\" value=\"Delete user\"></td>");
 	
 	table.append(row1)
 	table.append(row2)
@@ -207,15 +211,22 @@ function editUser(user){
 	if(currentUser.role!="ADMIN")
 		table.append(row6)
 	table.append(row7)
-	table.append(row8)
 	
 	forma.append(table)
 	
-	// When inputs with these classes get into focus, alert disappears
-	$('.data-form .input-data').each(function(){
-        $(this).focus(function(){
-           hideValidate(this);
-        });
+	// When inputs get into focus, alert disappears
+	$('.input-data').each(function(){
+		$(this).focus(function(){
+	           hideValidate(this);
+	    });
+	});
+	
+	//// When inputs lose focus, and are empty alert appears
+	$('.input-data').each(function(){
+		$(this).focusout(function(){
+	           if(($("#"+this.id + "")).val()=="")
+	        	   showValidate(this)
+	     });
     });
 	
 	// Deletes selected user
@@ -419,7 +430,8 @@ function addNewUser(organisations){
 	select.append(option2)
 	row6.append(select);
 	
-	row7.append("<td><input id=\"addUser\" type=\"submit\" value=\"Add new User\"></td>");
+	row7.append("<td><input id=\"addUser\" type=\"button\" value=\"Add\"></td>");
+	row7.append("<td><input id=\"cancel\" type=\"button\" value=\"Cancel\"></td>");
 	
 	table.append(row1);
 	table.append(row2);
@@ -432,11 +444,19 @@ function addNewUser(organisations){
 	
 	forma.append(table);
 	
-	// When inputs with these classes get into focus, alert disappears
-	$('.data-form .input-data').each(function(){
-        $(this).focus(function(){
-           hideValidate(this);
-        });
+	// When inputs get into focus, alert disappears
+	$('.input-data').each(function(){
+		$(this).focus(function(){
+	           hideValidate(this);
+	    });
+	});
+	
+	//// When inputs lose focus, and are empty alert appears
+	$('.input-data').each(function(){
+		$(this).focusout(function(){
+	           if(($("#"+this.id + "")).val()=="")
+	        	   showValidate(this)
+	     });
     });
 	
 	// Tries to add a new user
@@ -507,6 +527,21 @@ function addNewUser(organisations){
 		});
 	});
 	
+	$("#cancel").click(function(e){
+		e.preventDefault()
+		$.ajax({
+			type : 'GET',
+			url : "rest/userServ/getUsers",
+			dataType : "json",
+			success : function(response){
+				printUsers(response);
+			},
+			error : function() {
+				alert("Error")
+			}
+		});
+	})
+	
 }
 
 // Gets map of users and returns it
@@ -538,7 +573,7 @@ function addNewOrganisation(){
 	var row4 = $("<tr></tr>");
 	
 	row1.append("<td>Name</td>");
-	row1.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\"><input class=\"input-data\" type=\"text\" name=\"name\" id=\"name\"></td>");
+	row1.append("<td class=\"wrap-input validate-input\" data-validate=\"Name is required\" ><input class= \"input-data\"type=\"text\" name=\"orgName\" id=\"orgName\" ></td>");
 	
 	row2.append("<td>Description</td>");
 	row2.append("<td><input type=\"text\" name=\"description\" id=\"description\"></td>");
@@ -547,7 +582,8 @@ function addNewOrganisation(){
 	row3.append("<td><input type=\"file\" name=\"logo\" id=\"logo\"></td>");
 	
 	
-	row4.append("<td><input id=\"addOrganisation\" type=\"submit\" value=\"Add\"></td>");
+	row4.append("<td><input id=\"addOrganisation\" type=\"button\" value=\"Add\"></td>");
+	row4.append("<td><input id=\"cancel\" type=\"button\" value=\"Cancel\"></td>");
 	
 	table.append(row1);
 	table.append(row2);
@@ -556,11 +592,15 @@ function addNewOrganisation(){
 	
 	forma.append(table);
 	
-	// When inputs with these classes get into focus, alert disappears
-	$('.data-form .input-data').each(function(){
-        $(this).focus(function(){
-           hideValidate(this);
-        });
+	// When inputs get into focus, alert disappears
+    $("#orgName").focus(function(){
+       hideValidate(this);
+    });
+	
+	//// When inputs lose focus, and are empty alert appears
+    $("#orgName").focusout(function(){
+       if($("#orgName").val()=="")
+    	   showValidate(this)
     });
 	
 	// Tries to add a new organisation
@@ -568,15 +608,15 @@ function addNewOrganisation(){
 	// if failed makes alert
 	$("#addOrganisation").click(function(e){
 		e.preventDefault()
-		var name = $("#name").val()
+		var name = $("#orgName").val()
 		var description = $("#description").val()
 		var logo = $("#logo").val()
 		console.log(logo);
 		
 		if(name == ''){
-            showValidate($("#name"));
+            showValidate($("#orgName"));
         }else{
-        	hideValidate($("#name"));
+        	hideValidate($("#orgName"));
         }
 		
 		if (name == ""){
@@ -606,6 +646,21 @@ function addNewOrganisation(){
 			}
 		});
 	});
+	
+	$("#cancel").click(function(e){
+		e.preventDefault();
+		$.ajax({
+			type : 'GET',
+			url : "rest/orgServ/listOrganisations",
+			dataType : "json",
+			success : function(response){
+				printOrganisations(response);
+			},
+			error : function() {
+				alert("Error")
+			}
+		});
+	})
 }
 
 
@@ -619,7 +674,7 @@ function editOrganisation(organisation){
 	
 	var row1 = $("<tr></tr>")
 	row1.append("<td>Name</td>")
-	row1.append("<td><input name=\"name\" id=\"name\" type=\"text\" value=\""+organisation.name + "\" readonly></td>")
+	row1.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\" ><input name=\"name\" id=\"name\" type=\"text\" value=\""+organisation.name + "\"</td>")
 	
 	var row2 = $("<tr></tr>")
 	row2.append("<td>Description</td>")
@@ -640,6 +695,17 @@ function editOrganisation(organisation){
 	table.append(row4)
 	
 	forma.append(table)
+	
+	// When inputs get into focus, alert disappears
+    $("#name").focus(function(){
+       hideValidate(this);
+    });
+	
+	//// When inputs lose focus, and are empty alert appears
+    $("#name").focusout(function(){
+       if($("#name").val()=="")
+    	   showValidate(this)
+    });
 	
 	// Discards changes
 	// Gets map of organisations
@@ -667,6 +733,7 @@ function editOrganisation(organisation){
 	// if current user is an admin alerts him and calls function for printing his organisation 
 	$("#editOrg").click(function(e){
 		e.preventDefault();
+		var oldName = organisation.name;
 		var name = $("#name").val()
 		var description = $("#description").val()
 		var logo = $("#logo").val()
@@ -676,20 +743,25 @@ function editOrganisation(organisation){
 			url : "rest/orgServ/editOrg",
 			dataType : "json",
 			data : {
+				"oldName" : oldName,
 				"name" : name,
 	        	"description" : description,
 	        	"logo" : logo,
 	        },
 			success : function(response){
 				if (response != undefined) {
-					$("#edit").empty();
-					if(currentUser.role == "SUPER_ADMIN")
+					console.log("Usao")
+					if(currentUser.role == "SUPER_ADMIN"){
+						console.log(response)
 						printOrganisations(response);
+					}
+						
 					else{
 						alert("Changes have been saved")
 						getMyOrganisation()
 					}
-				}
+				}else
+					alert("Organisation with given name already exists!")
 			}
 		});
 		
@@ -710,20 +782,6 @@ function getMyOrganisation(){
 			alert("Error")
 		}
 	});
-}
-
-// Receives where to add class alert-validate
-function showValidate(input) {
-    var thisAlert = $(input).parent();
-
-    $(thisAlert).addClass('alert-validate');
-}
-
-// Receives where to remove class alert validate
-function hideValidate(input) {
-    var thisAlert = $(input).parent();
-
-    $(thisAlert).removeClass('alert-validate');
 }
 
 // Checks if there is a logged in user

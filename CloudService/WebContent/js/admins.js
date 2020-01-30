@@ -5,17 +5,10 @@ $(document).ready(function(e){
 	// Checks if there is a user that is logged in
 	// If not returns to the login page
 	checkIfLogged()
-	
-	printVMS()
 		
 	//Calls function for viewing profile
 	$('a[href="#viewProfile"]').click(function(){
 		updateProfile(currentUser)
-	});
-	
-	//Calls function for viewing VMs
-	$('a[href="#viewVMs"]').click(function(){
-		alert("View VMS")
 	});
 	
 	// Gets map of users form server
@@ -74,10 +67,6 @@ $(document).ready(function(e){
 	})
 	
 });
-
-function printVMS(){
-	alert("Print VMS")
-}
 
 // Receives a map of users
 // Prints the table of users
@@ -573,7 +562,7 @@ function addNewOrganisation(){
 	var row4 = $("<tr></tr>");
 	
 	row1.append("<td>Name</td>");
-	row1.append("<td class=\"wrap-input validate-input\" data-validate=\"Name is required\" ><input class= \"input-data\"type=\"text\" name=\"orgName\" id=\"orgName\" ></td>");
+	row1.append("<td class=\"wrap-input validate-input\" data-validate=\"Name is required\"><input type=\"text\" name=\"orgName\" id=\"orgName\"></td>");
 	
 	row2.append("<td>Description</td>");
 	row2.append("<td><input type=\"text\" name=\"description\" id=\"description\"></td>");

@@ -36,11 +36,12 @@ public class VM extends Resource {
 		this.activityList = activityList;
 	}
 
+	
+
 	@Override
 	public String toString() {
-		return "VM [organisation=" + organisation + ", category=" + category + ", numCPUCores=" + numCPUCores
-				+ ", ramCapacity=" + ramCapacity + ", numGPUCores=" + numGPUCores + ", discs=" + discs
-				+ ", activityList=" + activityList + "]";
+		return "VM [organisation=" + organisation + ", numCPUCores=" + numCPUCores + ", ramCapacity=" + ramCapacity
+				+ ", numGPUCores=" + numGPUCores + "]";
 	}
 
 	public VMCategory getCategory() {

@@ -49,6 +49,7 @@ public class DiscService {
 			return available;
 		}
 	}
+
 	
 	@GET
 	@Path("/getVMs")

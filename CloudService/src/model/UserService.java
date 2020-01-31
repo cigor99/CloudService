@@ -28,31 +28,23 @@ public class UserService {
 	public void loadAll() {
 		//load users and organisations
 		Users users = (Users) ctx.getAttribute("users");
-		
-		System.out.println(users);
 		if(users == null)
 		{
 			
 			users = new Users(ctx.getRealPath("."));
-			System.out.println(users);
 			Organisations organisations = new Organisations(ctx.getRealPath("."));
-			System.out.println(organisations);
 			for(Organisation o : organisations.getOrganisations().values()) {
-				System.out.println(o.getUsers());
 				for(String u : o.getUsers()) {
-					System.out.println("U: " + u);
 					users.getUsers().get(u).setOrganisation(o);
 				}
 			}
+			System.out.println(users);
 			ctx.setAttribute("users", users);
 			ctx.setAttribute("organisations", organisations);
-			//System.out.println("========================================");
-			//System.out.println(organisations);
-			//System.out.println("========================================");
-			//System.out.println(users);
+
 		}
 		
-		//System.out.println("========================================");
+
 		//load discs
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
@@ -60,11 +52,11 @@ public class UserService {
 		{
 			discs = new Discs(ctx.getRealPath("."));
 			ctx.setAttribute("discs", discs);
-			//System.out.println(discs);
+
 		}
 		//load vms
 		VMs vms = (VMs) ctx.getAttribute("vms");
-		///System.out.println("========================================");
+
 		if(vms == null)
 		{
 			vms = new VMs(ctx.getRealPath("."));
@@ -73,12 +65,11 @@ public class UserService {
 		}
 		//load cats
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
-		//System.out.println("========================================");
+
 		if(categories == null)
 		{
 			categories = new VMCategories(ctx.getRealPath("."));
 			ctx.setAttribute("vmCategories", categories);
-			System.out.println(categories);
 		}
 		
 	}
@@ -100,11 +91,12 @@ public class UserService {
 			}
 		}
 		HashMap<String, User> users = getUsers().getUsers();
-				
 		for(String email : users.keySet())
 		{
+			System.out.println(email);
 			if(email.equals(username) && users.get(email).getPassword().equals(password))
 			{
+				System.out.println(users.get(email));
 				request.getSession().setAttribute("currentUser", users.get(email));
 				return users.get(email);
 			}
@@ -163,6 +155,7 @@ public class UserService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public User getCurrentUser() {
 		User current = (User) request.getSession().getAttribute("currentUser");
+		System.out.println(current);
 		return current;
 	}
 	

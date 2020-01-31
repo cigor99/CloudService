@@ -12,22 +12,22 @@ import java.util.HashMap;
  */
 public class VM extends Resource {
 	// mandatory
-	private Organisation organisation;
-	private VMCategory category;
+	private String category;
 	private int numCPUCores;
 	private int ramCapacity;
 	private int numGPUCores;
 	
-	private HashMap<String, Disc> discs;
+	private ArrayList<String> discs;
 	private ArrayList<Activity> activityList;
 	
 	public VM() {
 	}
+
 	
-	public VM(String name, Organisation organisation, VMCategory category, int numCPUCores, int ramCapacity,
-			int numGPUCores, HashMap<String, Disc> discs, ArrayList<Activity> activityList) {
-		super(name);
-		this.organisation = organisation;
+
+	public VM(String name, String organisation, String category, int numCPUCores, int ramCapacity, int numGPUCores,
+			ArrayList<String> discs, ArrayList<Activity> activityList) {
+		super(name, organisation);
 		this.category = category;
 		this.numCPUCores = numCPUCores;
 		this.ramCapacity = ramCapacity;
@@ -36,19 +36,21 @@ public class VM extends Resource {
 		this.activityList = activityList;
 	}
 
-	
+
 
 	@Override
 	public String toString() {
-		return "VM [organisation=" + organisation + ", numCPUCores=" + numCPUCores + ", ramCapacity=" + ramCapacity
-				+ ", numGPUCores=" + numGPUCores + "]";
+		return "VM [category=" + category + ", numCPUCores=" + numCPUCores + ", ramCapacity=" + ramCapacity
+				+ ", numGPUCores=" + numGPUCores + ", discs=" + discs + ", activityList=" + activityList + "]";
 	}
 
-	public VMCategory getCategory() {
+
+
+	public String getCategory() {
 		return category;
 	}
 
-	public void setCategory(VMCategory category) {
+	public void setCategory(String category) {
 		this.category = category;
 	}
 
@@ -76,11 +78,11 @@ public class VM extends Resource {
 		this.numGPUCores = numGPUCores;
 	}
 
-	public HashMap<String, Disc> getDiscs() {
+	public ArrayList<String> getDiscs() {
 		return discs;
 	}
 
-	public void setDiscs(HashMap<String, Disc> discs) {
+	public void setDiscs(ArrayList<String> discs) {
 		this.discs = discs;
 	}
 
@@ -92,12 +94,6 @@ public class VM extends Resource {
 		this.activityList = activityList;
 	}
 
-	public Organisation getOrganisation() {
-		return organisation;
-	}
-
-	public void setOrganisation(Organisation organisation) {
-		this.organisation = organisation;
-	}
+	
 	
 }

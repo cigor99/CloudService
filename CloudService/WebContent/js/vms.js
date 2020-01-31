@@ -11,6 +11,8 @@ var ram = $("<td><input type=\"text\" name=\"ram\" id=\"ram\" readonly ></td>")
 	
 var gpu = $("<td><input type=\"text\" name=\"gpu\" id=\"gpu\" readonly ></td>")
 
+var currentCat;
+
 checkIfLogged();
 
 $(document).ready(function(e){
@@ -68,7 +70,7 @@ function printVMs(vms){
 		row.append("<td id=\"" + key + "\">" + value.ramCapacity + "</td>")
 		row.append("<td id=\"" + key + "\">" + value.numGPUCores + "</td>")
 		if(currentUser.role=="SUPER_ADMIN")
-			row.append("<td id=\"" + key + "\">" + value.organisation.name + "</td>")
+			row.append("<td id=\"" + key + "\">" + value.organisation + "</td>")
 		
 		body.append(row)
 	});
@@ -293,6 +295,7 @@ function addNewVM(vms){
 				"catName" : catName
 			},
 			success : function(response){
+				currentCat = response
 				$("#core").val(response.numCPUCores)
 				$("#ram").val(response.ramCapacity)
 				$("#gpu").val(response.numGPUCores)
@@ -302,29 +305,40 @@ function addNewVM(vms){
 	
 	$("#add").click(function(e){
 		e.preventDefault()
-		var name = $("#name").val()
-		var categoryName = selectCategory.val()
-		var organisation = selectOrg.val()
-		//var disc = $("#disc").val()
-		if(name == ''){
+		var vm = {
+			name : $("#name").val(),
+			organisation : selectOrg.val(),
+			category : selectCategory.val(),
+			numCPUCores : $("#core").val(),
+			ramCapacity : $("#ram").val(),
+			numGPUCores : $("#gpu").val(),
+			discs : $("#disc").val(),
+			activityList : null
+		}
+		console.log(vm)
+		if($("#name").val() == ''){
             showValidate($("#name"));
         }else{
         	hideValidate($("#name"));
         }
 		
+		if(selectOrg.val() == "")
+			alert("Organisation not selected")
+			
+		if(selectCategory.val() == "")
+			alert("Category not selected")
+		
 		if(!name)
 			return
 			
+		console.log(JSON.stringify(vm))
+		
 		$.ajax({
 			type : 'POST',
 			url : "rest/vmServ/addVM",
 			dataType : "json",
-			data : {
-				"name" : name,
-				"categoryName" : categoryName,
-				"organisation" : organisation
-				//"disc" : disc
-			},
+			data : JSON.stringify(vm),
+			contentType : "application/json",
 			success : function(response){
 				if(response==undefined)
 					alert("VM  with given name already exists!")

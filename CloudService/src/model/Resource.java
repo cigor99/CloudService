@@ -10,35 +10,31 @@ package model;
 public abstract class Resource {
 	// mandatory
 	private String name;
+	
+	private String organisation;
 
 	public Resource() {
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Resource other = (Resource) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return true;
+	
+	public Resource(String name, String organisation) {
+		super();
+		this.name = name;
+		this.organisation = organisation;
 	}
-
-
 
 	@Override
 	public String toString() {
-		return "Resource [name=" + name + "]";
+		return "Resource [name=" + name + ", organisation=" + organisation + "]";
 	}
 
+	public String getOrganisation() {
+		return organisation;
+	}
 
+	public void setOrganisation(String organisation) {
+		this.organisation = organisation;
+	}
 
 	public Resource(String name) {
 		super();

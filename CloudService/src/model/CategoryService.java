@@ -120,7 +120,7 @@ public class CategoryService {
 		
 		HashMap<String, VM> vms = getVMs();
 		for(VM vm: vms.values()) {
-			if(vm.getCategory().getName().equals(cat.getName()))
+			if(vm.getCategory().equals(cat.getName()))
 				return null;
 		}
 		categories.getVmCategories().remove(oldName);

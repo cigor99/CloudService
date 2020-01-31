@@ -41,7 +41,7 @@ public class DiscService {
 			HashMap<String, Disc> available = new HashMap<String, Disc>();
 			Organisation o = curr.getOrganisation();
 			for(Disc d : discs.getDiscs().values()) {
-				if(d.getOrganisation().getName().equals(o.getName())) {
+				if(d.getOrganisation().equals(o.getName())) {
 					available.put(d.getName(), d);
 				}
 					
@@ -99,7 +99,7 @@ public class DiscService {
 		if(curr.getRole().equals(Role.SUPER_ADMIN))
 			disc = new Disc(name, null, dt, Integer.parseInt(capacity), vmName);
 		else {
-			disc = new Disc(name, curr.getOrganisation(), dt, Integer.parseInt(capacity), vmName);
+			disc = new Disc(name, curr.getOrganisation().getName(), dt, Integer.parseInt(capacity), vmName);
 			curr.getOrganisation().getResources().add(name);
 		}
 		
@@ -108,10 +108,9 @@ public class DiscService {
 		if(curr.getRole().equals(Role.SUPER_ADMIN))
 			return discs.getDiscs();
 		
-		Organisation o = curr.getOrganisation(); 
 		HashMap<String, VM> vms = getVMs();
 		
-		vms.get(vmName).getDiscs().put(name, disc);
+		vms.get(vmName).getDiscs().add(name);
 		
 		return getDiscs();
 	}
@@ -123,6 +122,8 @@ public class DiscService {
 	public HashMap<String, Disc> editVMCategory(@FormParam("oldName") String oldName, @FormParam("newName") String newName, @FormParam("discType") String discType,@FormParam("capacity") String capacity,@FormParam("oldVMname") String oldVMname,@FormParam("newVMname") String newVMname)
 	{
 		Discs discs = (Discs) ctx.getAttribute("discs");
+		
+		Organisations orgs = (Organisations) ctx.getAttribute("organisations");
 		
 		if(!newName.equals(oldName))
 		{
@@ -147,14 +148,14 @@ public class DiscService {
 		discs.getDiscs().put(newName, d);
 		
 		//izmenjen u org resources
-		Organisation o = d.getOrganisation();
+		Organisation o = orgs.getOrganisations().get(d.getOrganisation());
 		o.getResources().remove(oldName);
 		o.getResources().add(newName);
 		
 		//izmenjen u vm 
 		HashMap<String, VM> vms = getVMs();
 		vms.get(oldVMname).getDiscs().remove(oldName);
-		vms.get(newVMname).getDiscs().put(newName, d);
+		vms.get(newVMname).getDiscs().add(newName);
 		
 		return discs.getDiscs();
 		
@@ -169,18 +170,20 @@ public class DiscService {
 		
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
+		Organisations orgs = (Organisations) ctx.getAttribute("organisations");
+		
 		Disc d = discs.getDiscs().get(oldName);
 		
 		//obrisan iz diskova
 		discs.getDiscs().remove(oldName);
 		
 		//obrisan iz resources
-		Organisation o = d.getOrganisation();
+		Organisation o = orgs.getOrganisations().get(d.getOrganisation());
 		o.getResources().remove(oldName);
 		
 		//obrisan iz vm
 		HashMap<String, VM> vms = getVMs();
-		vms.get(d.getVmName()).getDiscs().remove(d);
+		vms.get(d.getVmName()).getDiscs().remove(oldName);
 		
 		
 		return discs.getDiscs();
@@ -200,7 +203,7 @@ public class DiscService {
 		HashMap<String, Disc> freeDiscs = new HashMap<String, Disc>();
 		
 		for(Disc d : discs.getDiscs().values()) {
-			if(d.getOrganisation().getName().equals(orgName) && d.getVmName()==null) {
+			if(d.getOrganisation().equals(orgName) && d.getVmName()==null) {
 				freeDiscs.put(d.getName(), d);
 			}
 		}

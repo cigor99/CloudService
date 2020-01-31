@@ -40,7 +40,7 @@ function printDiscs(discs){
 		row.append("<td id=\"" + key + "\">" + value.name + "</td>")
 		row.append("<td id=\"" + key + "\">" + value.capacity + "</td>")
 		row.append("<td id=\"" + key + "\">" + value.vmName + "</td>")
-		row.append("<td id=\"" + key + "\">" + value.organisation.name + "</td>")
+		row.append("<td id=\"" + key + "\">" + value.organisation + "</td>")
 		
 		body.append(row)
 	});

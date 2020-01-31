@@ -189,10 +189,18 @@ function addNewVM(vms){
 	var row2 = $("<tr></tr>")
 	row2.append("<td>Organisation</td>")
 	if(currentUser.role=="ADMIN"){
-		var option = $("<option></option>")
-		option.append(currentUser.organisation.name)
-		selectOrg.append(option)
-		row2.append(selectOrg)
+		$.ajax({
+			type : 'GET',
+			url : "rest/orgServ/getMyOrg",
+			contentType : "application/json",
+			success : function(response){
+				var option1 = $("<option></option>");
+				option1.append(response.name);
+				selectOrg.append(option1);
+				row2.append(selectOrg);
+				selectOrg.trigger("change")
+			}
+		});
 	}
 	
 	if(currentUser.role=="SUPER_ADMIN"){
@@ -282,7 +290,6 @@ function addNewVM(vms){
 
 	selectOrg.on("change",function(){
 		var orgName = selectOrg.val()
-		console.log(orgName)
 		$.ajax({
 			type : 'POST',
 			url : "rest/discServ/getOrgFreeDiscs",
@@ -303,7 +310,6 @@ function addNewVM(vms){
 	
 	selectCategory.on("change",function(){
 		var catName = selectCategory.val()
-		console.log(catName)
 		$.ajax({
 			type : 'POST',
 			url : "rest/catServ/getCategory",
@@ -312,7 +318,6 @@ function addNewVM(vms){
 				"catName" : catName
 			},
 			success : function(response){
-				console.log(response)
 				currentCat = response
 				$("#core").val(response.numCPUCores)
 				$("#ram").val(response.ramCapacity)
@@ -345,7 +350,6 @@ function addNewVM(vms){
 		if(!$("#name"))
 			return
 			
-		
 		$.ajax({
 			type : 'POST',
 			url : "rest/vmServ/addVM",

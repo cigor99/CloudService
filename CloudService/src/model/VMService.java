@@ -56,22 +56,30 @@ public class VMService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public HashMap<String, VM> addVM(VM vm){
 		
+		System.out.println("Uso");
+		
 		VMs vms = (VMs) ctx.getAttribute("vms");
 		Discs discs = (Discs) ctx.getAttribute("discs");
+		
+		if(vms.getVms().containsKey(vm.getName()))
+			return null;
 		
 		vms.getVms().put(vm.getName(), vm);
 		
 		Organisations orgs = (Organisations) ctx.getAttribute("organisations");
 		orgs.getOrganisations().get(vm.getOrganisation()).getResources().add(vm.getName());
 		
-		for(Disc d : discs.getDiscs().values()) {
-			for(String dvm : vm.getDiscs()) {
-				if(d.getName().equals(dvm)) {
-					d.setVmName(vm.getName());
+		if (vm.getDiscs() != null) {
+			for(Disc d : discs.getDiscs().values()) {
+				for(String dvm : vm.getDiscs()) {
+					if(d.getName().equals(dvm)) {
+						d.setVmName(vm.getName());
+					}
 				}
 			}
 		}
 		
+		System.out.println(getVMs());
 		return getVMs();
 		
 	}

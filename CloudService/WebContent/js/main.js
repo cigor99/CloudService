@@ -1,16 +1,14 @@
 $(document).ready(function(e) {
-	
 	$.ajax({
 		type : 'GET',
 		url : "rest/userServ/loadAll",
 		error : function() {
-			alert("Error")
+			alert("Error in loading")
 		}
 	});
 	
 	$("#logOut").click(function(e){
 		e.preventDefault();
-		console.log("log out");
 		
 		$.ajax({
 			type : 'GET',
@@ -18,8 +16,8 @@ $(document).ready(function(e) {
 			success : function(){
 				$(location).attr('href', "login.html")
 			},
-			error : function() {
-				alert("Error")
+			error : function(data) {
+				alert(data.responseText)
 			}
 		});
 	});
@@ -40,12 +38,13 @@ $(document).ready(function(e) {
 	$(document).on('submit', '#login-form', function(e) {
 		e.preventDefault();
 		
-		var username = $("#username").val();
+		var email = $("#email").val();
 		var password = $("#password").val();
-		if(username == ''){
-            showValidate($("#username"));
+		
+		if(email == ''){
+            showValidate($("#email"));
         }else{
-        	hideValidate($("#username"));
+        	hideValidate($("#email"));
         }
 		
 		if(password == ''){
@@ -54,26 +53,22 @@ $(document).ready(function(e) {
         	hideValidate($("#password"));
         }
         	
-		if(username == '' || password == '')
+		if(!email || !password)
 			return;
-
+		
 		$.ajax({
 			type : 'POST',
 			url : "rest/userServ/validate",
 			dataType : "json",
 			data : {
-				"username" : username,
+				"email" : email,
 				"password" : password
 			},
-			success : function(response) {
-				if (response == undefined) {
-					alert("Wrong username or password!")
-				} else {
-					whereToGo(response)
-				}
+			success : function(response){
+				whereToGo(response)
 			},
-			error : function() {
-				alert("Error")
+			error : function(data) {
+				alert(data.responseText)
 			}
 		});
 	});
@@ -88,7 +83,7 @@ function whereToGo(user){
 	}else if(user.role=="USER"){
 		$(location).attr('href', 'user.html');
 	}else{
-		alert("error")
+		alert("Error in redirecting")
 	}
 	
 }

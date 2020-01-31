@@ -3,7 +3,6 @@
  */
 package model;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,6 +16,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -32,8 +35,6 @@ public class OrganisationService {
 	
 	@Context
 	ServletContext ctx;
-
-	
 	
 	// Returns instance of class organisations which has a map of all organisations
 	// Organisations will be loaded from file if previously weren't
@@ -52,8 +53,25 @@ public class OrganisationService {
 	@GET
 	@Path("/listOrganisations")
 	@Produces(MediaType.APPLICATION_JSON)
-	public HashMap<String, Organisation> listOrganisations(){
-		return getOrganisations().getOrganisations();
+	public Response listOrganisations(){
+		
+		User user = (User) request.getSession().getAttribute("currentUser");
+		
+		if(user == null)
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		
+		if(user.getRole().equals(Role.USER))
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		String JSON = "";
+		try {
+			JSON = mapper.writeValueAsString(getOrganisations().getOrganisations());
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		
+		return Response.ok(JSON).build();
 	}
 	
 	// Returns organisation for current user
@@ -87,20 +105,32 @@ public class OrganisationService {
 	@Path("addNewOrg")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public HashMap<String, Organisation> addNewOrg(@FormParam("name") String name, @FormParam("description") String description, @FormParam("logo") String logo){
-		if(name.equals("")) {
-			return null;
+	public Response addNewOrg(@FormParam("name") String name, @FormParam("description") String description, @FormParam("logo") String logo){
+		
+		String[] args = {name, description, logo};
+		
+		if(Validator.valEmpty(args)) {
+			Response.status(400).entity("Error 400 : Login parameter/s empty").build();
 		}
+		
+		String JSON = "";
+		ObjectMapper mapper = new ObjectMapper();
+		
 		Organisations organisations = (Organisations) ctx.getAttribute("organisations");
 		Organisation org = new Organisation(name, description, makeLogoPath(logo), new ArrayList<String>(),new  ArrayList<String>());
 		if(!organisations.getOrganisations().containsKey(name)) {
 			organisations.getOrganisations().put(name, org);
-			ctx.setAttribute("organisations", organisations);
-
 			organisations.WriteToFile(ctx.getRealPath("."));
-			return organisations.getOrganisations();
+			
+			try {
+				JSON = mapper.writeValueAsString(organisations.getOrganisations());
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+			return Response.ok(JSON).build();
 		}
-		return null;
+
+		return Response.status(400).entity("Error 400 : Organisation with given name already exists!").build();
 		
 	}
 	
@@ -140,8 +170,8 @@ public class OrganisationService {
 		
 		Users users = getUsers();
 		for(User value : users.getUsers().values()) {
-			if(value.getOrganisation().getName().equals(oldName)) {
-				value.setOrganisation(org);
+			if(value.getOrganisation().equals(oldName)) {
+				value.setOrganisation(name);
 			}
 		}
 		

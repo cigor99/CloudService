@@ -39,9 +39,8 @@ public class DiscService {
 			return discs.getDiscs();
 		else {
 			HashMap<String, Disc> available = new HashMap<String, Disc>();
-			Organisation o = curr.getOrganisation();
 			for(Disc d : discs.getDiscs().values()) {
-				if(d.getOrganisation().equals(o.getName())) {
+				if(d.getOrganisation().equals(curr.getOrganisation())) {
 					available.put(d.getName(), d);
 				}
 					
@@ -69,8 +68,10 @@ public class DiscService {
 		if(curr.getRole().equals(Role.SUPER_ADMIN))
 			return vms.getVms();
 		
+		Organisations organs = (Organisations) ctx.getAttribute("organisations");
+		
 		HashMap<String, VM> orgVM = new HashMap<String, VM>();
-		for(String r : curr.getOrganisation().getResources()) {
+		for(String r : organs.getOrganisations().get(curr.getOrganisation()).getResources()) {
 			if(vms.getVms().containsKey(r))
 				orgVM.put(r, vms.getVms().get(r));
 		}
@@ -106,12 +107,14 @@ public class DiscService {
 		
 		User curr = (User) request.getSession().getAttribute("currentUser");
 		
+		Organisations organs = (Organisations) ctx.getAttribute("organisations");
+		
 		Disc disc = null;
 		if(curr.getRole().equals(Role.SUPER_ADMIN))
 			disc = new Disc(name, null, dt, Integer.parseInt(capacity), vmName);
 		else {
-			disc = new Disc(name, curr.getOrganisation().getName(), dt, Integer.parseInt(capacity), vmName);
-			curr.getOrganisation().getResources().add(name);
+			disc = new Disc(name, curr.getOrganisation(), dt, Integer.parseInt(capacity), vmName);
+			organs.getOrganisations().get(curr.getOrganisation()).getResources().add(name);
 		}
 		
 		discs.getDiscs().put(name, disc);

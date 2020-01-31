@@ -2,7 +2,6 @@ package model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -42,8 +41,10 @@ public class VMService {
 		if(curr.getRole().equals(Role.SUPER_ADMIN))
 			return vms.getVms();
 		
+		Organisations organs = (Organisations) ctx.getAttribute("organisations");
+		
 		HashMap<String, VM> orgVM = new HashMap<String, VM>();
-		for(String r : curr.getOrganisation().getResources()) {
+		for(String r : organs.getOrganisations().get(curr.getOrganisation()).getResources()) {
 			if(vms.getVms().containsKey(r))
 				orgVM.put(r, vms.getVms().get(r));
 		}

@@ -12,6 +12,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 @Path("userServ")
@@ -21,30 +25,30 @@ public class UserService {
 	HttpServletRequest request;
 	
 	@Context
+	HttpServletRequest response;
+	
+	@Context
 	ServletContext ctx;
 	
 	@GET
 	@Path("/loadAll")
-	public void loadAll() {
-		//load users and organisations
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response loadAll() {
+		//load user
 		Users users = (Users) ctx.getAttribute("users");
 		if(users == null)
 		{
-			
 			users = new Users(ctx.getRealPath("."));
-			Organisations organisations = new Organisations(ctx.getRealPath("."));
-			for(Organisation o : organisations.getOrganisations().values()) {
-				for(String u : o.getUsers()) {
-					users.getUsers().get(u).setOrganisation(o);
-				}
-			}
-			System.out.println(users);
 			ctx.setAttribute("users", users);
-			ctx.setAttribute("organisations", organisations);
-
 		}
 		
-
+		//load organisations
+		Organisations organisations = (Organisations) ctx.getAttribute("organisations");
+		if(organisations == null) {
+			organisations = new Organisations(ctx.getRealPath("."));
+			ctx.setAttribute("organisations", organisations);
+		}
+		
 		//load discs
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
@@ -61,7 +65,6 @@ public class UserService {
 		{
 			vms = new VMs(ctx.getRealPath("."));
 			ctx.setAttribute("vms", vms);
-			System.out.println(vms);
 		}
 		//load cats
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
@@ -72,54 +75,40 @@ public class UserService {
 			ctx.setAttribute("vmCategories", categories);
 		}
 		
+		return Response.ok().build();
+		
 	}
 	
 	@POST
 	@Path("/validate")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public User validate(@FormParam("username") String username, @FormParam("password") String password)
+	public Response validate(@FormParam("email") String email, @FormParam("password") String password)
 	{
+		ObjectMapper mapper = new ObjectMapper();
+		String json = "";
 		
-		String[] args = {username, password};
+		String[] args = {email, password};
 		if(Validator.valEmpty(args)) {
-			return null;
-		}
-		if(!username.equals("admin")){
-			if(!Validator.valEmail(username)) {
-				return null;
-			}
-		}
-		HashMap<String, User> users = getUsers().getUsers();
-		for(String email : users.keySet())
-		{
-			System.out.println(email);
-			if(email.equals(username) && users.get(email).getPassword().equals(password))
-			{
-				System.out.println(users.get(email));
-				request.getSession().setAttribute("currentUser", users.get(email));
-				return users.get(email);
-			}
-		}
-		return null;
-	}
-
-	private Users getUsers() {
-		Users users = (Users) ctx.getAttribute("users");
-		if(users == null)
-		{
-			users = new Users(ctx.getRealPath("."));
-			Organisations organisations = new Organisations(ctx.getRealPath("."));
-			for(Organisation o : organisations.getOrganisations().values()) {
-				for(String u : o.getUsers()) {
-					users.getUsers().get(u).setOrganisation(o);
-				}
-			}
-			ctx.setAttribute("users", users);
-			ctx.setAttribute("organisations", organisations);
+			Response.status(400).entity("Error 400 : Login parameter/s empty").build();
 		}
 		
-		return users;
+		Users users = (Users) ctx.getAttribute("users");
+		for(String e : users.getUsers().keySet())
+		{
+			if(e.equals(email) && users.getUsers().get(e).getPassword().equals(password))
+			{
+				request.getSession().setAttribute("currentUser", users.getUsers().get(e));
+				try {
+					json = mapper.writeValueAsString(users.getUsers().get(e));
+				} catch (JsonProcessingException e1) {
+					e1.printStackTrace();
+				}
+				return Response.ok(json).build();
+			}
+		}
+		
+		return Response.status(400).entity("Error 400 : User with given email and password not found!").build();
 	}
 
 	@GET
@@ -140,7 +129,7 @@ public class UserService {
 				{
 					continue;
 				}
-				if(curr.getOrganisation().getName().equals(users.getUsers().get(email).getOrganisation().getName()))
+				if(curr.getOrganisation().equals(users.getUsers().get(email).getOrganisation()))
 				{
 					orgUsers.put(email,users.getUsers().get(email));
 				}
@@ -155,7 +144,6 @@ public class UserService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public User getCurrentUser() {
 		User current = (User) request.getSession().getAttribute("currentUser");
-		System.out.println(current);
 		return current;
 	}
 	
@@ -189,13 +177,11 @@ public class UserService {
 		if(role == "USER") {
 			r = Role.USER;
 		}
-		User user = new User(email,password,name,surname,organisations.getOrganisations().get(organisation),r);
+		User user = new User(email,password,name,surname,organisation,r);
 		
 		if(!users.getUsers().containsKey(email)) {
 			organisations.getOrganisations().get(organisation).getUsers().add(email);
 			users.getUsers().put(email, user);
-			ctx.setAttribute("users", users);
-			ctx.setAttribute("organisatons", organisations);
 			
 			users.WriteToFile(ctx.getRealPath("."));
 			organisations.WriteToFile(ctx.getRealPath("."));

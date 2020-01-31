@@ -14,14 +14,14 @@ public class User {
 	private String password;
 	private String name;
 	private String surname;
-	private Organisation organisation;
+	private String organisation;
 	private Role role;
 	
 	
 	public User() {
 		super();
 	}
-	public User(String email, String password, String name, String surname, Organisation organisation, Role role) {
+	public User(String email, String password, String name, String surname, String organisation, Role role) {
 		super();
 		this.email = email;
 		this.password = password;
@@ -78,10 +78,11 @@ public class User {
 	public void setSurname(String surname) {
 		this.surname = surname;
 	}
-	public Organisation getOrganisation() {
+	public String getOrganisation() {
 		return organisation;
 	}
-	public void setOrganisation(Organisation organisation) {
+	
+	public void setOrganisation(String organisation) {
 		this.organisation = organisation;
 	}
 	public Role getRole() {

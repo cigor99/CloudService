@@ -13,8 +13,6 @@ var gpu = $("<td><input type=\"text\" name=\"gpu\" id=\"gpu\" readonly ></td>")
 
 var currentCat;
 
-checkIfLogged();
-
 $(document).ready(function(e){
 	
 	$.ajax({

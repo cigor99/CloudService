@@ -4,6 +4,7 @@
     "password": "pass3",
     "name": "Name3",
     "surname": "Surname3",
+    "organisation": "Organisation2",
     "role": "ADMIN"
   },
   "email2@email.com": {
@@ -11,6 +12,7 @@
     "password": "pass2",
     "name": "Name2",
     "surname": "Surname2",
+    "organisation": "Organisation1",
     "role": "USER"
   },
   "email1@email.com": {
@@ -18,6 +20,7 @@
     "password": "pass1",
     "name": "Name1",
     "surname": "Surname1",
+    "organisation": "Organisation1",
     "role": "ADMIN"
   },
   "admin": {
@@ -28,10 +31,11 @@
     "role": "SUPER_ADMIN"
   },
   "email4@email.com": {
-    "email": "email4@email.com",
+    "email": "email4",
     "password": "pass4",
     "name": "Name4",
     "surname": "Surname4",
+    "organisation": "Organisation2",
     "role": "USER"
   }
 }

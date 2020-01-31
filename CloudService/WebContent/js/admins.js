@@ -1,6 +1,6 @@
-var currentUser;
+//var currentUser;
 
-$(document).ready(function(e){
+/*$(document).ready(function(e){
 
 	// Checks if there is a user that is logged in
 	// If not returns to the login page
@@ -66,11 +66,11 @@ $(document).ready(function(e){
 		});
 	})
 	
-});
+});*/
 
 // Receives a map of users
 // Prints the table of users
-function printUsers(users){
+/*function printUsers(users){
 	var edit = $("#fillEditForm")
 	edit.empty()
 	
@@ -148,11 +148,11 @@ function printUsers(users){
 		});
 		
 	});
-}
+}*/
 
 // Receives user to edit
 // Opens menu for editing
-function editUser(user){
+/*function editUser(user){
 	var forma = $("#fillEditForm")
 	forma.empty();
 	
@@ -316,11 +316,11 @@ function editUser(user){
 		});
 		
 	});
-}
+}*/
 
 // Receives map of organisations
 // Prints the table of  oforganisations
-function printOrganisations(organisations){
+/*function printOrganisations(organisations){
 	var edit = $("#fillEditForm")
 	edit.empty()
 	
@@ -371,11 +371,11 @@ function printOrganisations(organisations){
 	});
 		
 	
-}
+}*/
 
 // Receives map of organisations
 // Prints manu for adding new users
-function addNewUser(organisations){
+/*function addNewUser(organisations){
 	var forma = $("#fillEditForm")
 	
 	forma.empty();
@@ -531,10 +531,10 @@ function addNewUser(organisations){
 		});
 	})
 	
-}
+}*/
 
 // Gets map of users and returns it
-function getAllUsers(){
+/*function getAllUsers(){
 	$.ajax({
 		type : 'GET',
 		url : "rest/userServ/getUsers",
@@ -546,10 +546,10 @@ function getAllUsers(){
 			alert("Error")
 		}
 	});
-}
+}*/
 
 // Prints menu for adding new organisations
-function addNewOrganisation(){
+/*function addNewOrganisation(){
 	
 	var forma = $("#fillEditForm")
 	forma.empty();
@@ -650,12 +650,12 @@ function addNewOrganisation(){
 			}
 		});
 	})
-}
+}*/
 
 
 // Receives organisation to edit
 // Prints edit menu
-function editOrganisation(organisation){
+/*function editOrganisation(organisation){
 	var forma = $("#fillEditForm")
 	forma.empty()
 	
@@ -755,11 +755,11 @@ function editOrganisation(organisation){
 		});
 		
 	});
-}
+}*/
 
 // Gets organisation for current user
 // Calls function for editing organisation
-function getMyOrganisation(){
+/*function getMyOrganisation(){
 	$.ajax({
 		type : 'GET',
 		url : "rest/orgServ/getMyOrg",
@@ -771,12 +771,12 @@ function getMyOrganisation(){
 			alert("Error")
 		}
 	});
-}
+}*/
 
 // Checks if there is a logged in user
 // If no alerts and returns to login page
 // If yes gets current user and calls function for editing profile 
-function checkIfLogged(){
+/*function checkIfLogged(){
 	$.ajax({
 		type: 'GET',
 		url: "rest/userServ/getCurrentUser",
@@ -793,5 +793,5 @@ function checkIfLogged(){
 			alert("Error")
 		}
 	});
-}
+}*/
 

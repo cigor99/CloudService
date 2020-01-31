@@ -13,8 +13,6 @@ public class Disc extends Resource {
 	private int capacity;
 	private String vmName;
 
-	
-
 	public Disc() {
 		super();
 	}

@@ -196,8 +196,6 @@ public class DiscService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, Disc> getOrgFreeDiscs(@FormParam("orgName") String orgName)
 	{
-		System.out.println("Uso");
-		System.out.println(orgName);
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
 		HashMap<String, Disc> freeDiscs = new HashMap<String, Disc>();
@@ -210,6 +208,28 @@ public class DiscService {
 		
 		
 		return freeDiscs;
+		
+	}
+	
+	@POST
+	@Path("/getAllVMDiscs")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public HashMap<String, Disc> getAllVMDiscs(@FormParam("vmName") String vmName)
+	{
+		Discs discs = (Discs) ctx.getAttribute("discs");
+		
+		HashMap<String, Disc> allDiscs = new HashMap<String, Disc>();
+		
+		for(Disc d : discs.getDiscs().values()) {
+			if(d.getVmName() != null) {
+				if(d.getVmName().equals(vmName))
+					allDiscs.put(d.getName(), d);
+			}
+		}
+		
+		
+		return allDiscs;
 		
 	}
 	

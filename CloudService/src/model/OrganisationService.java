@@ -107,6 +107,14 @@ public class OrganisationService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response addNewOrg(@FormParam("name") String name, @FormParam("description") String description, @FormParam("logo") String logo){
 		
+		User user = (User) request.getSession().getAttribute("currentUser");
+		
+		if(user == null)
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		
+		if(user.getRole().equals(Role.USER))
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		
 		String[] args = {name, description, logo};
 		
 		if(Validator.valEmpty(args)) {

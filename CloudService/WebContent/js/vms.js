@@ -183,14 +183,18 @@ function addNewVM(vms){
 	row1.append("<td>Name</td>")
 	row1.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\"><input class=\"input-data\" type=\"text\" name=\"name\" id=\"name\"></td>")
 	
+	
+	
+	selectOrg.empty()
 	var row2 = $("<tr></tr>")
 	row2.append("<td>Organisation</td>")
 	if(currentUser.role=="ADMIN"){
-		var org = currentUser.organisation.name
-		row2.append("<td><input type=\"text\" name=\"org\" id=\"org\" readonly ></td>")
+		var option = $("<option></option>")
+		option.append(currentUser.organisation.name)
+		selectOrg.append(option)
+		row2.append(selectOrg)
 	}
 	
-	selectOrg.append("<option></option>")
 	if(currentUser.role=="SUPER_ADMIN"){
 		$.ajax({
 			type : 'GET',
@@ -203,9 +207,13 @@ function addNewVM(vms){
 					selectOrg.append(option1);
 				});
 				row2.append(selectOrg);
+				selectOrg.trigger("change")
 			}
 		});
 	}
+	
+
+	$("#orgName").val($("#orgName option:first").val())
 	
 	var row3 = $("<tr></tr>")
 	row3.append("<td>Discs</td>")
@@ -214,7 +222,7 @@ function addNewVM(vms){
 	
 	row3.append(selectDisc);
 	
-	selectCategory.append("<option></option>")
+	selectCategory.empty()
 	var row4 = $("<tr></tr>")
 	row4.append("<td>Category</td>")
 	$.ajax({
@@ -227,8 +235,13 @@ function addNewVM(vms){
 				option2.append(key);
 				selectCategory.append(option2);
 			});
+			selectCategory.trigger("change")
 		}
 	});
+	
+
+	$("#category").val($("#category option:first").val())
+	
 	row4.append(selectCategory);
 	
 	var row5 = $("<tr></tr>")
@@ -257,6 +270,8 @@ function addNewVM(vms){
 	
 	form.append(table)
 	
+	
+	
 	// When inputs with these classes get into focus, alert disappears
 	$('.input-data').each(function(){
         $(this).focus(function(){
@@ -267,6 +282,7 @@ function addNewVM(vms){
 
 	selectOrg.on("change",function(){
 		var orgName = selectOrg.val()
+		console.log(orgName)
 		$.ajax({
 			type : 'POST',
 			url : "rest/discServ/getOrgFreeDiscs",
@@ -287,6 +303,7 @@ function addNewVM(vms){
 	
 	selectCategory.on("change",function(){
 		var catName = selectCategory.val()
+		console.log(catName)
 		$.ajax({
 			type : 'POST',
 			url : "rest/catServ/getCategory",
@@ -295,6 +312,7 @@ function addNewVM(vms){
 				"catName" : catName
 			},
 			success : function(response){
+				console.log(response)
 				currentCat = response
 				$("#core").val(response.numCPUCores)
 				$("#ram").val(response.ramCapacity)
@@ -306,32 +324,27 @@ function addNewVM(vms){
 	$("#add").click(function(e){
 		e.preventDefault()
 		var vm = {
-			name : $("#name").val(),
-			organisation : selectOrg.val(),
-			category : selectCategory.val(),
-			numCPUCores : $("#core").val(),
-			ramCapacity : $("#ram").val(),
-			numGPUCores : $("#gpu").val(),
-			discs : $("#disc").val(),
-			activityList : null
+				name : $("#name").val(),
+				organisation : selectOrg.val(),
+				category : selectCategory.val(),
+				numCPUCores : $("#core").val(),
+				ramCapacity : $("#ram").val(),
+				numGPUCores : $("#gpu").val(),
+				discs : $("#disc").val(),
+				activityList : null
 		}
-		console.log(vm)
+		
 		if($("#name").val() == ''){
             showValidate($("#name"));
         }else{
         	hideValidate($("#name"));
         }
 		
-		if(selectOrg.val() == "")
-			alert("Organisation not selected")
-			
-		if(selectCategory.val() == "")
-			alert("Category not selected")
 		
-		if(!name)
+		
+		if(!$("#name"))
 			return
 			
-		console.log(JSON.stringify(vm))
 		
 		$.ajax({
 			type : 'POST',

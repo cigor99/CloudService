@@ -57,11 +57,20 @@ public class VMService {
 	public HashMap<String, VM> addVM(VM vm){
 		
 		VMs vms = (VMs) ctx.getAttribute("vms");
+		Discs discs = (Discs) ctx.getAttribute("discs");
 		
 		vms.getVms().put(vm.getName(), vm);
 		
 		Organisations orgs = (Organisations) ctx.getAttribute("organisations");
 		orgs.getOrganisations().get(vm.getOrganisation()).getResources().add(vm.getName());
+		
+		for(Disc d : discs.getDiscs().values()) {
+			for(String dvm : vm.getDiscs()) {
+				if(d.getName().equals(dvm)) {
+					d.setVmName(vm.getName());
+				}
+			}
+		}
 		
 		return getVMs();
 		

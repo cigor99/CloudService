@@ -4,8 +4,8 @@
     "description": "Biomedical organisation",
     "logo": "data/logos\\logo1.jpg",
     "users": [
-      "email3",
-      "email4"
+      "email3@email.com",
+      "email4@email.com"
     ],
     "resources": [
       "VM2",
@@ -18,8 +18,8 @@
     "description": "Agricultural organisation",
     "logo": "data/logos\\logo4.jpg",
     "users": [
-      "email1",
-      "email2"
+      "email1@email.com",
+      "email2@email.com"
     ],
     "resources": [
       "VM1",

@@ -94,7 +94,12 @@ public class Organisation {
 
 	@Override
 	public String toString() {
-		return "Organisation [name=" + name + ", description=" + description + ", logo=" + logo + "]";
+		String us = "";
+		for(String s : this.users) {
+			us+=s;
+			us+="\n";
+		}
+		return "Organisation [name=" + name + ", description=" + description + ", logo=" + logo + " users:\n" + us +"]";
 	}
 
 }

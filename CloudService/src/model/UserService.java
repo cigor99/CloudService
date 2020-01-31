@@ -29,19 +29,30 @@ public class UserService {
 		//load users and organisations
 		Users users = (Users) ctx.getAttribute("users");
 		
+		System.out.println(users);
 		if(users == null)
 		{
+			
 			users = new Users(ctx.getRealPath("."));
+			System.out.println(users);
 			Organisations organisations = new Organisations(ctx.getRealPath("."));
+			System.out.println(organisations);
 			for(Organisation o : organisations.getOrganisations().values()) {
+				System.out.println(o.getUsers());
 				for(String u : o.getUsers()) {
+					System.out.println("U: " + u);
 					users.getUsers().get(u).setOrganisation(o);
 				}
 			}
 			ctx.setAttribute("users", users);
 			ctx.setAttribute("organisations", organisations);
+			//System.out.println("========================================");
+			//System.out.println(organisations);
+			//System.out.println("========================================");
+			//System.out.println(users);
 		}
 		
+		//System.out.println("========================================");
 		//load discs
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
@@ -49,22 +60,25 @@ public class UserService {
 		{
 			discs = new Discs(ctx.getRealPath("."));
 			ctx.setAttribute("discs", discs);
+			//System.out.println(discs);
 		}
 		//load vms
 		VMs vms = (VMs) ctx.getAttribute("vms");
-		
+		///System.out.println("========================================");
 		if(vms == null)
 		{
 			vms = new VMs(ctx.getRealPath("."));
 			ctx.setAttribute("vms", vms);
+			System.out.println(vms);
 		}
 		//load cats
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
-		
+		//System.out.println("========================================");
 		if(categories == null)
 		{
 			categories = new VMCategories(ctx.getRealPath("."));
 			ctx.setAttribute("vmCategories", categories);
+			System.out.println(categories);
 		}
 		
 	}

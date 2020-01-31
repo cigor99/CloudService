@@ -13,14 +13,14 @@ public class VMCategory {
 	// >0
 	private int numCPUCores;
 	// >0
-	private float ramCapacity;
+	private int ramCapacity;
 	private int numGPUCores;
 	
 	
 	public VMCategory() {
 		super();
 	}
-	public VMCategory(String name, int numCPUCores, float ramCapacity, int numGPUCores) {
+	public VMCategory(String name, int numCPUCores, int ramCapacity, int numGPUCores) {
 		super();
 		this.name = name;
 		this.numCPUCores = numCPUCores;
@@ -61,10 +61,10 @@ public class VMCategory {
 	public void setNumCPUCores(int numCPUCores) {
 		this.numCPUCores = numCPUCores;
 	}
-	public float getRamCapacity() {
+	public int getRamCapacity() {
 		return ramCapacity;
 	}
-	public void setRamCapacity(float ramCapacity) {
+	public void setRamCapacity(int ramCapacity) {
 		this.ramCapacity = ramCapacity;
 	}
 	public int getNumGPUCores() {

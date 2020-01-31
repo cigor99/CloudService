@@ -23,6 +23,51 @@ public class UserService {
 	@Context
 	ServletContext ctx;
 	
+	@GET
+	@Path("/loadAll")
+	public void loadAll() {
+		//load users and organisations
+		Users users = (Users) ctx.getAttribute("users");
+		if(users == null)
+		{
+			users = new Users(ctx.getRealPath("."));
+			Organisations organisations = new Organisations(ctx.getRealPath("."));
+			for(Organisation o : organisations.getOrganisations().values()) {
+				for(String u : o.getUsers()) {
+					users.getUsers().get(u).setOrganisation(o);
+				}
+			}
+			ctx.setAttribute("users", users);
+			ctx.setAttribute("organisations", organisations);
+		}
+		
+		//load discs
+		Discs discs = (Discs) ctx.getAttribute("discs");
+		
+		if(discs == null)
+		{
+			discs = new Discs(ctx.getRealPath("."));
+			ctx.setAttribute("discs", discs);
+		}
+		//load vms
+		VMs vms = (VMs) ctx.getAttribute("vms");
+		
+		if(vms == null)
+		{
+			vms = new VMs(ctx.getRealPath("."));
+			ctx.setAttribute("vms", vms);
+		}
+		//load cats
+		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
+		
+		if(categories == null)
+		{
+			categories = new VMCategories(ctx.getRealPath("."));
+			ctx.setAttribute("vmCategories", categories);
+		}
+		
+	}
+	
 	@POST
 	@Path("/validate")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)

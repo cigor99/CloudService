@@ -1,8 +1,31 @@
 var currentUser;
 
+
+var selectOrg = $("<select name=\"orgName\" id=\"orgName\" </select>");
+
+var selectCategory = $("<select name=\"category\" id=\"category\" </select>")
+
+var core = $("<td><input type=\"text\" name=\"core\" id=\"core\" readonly ></td>")
+	
+var ram = $("<td><input type=\"text\" name=\"ram\" id=\"ram\" readonly ></td>")
+	
+var gpu = $("<td><input type=\"text\" name=\"gpu\" id=\"gpu\" readonly ></td>")
+
 checkIfLogged();
 
 $(document).ready(function(e){
+	
+	$.ajax({
+		type : 'GET',
+		url : "rest/vmServ/getVMs",
+		contentType : "application/json",
+		success : function(response){
+			printVMs(response)
+		},
+		error : function(){
+			alert("Error")
+		}
+	});
 	
 	$('a[href="#viewVMs"]').click(function(){
 		$.ajax({
@@ -34,7 +57,8 @@ function printVMs(vms){
 	header.append("<th>Num CPU Cores</th>")
 	header.append("<th>Ram</th>")
 	header.append("<th>Num GPU Cores</th>")
-	header.append("<th>Organisation</th>")
+	if(currentUser.role=="SUPER_ADMIN")
+		header.append("<th>Organisation</th>")
 	
 	$.each(vms, function(key,value){
 		var row = $("<tr id=\""+key+"\" class=\"editVM\"></tr>")
@@ -43,14 +67,17 @@ function printVMs(vms){
 		row.append("<td id=\"" + key + "\">" + value.numCPUCores + "</td>")
 		row.append("<td id=\"" + key + "\">" + value.ramCapacity + "</td>")
 		row.append("<td id=\"" + key + "\">" + value.numGPUCores + "</td>")
-		row.append("<td id=\"" + key + "\">" + value.organisation.name + "</td>")
+		if(currentUser.role=="SUPER_ADMIN")
+			row.append("<td id=\"" + key + "\">" + value.organisation.name + "</td>")
 		
 		body.append(row)
 	});
 	
-	if(currentUser.role!="USER")
+	if(currentUser.role=="SUPER_ADMIN")
+		body.append("<tr><td><input type=\"submit\" id=\"addVM\" name=\"addVM\" value=\"Add new VM\"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
+	if(currentUser.role=="ADMIN")
 		body.append("<tr><td><input type=\"submit\" id=\"addVM\" name=\"addVM\" value=\"Add new VM\"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
-
+	
 	
 	$("#addVM").click(function(e){
 		e.preventDefault();
@@ -154,119 +181,157 @@ function addNewVM(vms){
 	row1.append("<td>Name</td>")
 	row1.append("<td class=\"wrap-input validate-input \" data-validate=\"Name is required\"><input class=\"input-data\" type=\"text\" name=\"name\" id=\"name\"></td>")
 	
-	
-	
 	var row2 = $("<tr></tr>")
-	row2.append("<td>Category</td>")
+	row2.append("<td>Organisation</td>")
+	if(currentUser.role=="ADMIN"){
+		var org = currentUser.organisation.name
+		row2.append("<td><input type=\"text\" name=\"org\" id=\"org\" readonly ></td>")
+	}
+	
+	selectOrg.append("<option></option>")
+	if(currentUser.role=="SUPER_ADMIN"){
+		$.ajax({
+			type : 'GET',
+			url : "rest/orgServ/listOrganisations",
+			contentType : "application/json",
+			success : function(response){
+				$.each(response, function(key, value){
+					var option1 = $("<option></option>");
+					option1.append(key);
+					selectOrg.append(option1);
+				});
+				row2.append(selectOrg);
+			}
+		});
+	}
+	
+	var row3 = $("<tr></tr>")
+	row3.append("<td>Discs</td>")
+	
+	var selectDisc = $("<select name=\"disc\" id=\"disc\" multiple=\"multiple\"</select>")
+	
+	row3.append(selectDisc);
+	
+	selectCategory.append("<option></option>")
+	var row4 = $("<tr></tr>")
+	row4.append("<td>Category</td>")
 	$.ajax({
 		type : 'GET',
 		url : "rest/catServ/getCategories",
 		contentType : "application/json",
 		success : function(response){
-			var categories = response
-			var selectCat = $("<select name=\"category\" id=\"category\"</select>")
-			$.each(categories, function(key, value){
-				var option = $("<option></option>");
-				option.append(key);
-				selectCat.append(option);
+			$.each(response, function(key, value){
+				var option2 = $("<option></option>");
+				option2.append(key);
+				selectCategory.append(option2);
 			});
-			row2.append(selectCat);
 		}
 	});
+	row4.append(selectCategory);
 	
-
-
-	var org = currentUser.organisation.name;
-
+	var row5 = $("<tr></tr>")
+	row5.append("<td>Core number</td>")
+	row5.append(core)
 	
-	console.log(org);
+	var row6 = $("<tr></tr>")
+	row6.append("<td>Ram capacity</td>")
+	row6.append(ram)
 	
-	form.append(table)
-	var row4 = $("<tr></tr>")
-	row4.append("<td>Discs<td>")
-	var selectDiscs = $("<select multiple id=\"discs\"></select>")
-	$.ajax({
-		type : 'POST',
-		url : "rest/vmServ/as",
-		contentType : "application/json",
-		success : function(response){
-			var discs = response;
-			$.each(discs, function(key, value){
-				var option = $("<option></option>");
-				option.append(key);
-				selectDiscs.append(option);
-			});
-		},
-		error : function(){
-			alert("Error")
-		}
-	});
+	var row7 = $("<tr></tr>")
+	row7.append("<td>GPU</td>")
+	row7.append(gpu)
+	
+	var row8 = $("<tr></tr>")
+	row8.append("<td><input id=\"add\" type=\"submit\" value=\"Add\"></td>");
 
 	table.append(row1)
 	table.append(row2)
-	
+	table.append(row3)
 	table.append(row4)
 	table.append(row5)
+	table.append(row6)
+	table.append(row7)
+	table.append(row8)
 	
-	var row5 = $("<tr></tr>")
-	row5.append("<td><input id=\"add\" type=\"submit\" value=\"Add\"></td>");
-
+	form.append(table)
 	
-	/*
 	// When inputs with these classes get into focus, alert disappears
-	$('.data-form .input-data').each(function(){
+	$('.input-data').each(function(){
         $(this).focus(function(){
            hideValidate(this);
         });
     });
 	
+
+	selectOrg.on("change",function(){
+		var orgName = selectOrg.val()
+		$.ajax({
+			type : 'POST',
+			url : "rest/discServ/getOrgFreeDiscs",
+			dataType : "json",
+			data : {
+				"orgName" : orgName
+			},
+			success : function(response){
+				selectDisc.empty()
+				$.each(response, function(key, value){
+					var option3 = $("<option></option>");
+					option3.append(key);
+					selectDisc.append(option3);
+				});
+			}
+		})
+	})
+	
+	selectCategory.on("change",function(){
+		var catName = selectCategory.val()
+		$.ajax({
+			type : 'POST',
+			url : "rest/catServ/getCategory",
+			dataType : "json",
+			data : {
+				"catName" : catName
+			},
+			success : function(response){
+				$("#core").val(response.numCPUCores)
+				$("#ram").val(response.ramCapacity)
+				$("#gpu").val(response.numGPUCores)
+			}
+		});
+	})
+	
 	$("#add").click(function(e){
 		e.preventDefault()
 		var name = $("#name").val()
-		var core = $("#core").val()
-		var ram = $("#ram").val()
-		var gpu = $("#gpu").val()
-		
+		var categoryName = selectCategory.val()
+		var organisation = selectOrg.val()
+		//var disc = $("#disc").val()
 		if(name == ''){
             showValidate($("#name"));
         }else{
         	hideValidate($("#name"));
         }
 		
-		if(core == ''){
-            showValidate($("#core"));
-        }else{
-        	hideValidate($("#core"));
-        }
-		
-		if(ram == ''){
-            showValidate($("#ram"));
-        }else{
-        	hideValidate($("#ram"));
-        }
-		
-		if(gpu == '')
-			gpu = "0"
-		
-		if(!name || !core || !ram || !gpu)
+		if(!name)
 			return
 			
 		$.ajax({
 			type : 'POST',
-			url : "rest/catServ/addVMCategory",
+			url : "rest/vmServ/addVM",
 			dataType : "json",
 			data : {
 				"name" : name,
-				"core" : core,
-				"ram" : ram,
-				"gpu" : gpu
+				"categoryName" : categoryName,
+				"organisation" : organisation
+				//"disc" : disc
 			},
 			success : function(response){
 				if(response==undefined)
-					alert("VM Category with given name already exists!")
+					alert("VM  with given name already exists!")
 				else
-					printCategories(response)
+					printVMs(response)
 			}
 		});
-	})*/
+	})
 }
+

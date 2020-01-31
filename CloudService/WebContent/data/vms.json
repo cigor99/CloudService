@@ -10,7 +10,8 @@
       ],
       "resources": [
         "VM2",
-        "Disc3"
+        "Disc3",
+        "Disc4"
       ]
     },
     "category": {
@@ -34,7 +35,8 @@
           ],
           "resources": [
             "VM2",
-            "Disc3"
+            "Disc3",
+            "Disc4"
           ]
         },
         "type": "SSD",

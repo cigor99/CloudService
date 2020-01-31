@@ -1,6 +1,7 @@
 package model;
 
 import java.util.HashMap;
+import java.util.Locale.Category;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -125,6 +126,18 @@ public class CategoryService {
 		categories.getVmCategories().remove(oldName);
 		
 		return categories.getVmCategories();
+		
+	}
+	
+	@POST
+	@Path("/getCategory")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public VMCategory getCategory(@FormParam("catName") String catName)
+	{
+		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
+		
+		return categories.getVmCategories().get(catName);
 		
 	}
 }

@@ -1,4 +1,23 @@
 {
+  "Disc4": {
+    "organisation": {
+      "name": "Organisation2",
+      "description": "Biomedical organisation",
+      "logo": "data/logos\\logo1.jpg",
+      "users": [
+        "email3",
+        "email4"
+      ],
+      "resources": [
+        "VM2",
+        "Disc3",
+        "Disc4"
+      ]
+    },
+    "type": "HDD",
+    "capacity": 4,
+    "name": "Disc4"
+  },
   "Disc3": {
     "organisation": {
       "name": "Organisation2",
@@ -10,7 +29,8 @@
       ],
       "resources": [
         "VM2",
-        "Disc3"
+        "Disc3",
+        "Disc4"
       ]
     },
     "type": "SSD",

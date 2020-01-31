@@ -1,5 +1,6 @@
 package model;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import javax.servlet.ServletContext;
@@ -51,7 +52,7 @@ public class VMService {
 	
 	
 	
-	@POST
+	/*@POST
 	@Path("/as")
 	@Produces(MediaType.APPLICATION_JSON)
 	public HashMap<String, Disc> getDiscsOfOrganisation(){
@@ -76,6 +77,39 @@ public class VMService {
 		logger.append(ds.toString());
 		logger.logAll();
 		return ds;
+	}*/
+	
+	@POST
+	@Path("/addVM")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public HashMap<String, VM> addVM(@FormParam("name") String name, @FormParam("categoryName") String categoryName, @FormParam("organisation") String organisation){
+		
+		VMs vms = (VMs) ctx.getAttribute("vms");
+		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
+		VMCategory cat = categories.getVmCategories().get(categoryName);
+		Organisations orgs = (Organisations) ctx.getAttribute("organisations");
+		Discs dis = (Discs) ctx.getAttribute("discs");
+		if(vms.getVms().containsKey(name))
+			return null;
+					
+		VM vm = new VM();
+		
+		vm.setName(name);
+		vm.setCategory(cat);
+		vm.setOrganisation(orgs.getOrganisations().get(organisation));
+		vm.setNumCPUCores(cat.getNumCPUCores());
+		vm.setNumGPUCores(cat.getNumGPUCores());
+		vm.setRamCapacity(cat.getRamCapacity());
+		/*for(String d : discs) {
+			vm.getDiscs().put(d, dis.getDiscs().get(d));
+			dis.getDiscs().get(d).setVmName(name);
+		}*/
+		
+		vms.getVms().put(name, vm);
+		
+		return getVMs();
+		
 	}
 	
 }

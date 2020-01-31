@@ -1,5 +1,13 @@
 $(document).ready(function(e) {
 	
+	$.ajax({
+		type : 'GET',
+		url : "rest/userServ/loadAll",
+		error : function() {
+			alert("Error")
+		}
+	});
+	
 	$("#logOut").click(function(e){
 		e.preventDefault();
 		console.log("log out");

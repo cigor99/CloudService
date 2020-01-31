@@ -84,6 +84,17 @@ public class DiscService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, Disc> addDisc(@FormParam("name") String name, @FormParam("discType") String discType, @FormParam("capacity") String capacity, @FormParam("vmName") String vmName)
 	{
+		String[] args = {capacity, discType, name, vmName};
+		if(Validator.valEmpty(args)) {
+			return null;
+		}
+		if(!Validator.valType(discType)) {
+			return null;
+		}
+		if(!Validator.valPositive(capacity)) {
+			return null;
+		}
+		
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
 		if(discs.getDiscs().containsKey(name))
@@ -121,6 +132,17 @@ public class DiscService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, Disc> editVMCategory(@FormParam("oldName") String oldName, @FormParam("newName") String newName, @FormParam("discType") String discType,@FormParam("capacity") String capacity,@FormParam("oldVMname") String oldVMname,@FormParam("newVMname") String newVMname)
 	{
+		
+		String[] args = {capacity, discType, newName, oldName, newVMname, oldVMname};
+		if(Validator.valEmpty(args)) {
+			return null;
+		}
+		if(!Validator.valType(discType)) {
+			return null;
+		}
+		if(!Validator.valPositive(capacity)) {
+			return null;
+		}
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
 		Organisations orgs = (Organisations) ctx.getAttribute("organisations");
@@ -167,6 +189,9 @@ public class DiscService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, Disc> deleteCategory(@FormParam("oldName") String oldName)
 	{
+		if(oldName.equals("")) {
+			return null;
+		}
 		
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
@@ -196,6 +221,9 @@ public class DiscService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, Disc> getOrgFreeDiscs(@FormParam("orgName") String orgName)
 	{
+		if(orgName.equals("")) {
+			return null;
+		}
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
 		HashMap<String, Disc> freeDiscs = new HashMap<String, Disc>();
@@ -217,6 +245,9 @@ public class DiscService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, Disc> getAllVMDiscs(@FormParam("vmName") String vmName)
 	{
+		if(vmName.equals("")) {
+			return null;
+		}
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
 		HashMap<String, Disc> allDiscs = new HashMap<String, Disc>();

@@ -72,7 +72,6 @@ public class OrganisationService {
 	}
 	
 	private String makeLogoPath(String fakePath) {
-		String sep = File.separator;
 		String[] token = fakePath.split("fakepath");
 		String path = "data" + "/" + "logos";
 		if(token.length==1)
@@ -89,6 +88,9 @@ public class OrganisationService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, Organisation> addNewOrg(@FormParam("name") String name, @FormParam("description") String description, @FormParam("logo") String logo){
+		if(name.equals("")) {
+			return null;
+		}
 		Organisations organisations = (Organisations) ctx.getAttribute("organisations");
 		Organisation org = new Organisation(name, description, makeLogoPath(logo), new ArrayList<String>(),new  ArrayList<String>());
 		if(!organisations.getOrganisations().containsKey(name)) {
@@ -111,6 +113,10 @@ public class OrganisationService {
 	public HashMap<String, Organisation> editOrganisation(@FormParam("oldName") String oldName,@FormParam("name") String name, @FormParam("description") String description, @FormParam("logo") String logo){
 		Organisations organisations = (Organisations) ctx.getAttribute("organisations");
 		
+		if(name.equals("")) {
+			return null;
+		}
+		
 		if(!oldName.equals(name)) {
 			if(organisations.getOrganisations().containsKey(name)) {
 				return null;
@@ -119,15 +125,63 @@ public class OrganisationService {
 		
 		Organisation org = organisations.getOrganisations().get(oldName);
 		organisations.getOrganisations().remove(oldName);
+		
+		
 		org.setName(name);
 		org.setDescription(description);
 		org.setLogo( makeLogoPath(logo));
 		
+		VMs vms = getVMs();
+		for(VM value : vms.getVms().values()) {
+			if(value.getOrganisation().equals(oldName)) {
+				value.setOrganisation(name);
+			}
+		}
+		
+		Users users = getUsers();
+		for(User value : users.getUsers().values()) {
+			if(value.getOrganisation().getName().equals(oldName)) {
+				value.setOrganisation(org);
+			}
+		}
+		
+		Discs discs = getDiscs();
+		for(Disc value : discs.getDiscs().values()) {
+			if(value.getOrganisation().equals(oldName)) {
+				value.setOrganisation(name);
+			}
+		}
+		
 		organisations.getOrganisations().put(name, org);
-
 		organisations.WriteToFile(ctx.getRealPath("."));
 		return organisations.getOrganisations();
 	}
+	
+	private VMs getVMs(){
+		VMs vms = (VMs) ctx.getAttribute("vms");
+		if(vms == null) {
+			vms = new VMs(ctx.getRealPath("."));
+			ctx.setAttribute("vms", vms);
+		}
+		return vms;
+	}
 
+	private Discs getDiscs(){
+		Discs discs = (Discs) ctx.getAttribute("dics");
+		if(discs == null) {
+			discs = new Discs(ctx.getRealPath("."));
+			ctx.setAttribute("discs", discs);
+		}
+		return discs;
+	}
+	
+	private Users getUsers(){
+		Users users = (Users) ctx.getAttribute("users");
+		if(users == null) {
+			users = new Users(ctx.getRealPath("."));
+			ctx.setAttribute("users", users);
+		}
+		return users;
+	}
 }
 

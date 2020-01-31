@@ -1,7 +1,6 @@
 package model;
 
 import java.util.HashMap;
-import java.util.Locale.Category;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +44,18 @@ public class CategoryService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, VMCategory> addVMCategory(@FormParam("name") String name, @FormParam("core") String core,@FormParam("ram") String ram,@FormParam("gpu") String gpu)
 	{
+		String[] args = {name, core, ram, gpu};
+		if(Validator.valEmpty(args)) {
+			return null;
+		}
+		String[] nums = {core, ram, gpu};
+		if(!Validator.valNumber(nums)) {
+			return null;
+		}
+		String[] pos = {core,ram};
+		if(!Validator.valPositive(pos)) {
+			return null;
+		}
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
 		
 		if(categories.getVmCategories().containsKey(name))
@@ -64,6 +75,18 @@ public class CategoryService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, VMCategory> editVMCategory(@FormParam("oldName") String oldName, @FormParam("newName") String newName, @FormParam("core") String core,@FormParam("ram") String ram,@FormParam("gpu") String gpu)
 	{
+		String[] args = {oldName, newName, core, gpu, ram};
+		if(Validator.valEmpty(args)) {
+			return null;
+		}
+		String[] nums = {core, ram, gpu};
+		if(!Validator.valNumber(nums)) {
+			return null;
+		}
+		String[] pos = {core,ram};
+		if(!Validator.valPositive(pos)) {
+			return null;
+		}
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
 		
 		if(!newName.equals(oldName))
@@ -114,6 +137,9 @@ public class CategoryService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, VMCategory> deleteCategory(@FormParam("oldName") String oldName)
 	{
+		if(oldName.equals("")) {
+			return null;
+		}
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
 		
 		VMCategory cat = categories.getVmCategories().get(oldName);
@@ -135,6 +161,9 @@ public class CategoryService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public VMCategory getCategory(@FormParam("catName") String catName)
 	{
+		if(catName.equals("")) {
+			return null;
+		}
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
 		
 		return categories.getVmCategories().get(catName);

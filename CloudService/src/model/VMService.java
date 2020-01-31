@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +56,20 @@ public class VMService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public HashMap<String, VM> addVM(VM vm){
+		if(vm == null) {
+			return null;
+		}
+		ArrayList<Integer> positive = new ArrayList<Integer>();
+		positive.add(vm.getNumCPUCores());
+		positive.add(vm.getRamCapacity());
+		if(vm.getNumGPUCores() < 0) 
+			return null;
+		if(!Validator.valPositive(positive))
+			return null;
+		String[] args = {vm.getName(), vm.getOrganisation()};
+		if(Validator.valEmpty(args)) {
+			return null;
+		}
 		
 		VMs vms = (VMs) ctx.getAttribute("vms");
 		Discs discs = (Discs) ctx.getAttribute("discs");
@@ -86,6 +101,20 @@ public class VMService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public HashMap<String, VM> editVM(VMWrapper vmWrap){
+		if(vmWrap == null) {
+			return null;
+		}
+		ArrayList<Integer> positive = new ArrayList<Integer>();
+		positive.add(vmWrap.getNumCPUCores());
+		positive.add(vmWrap.getRamCapacity());
+		if(vmWrap.getNumGPUCores() < 0) 
+			return null;
+		if(!Validator.valPositive(positive))
+			return null;
+		String[] args = {vmWrap.getName(), vmWrap.getOrganisation(), vmWrap.getOldName()};
+		if(Validator.valEmpty(args)) {
+			return null;
+		}
 		
 		VMs vms = (VMs) ctx.getAttribute("vms");
 		Discs discs = (Discs) ctx.getAttribute("discs");
@@ -136,6 +165,11 @@ public class VMService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, VM> deleteVM(@FormParam("oldName") String oldName, @FormParam("organisation") String organisation){
+		
+		String[] args = {oldName, organisation};
+		if(Validator.valEmpty(args)) {
+			return null;
+		}
 		
 		System.out.println("Uso");
 		VMs vms = (VMs) ctx.getAttribute("vms");

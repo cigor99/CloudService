@@ -28,6 +28,7 @@ public class UserService {
 	public void loadAll() {
 		//load users and organisations
 		Users users = (Users) ctx.getAttribute("users");
+		
 		if(users == null)
 		{
 			users = new Users(ctx.getRealPath("."));
@@ -74,6 +75,16 @@ public class UserService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public User validate(@FormParam("username") String username, @FormParam("password") String password)
 	{
+		
+		String[] args = {username, password};
+		if(Validator.valEmpty(args)) {
+			return null;
+		}
+		if(!username.equals("admin")){
+			if(!Validator.valEmail(username)) {
+				return null;
+			}
+		}
 		HashMap<String, User> users = getUsers().getUsers();
 				
 		for(String email : users.keySet())
@@ -137,8 +148,8 @@ public class UserService {
 	@Path("/getCurrentUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	public User getCurrentUser() {
-		User usr = (User) request.getSession().getAttribute("currentUser");
-		return usr;
+		User current = (User) request.getSession().getAttribute("currentUser");
+		return current;
 	}
 	
 	@GET
@@ -154,7 +165,17 @@ public class UserService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, User> addNewUser(@FormParam("email") String email,@FormParam("password") String password,@FormParam("name") String name,@FormParam("surname") String surname,@FormParam("role") String role,@FormParam("organisation") String organisation){
+		String[] args = {email, password, name, organisation, surname, role};
+		if(Validator.valEmpty(args)) {
+			return null;
+		}
+		if(!Validator.valEmail(email)) {
+			return null;
+		}
 		
+		if(!Validator.valRole(role)) {
+			return null;
+		}
 		Organisations organisations = (Organisations)ctx.getAttribute("organisations");
 		Users users = (Users)ctx.getAttribute("users");
 		Role r = Role.ADMIN;
@@ -182,7 +203,18 @@ public class UserService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, User> editUser(@FormParam("email") String email,@FormParam("password") String password,@FormParam("name") String name,@FormParam("surname") String surname,@FormParam("role") String role){
+	
+		String[] args = {email, password, name, surname, role};
+		if(Validator.valEmpty(args)) {
+			return null;
+		}
+		if(!Validator.valEmail(email)) {
+			return null;
+		}
 		
+		if(!Validator.valRole(role)) {
+			return null;
+		}
 		Users users = (Users)ctx.getAttribute("users");
 		Role r = Role.ADMIN;
 		if(role == "User") {
@@ -211,6 +243,13 @@ public class UserService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public User updateProfile(@FormParam("oldEmail") String oldEmail, @FormParam("email") String email,@FormParam("password") String password, @FormParam("name") String name,@FormParam("surname") String surname){		
 		
+		String[] args = {email, password, name, surname};
+		if(Validator.valEmpty(args)) {
+			return null;
+		}
+		if(!Validator.valEmail(email)) {
+			return null;
+		}
 		Users users = (Users)ctx.getAttribute("users");
 		
 		User user = users.getUsers().get(oldEmail);
@@ -243,6 +282,13 @@ public class UserService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public HashMap<String, User> deleteUser(@FormParam("email") String email,@FormParam("organisation") String organisation)
 	{
+		String[] args = {email, organisation};
+		if(Validator.valEmpty(args)) {
+			return null;
+		}
+		if(!Validator.valEmail(email)) {
+			return null;
+		}
 		Users users = (Users)ctx.getAttribute("users");
 		users.getUsers().remove(email);
 		

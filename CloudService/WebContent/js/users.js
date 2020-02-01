@@ -63,7 +63,7 @@ function printUsers(users){
 				if(value.organisation == null){
 					row.append("<td id=\""+key+"\">" + "/"+ "</td>");
 				}else{
-					row.append("<td id=\""+key+"\">" + value.organisation.name+ "</td>");
+					row.append("<td id=\""+key+"\">" + value.organisation + "</td>");
 				}
 			}
 			body.append(row)
@@ -227,7 +227,7 @@ function addNewUser(organisations){
 		
 		
 		if(currentUser.role=="ADMIN"){
-			organisation = currentUser.organisation.name
+			organisation = currentUser.organisation
 		}
 		
 		$.ajax({
@@ -244,11 +244,13 @@ function addNewUser(organisations){
 			},
 			success : function(response){
 				if (response == undefined) {
-					alert("User with given email already exists!");
-				} else {
+					alert("User with given email already exists!");	
+				}else {
 					printUsers(response);
-					
 				}
+			},
+			error : function(data) {
+				alert(data.responseText)
 			}
 		});
 	});
@@ -279,7 +281,7 @@ function editUser(user){
 	
 	var row5 = $("<tr></tr>")
 	row5.append("<td>Organisation</td>")
-	row5.append("<td colspan=\"2\" ><input name=\"organisation\" id=\"organisation\" type=\"text\" value=\""+user.organisation.name + "\" readonly></td>")
+	row5.append("<td colspan=\"2\" ><input name=\"organisation\" id=\"organisation\" type=\"text\" value=\""+user.organisation + "\" readonly></td>")
 	
 	var row6 = $("<tr></tr>")
 	row6.append("<td>Role</td>")

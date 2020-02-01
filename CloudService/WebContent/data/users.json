@@ -23,15 +23,8 @@
     "organisation": "Organisation1",
     "role": "ADMIN"
   },
-  "admin": {
-    "email": "admin",
-    "password": "admin",
-    "name": "Admin",
-    "surname": "Admin",
-    "role": "SUPER_ADMIN"
-  },
   "email4@email.com": {
-    "email": "email4",
+    "email": "email4@email.com",
     "password": "pass4",
     "name": "Name4",
     "surname": "Surname4",

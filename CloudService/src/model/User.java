@@ -81,7 +81,6 @@ public class User {
 	public String getOrganisation() {
 		return organisation;
 	}
-	
 	public void setOrganisation(String organisation) {
 		this.organisation = organisation;
 	}

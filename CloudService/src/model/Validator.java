@@ -24,9 +24,9 @@ public class Validator {
 	}
 
 	public static boolean valRole(String role) {
-		if(role.equals("ADMIN")) {
+		if(role.equalsIgnoreCase("ADMIN")) {
 			return true;
-		}else if(role.equals("USER")) {
+		}else if(role.equalsIgnoreCase("USER")) {
 			return true;
 		}
 		else {

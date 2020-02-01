@@ -22,9 +22,10 @@ $(document).ready(function(e){
 		success : function(response){
 			printVMs(response)
 		},
-		error : function(){
-			alert("Error")
+		error : function(data){
+			alert(data.responseText);
 		}
+		
 	});
 	
 	$('a[href="#viewVMs"]').click(function(){
@@ -35,9 +36,10 @@ $(document).ready(function(e){
 			success : function(response){
 				printVMs(response)
 			},
-			error : function(){
-				alert("Error")
+			error : function(data){
+				alert(data.responseText);
 			}
+			
 		});
 	});
 	
@@ -78,7 +80,119 @@ function printVMs(vms){
 	if(currentUser.role=="ADMIN")
 		body.append("<tr><td><input type=\"submit\" id=\"addVM\" name=\"addVM\" value=\"Add new VM\"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
 	
+	table = $("<table></table>")
 	
+	table.append("<tr><td colspan =\"4\" ><input id=\"search\" name=\"search\" class=\"searchBar\" type=\"text\" placeholder=\"Search..\" ></td></tr>")
+	table.append("<tr><td colspan =\"4\2\" >Fillter by:</td></tr>")
+	
+	var rowF3 = $("<tr></tr>")
+	rowF3.append("<td>Number of cores:</td>")
+	rowF3.append("<input id=\"cpufrom\" name=\"cpufrom\" class=\"fillterField\" type=\"text\" >")
+	rowF3.append("<td>-</td>")
+	rowF3.append("<input id=\"cputo\" name=\"cputo\" class=\"fillterField\" type=\"text\" >")
+	
+	var rowF4 = $("<tr></tr>")
+	rowF4.append("<td>RAM:</td>")
+	rowF4.append("<input id=\"ramfrom\" name=\"ramfrom\" class=\"fillterField\" type=\"text\" >")
+	rowF4.append("<td>-</td>")
+	rowF4.append("<input id=\"ramto\" name=\"ramto\" class=\"fillterField\" type=\"text\" >")
+	
+	var rowF5 = $("<tr></tr>")
+	rowF5.append("<td>GPU:</td>")
+	rowF5.append("<input id=\"gpufrom\" name=\"gpufrom\" class=\"fillterField\" type=\"text\" >")
+	rowF5.append("<td>-</td>")
+	rowF5.append("<input id=\"gputo\" name=\"gputo\" class=\"fillterField\" type=\"text\" >")
+	
+	var rowF6 = $("<tr></tr>")
+	rowF6.append("<td><input type=\"button\" id=\"filterVM\" name=\"filterVM\" value=\"Filter VMs\"</td>")
+	
+	table.append(rowF3)
+	table.append(rowF4)
+	table.append(rowF5)
+	table.append(rowF6)
+	
+	edit.append(table)
+	
+	$("#filterVM").click(function(e){
+		e.preventDefault();
+		$.ajax({
+			type : 'POST',
+			url : "rest/vmServ/filterVM",
+			dataType : "json",
+			data : {
+				"cpufrom" : $("#cpufrom").val(),
+				"cputo" : $("#cputo").val(),
+				"ramfrom" : $("#ramfrom").val(),
+				"ramto" : $("#ramto").val(),
+				"gpufrom" : $("#gpufrom").val(),
+				"gputo" : $("#gputo").val(),
+				"text" : $("#search").val()
+			},
+			success : function(vms){
+				var body = $("#fillBody")
+				body.empty()
+				$.each(vms, function(key,value){
+					var row = $("<tr id=\""+key+"\" class=\"editVM\"></tr>")
+					
+					row.append("<td id=\"" + key + "\">" + value.name + "</td>")
+					row.append("<td id=\"" + key + "\">" + value.numCPUCores + "</td>")
+					row.append("<td id=\"" + key + "\">" + value.ramCapacity + "</td>")
+					row.append("<td id=\"" + key + "\">" + value.numGPUCores + "</td>")
+					if(currentUser.role=="SUPER_ADMIN")
+						row.append("<td id=\"" + key + "\">" + value.organisation + "</td>")
+					
+					body.append(row)
+				});
+				
+				if(currentUser.role=="SUPER_ADMIN")
+					body.append("<tr><td><input type=\"submit\" id=\"addVM\" name=\"addVM\" value=\"Add new VM\"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
+				if(currentUser.role=="ADMIN")
+					body.append("<tr><td><input type=\"submit\" id=\"addVM\" name=\"addVM\" value=\"Add new VM\"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
+
+			}
+		})
+		
+	});
+	
+	 $("#search").on("keyup", function(){
+		 var text = $("#search").val()
+			$.ajax({
+				type : 'POST',
+				url : "rest/vmServ/getFillterVMs",
+				dataType : "json",
+				data :
+					{
+						"text" : text
+					},
+				success : function(vms){
+					var body = $("#fillBody")
+					body.empty()
+					$.each(vms, function(key,value){
+						var row = $("<tr id=\""+key+"\" class=\"editVM\"></tr>")
+						
+						row.append("<td id=\"" + key + "\">" + value.name + "</td>")
+						row.append("<td id=\"" + key + "\">" + value.numCPUCores + "</td>")
+						row.append("<td id=\"" + key + "\">" + value.ramCapacity + "</td>")
+						row.append("<td id=\"" + key + "\">" + value.numGPUCores + "</td>")
+						if(currentUser.role=="SUPER_ADMIN")
+							row.append("<td id=\"" + key + "\">" + value.organisation + "</td>")
+						
+						body.append(row)
+					});
+					
+					if(currentUser.role=="SUPER_ADMIN")
+						body.append("<tr><td><input type=\"submit\" id=\"addVM\" name=\"addVM\" value=\"Add new VM\"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
+					if(currentUser.role=="ADMIN")
+						body.append("<tr><td><input type=\"submit\" id=\"addVM\" name=\"addVM\" value=\"Add new VM\"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
+
+				},
+				error : function() {
+					alert("Error")
+				}
+			});
+	 });
+	
+	 
 	$("#addVM").click(function(e){
 		e.preventDefault();
 		$.ajax({
@@ -88,8 +202,8 @@ function printVMs(vms){
 			success : function(response){
 				addNewVM(response);
 			},
-			error : function() {
-				alert("Error")
+			error : function(data){
+				alert(data.responseText);
 			}
 		});
 	});
@@ -147,7 +261,7 @@ function editVM(vm){
 	row4.append("<td>Category</td>")
 	$.ajax({
 		type : 'GET',
-		url : "rest/catServ/getCategories",
+		url : "rest/catServ/getCategories", ///////////////DA L SAM SMEO OVO DA MENJAM
 		contentType : "application/json",
 		success : function(response){
 			$.each(response, function(key, value){
@@ -157,6 +271,9 @@ function editVM(vm){
 			});
 			selectCategory.val(vm.category);
 			selectCategory.trigger("change")
+		},
+		error : function(data){
+			alert(data.responseText);
 		}
 	});
 	
@@ -244,7 +361,11 @@ function editVM(vm){
 					alert("VM  with given name already exists!")
 				else
 					printVMs(response)
+			},
+			error : function(data){
+				alert(data.responseText);
 			}
+			
 		});
 	})
 	
@@ -257,9 +378,10 @@ function editVM(vm){
 			success : function(response){
 				printVMs(response)
 			},
-			error : function(){
-				alert("Error")
+			error : function(data){
+				alert(data.responseText);
 			}
+			
 		});
 	});
 	
@@ -277,9 +399,10 @@ function editVM(vm){
 			success : function(response){
 				printVMs(response)
 			},
-			error : function(){
-				alert("Error")
+			error : function(data){
+				alert(data.responseText);
 			}
+			
 		});
 	});
 	
@@ -313,7 +436,11 @@ function addNewVM(vms){
 				selectOrg.append(option1);
 				row2.append(selectOrg);
 				selectOrg.trigger("change")
+			},
+			error : function(data){
+				alert(data.responseText);
 			}
+			
 		});
 	}
 	
@@ -330,7 +457,11 @@ function addNewVM(vms){
 				});
 				row2.append(selectOrg);
 				selectOrg.trigger("change")
+			},
+			error : function(data){
+				alert(data.responseText);
 			}
+			
 		});
 	}
 	
@@ -473,7 +604,11 @@ function addNewVM(vms){
 					alert("VM  with given name already exists!")
 				else
 					printVMs(response)
+			},
+			error : function(data){
+				alert(data.responseText);
 			}
+			
 		});
 	})
 }

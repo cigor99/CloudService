@@ -310,10 +310,124 @@ public class VMService {
 			discs.getDiscs().get(d).setVmName(null);
 		}
 		
-		
-		
 		return getVMs();
 		
 	}
 	
+	@POST
+	@Path("/getFillterVMs")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public HashMap<String, VM> getFillterVMs(@FormParam("text") String text)
+	{
+		HashMap<String,VM> vms = getVMs2();
+		
+		HashMap<String, VM> fillterVMs = new HashMap<String, VM>();
+		
+		for (String name : vms.keySet()) {
+			if(name.contains(text))
+				fillterVMs.put(name,vms.get(name));
+		}
+		
+		return fillterVMs;
+	}
+	
+	private HashMap<String,VM>  getVMs2()
+	{
+		User curr = (User) request.getSession().getAttribute("currentUser");
+		
+		VMs vms = (VMs) ctx.getAttribute("vms");
+		
+		if(vms == null)
+		{
+			vms = new VMs(ctx.getRealPath("."));
+			ctx.setAttribute("vms", vms);
+		}
+		if(curr.getRole().equals(Role.SUPER_ADMIN)) {
+			return vms.getVms();
+		}
+			
+		
+		Organisations organs = (Organisations) ctx.getAttribute("organisations");
+		
+		HashMap<String, VM> orgVM = new HashMap<String, VM>();
+		for(String r : organs.getOrganisations().get(curr.getOrganisation()).getResources()) {
+			if(vms.getVms().containsKey(r))
+				orgVM.put(r, vms.getVms().get(r));
+		}
+		
+		return orgVM;
+	}
+	
+	@POST
+	@Path("/filterVM")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public HashMap<String, VM> filterVM(@FormParam("cpufrom") String cpufrom,@FormParam("cputo") String cputo,
+			@FormParam("ramfrom") String ramfrom,@FormParam("ramto") String ramto,
+			@FormParam("gpufrom") String gpufrom,@FormParam("gputo") String gputo,
+			@FormParam("text") String text)
+	{
+		
+		HashMap<String,VM> vms = getFillterVMs(text);
+		
+		//svi
+		Integer cpufromI = from(cpufrom);
+		Integer cputoI = to(cputo);
+		Integer ramfromI = from(ramfrom);
+		Integer ramtoI = to(ramto);
+		Integer gpufromI = from(gpufrom);
+		Integer gputoI = to(gputo);
+		
+		//ako je bilo sta od toga svega neko slovo tj nije prazan string ili broj vracam gresku
+		if(cpufromI == null || cputoI == null || ramfromI==null || ramtoI==null || gpufromI==null || gputoI==null ) {
+			return null;
+		}
+		
+		HashMap<String, VM> fillterVMs = new HashMap<String, VM>();
+		
+		for (VM vm : vms.values()) {
+			if(vm.getNumCPUCores() >= cpufromI && vm.getNumCPUCores() <= cputoI && vm.getRamCapacity() >= ramfromI && vm.getRamCapacity() <= ramtoI && vm.getNumGPUCores() >= gpufromI && vm.getNumGPUCores() <=gputoI  ) {
+				fillterVMs.put(vm.getName(),vm);
+			}
+		}
+		
+		return fillterVMs;
+	}
+	
+	private static Integer from(String from) {
+		if(from.equals("")) {
+			return Integer.MIN_VALUE;
+		}else {
+			if(isNumeric(from)) {
+				return Integer.parseInt(from);
+			}
+		}
+		
+		return null;
+	}
+	
+	private static Integer to(String to) {
+		if(to.equals("")) {
+			return Integer.MAX_VALUE;
+		}else {
+			if(isNumeric(to)) {
+				return Integer.parseInt(to);
+			}
+		}
+		
+		return null;
+	}
+	
+	private static boolean isNumeric(String strNum) {
+	    if (strNum == null) {
+	        return false;
+	    }
+	    try {
+	        int i = Integer.parseInt(strNum);
+	    } catch (NumberFormatException nfe) {
+	        return false;
+	    }
+	    return true;
+	}
 }

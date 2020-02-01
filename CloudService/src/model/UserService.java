@@ -142,7 +142,6 @@ public class UserService {
 		}
 		ObjectMapper mapper = new ObjectMapper();
 		String JSON = "";
-		System.out.println("GETUSERS: ROLE:" + curr.getRole());
 		if(curr.getRole().equals(Role.SUPER_ADMIN))
 		{
 			try {
@@ -237,8 +236,8 @@ public class UserService {
 			organisations.getOrganisations().get(organisation).getUsers().add(email);
 			users.getUsers().put(email, user);
 			
-			ctx.setAttribute("users", users);
-			ctx.setAttribute("organisations", organisations);
+			//ctx.setAttribute("users", users);
+			//ctx.setAttribute("organisations", organisations);
 			users.WriteToFile(ctx.getRealPath("."));
 			organisations.WriteToFile(ctx.getRealPath("."));
 			
@@ -330,7 +329,7 @@ public class UserService {
 		
 		users.getUsers().put(email, user);
 		
-		ctx.setAttribute("users", users);
+		//ctx.setAttribute("users", users);
 		
 		users.WriteToFile(ctx.getRealPath("."));
 		
@@ -407,7 +406,7 @@ public class UserService {
 		users.getUsers().remove(oldEmail);
 		users.getUsers().put(email, user);
 		
-		ctx.setAttribute("users", users);
+		//ctx.setAttribute("users", users);
 		request.getSession().setAttribute("currentUser", user);
 		users.WriteToFile(ctx.getRealPath("."));
 		ObjectMapper mapper = new ObjectMapper();
@@ -457,8 +456,8 @@ public class UserService {
 		}
 		users.getUsers().remove(email);
 		org.getUsers().remove(email);
-		ctx.setAttribute("users", users);
-		ctx.setAttribute("organisations", organisations);
+		//ctx.setAttribute("users", users);
+		//ctx.setAttribute("organisations", organisations);
 		
 		users.WriteToFile(ctx.getRealPath("."));
 		organisations.WriteToFile(ctx.getRealPath("."));

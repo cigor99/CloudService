@@ -193,6 +193,13 @@ function addNewOrganisation(){
 //Receives organisation to edit
 //Prints edit menu
 function editOrganisation(organisation){
+	if(currentUser.role == "ADMIN"){
+		var body = $("#fillBody");
+		body.empty();
+		
+		var header = $("#fillHeader");
+		header.empty();
+	}
 	var forma = $("#fillEditForm")
 	forma.empty()
 	

@@ -10,9 +10,10 @@ $(document).ready(function(e){
 			success : function(response){
 				printDiscs(response)
 			},
-			error : function(){
-				alert("Error")
+			error : function(data){
+				alert(data.responseText);
 			}
+			
 		});
 		
 	});
@@ -173,7 +174,11 @@ function addNewDisc(vms){
 					alert("Disc with given name already exists")
 				else
 					printDiscs(response)
+			},
+			error : function(data){
+				alert(data.responseText);
 			}
+			
 		});
 		
 	});
@@ -227,15 +232,16 @@ function editDisc(disc){
 			type : 'GET',
 			url : "rest/discServ/getVMs",
 			success : function(response){
-				$.each(response, function(key,value){
+				//$.each(response, function(key,value){
 					var selectVM = $("<select name=\"vmName\" id=\"vmName\"></select>");
 					$.each(response, function(key, value){
 						var option = $("<option></option>");
 						option.append(key);
 						selectVM.append(option);
 					});
-					row4.append(selectVM);
-				});
+					//row4.append(selectVM);
+				//});
+				row4.append(selectVM);
 			}
 		});
 	
@@ -296,7 +302,11 @@ function editDisc(disc){
 					alert("Disc with given name already exists!")
 				else
 					printDiscs(response)
+			},
+			error : function(data){
+				alert(data.responseText);
 			}
+			
 		});
 	})
 	
@@ -309,9 +319,10 @@ function editDisc(disc){
 			success : function(response){
 				printDiscs(response)
 			},
-			error : function(){
-				alert("Error")
+			error : function(data){
+				alert(data.responseText);
 			}
+			
 		})
 	});
 	
@@ -328,9 +339,10 @@ function editDisc(disc){
 			success : function(response){
 				printDiscs(response)
 			},
-			error : function(){
-				alert("Error")
+			error : function(data){
+				alert(data.responseText);
 			}
+			
 		});
 	});
 }

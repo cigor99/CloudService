@@ -144,6 +144,7 @@ public class OrganisationService {
 		if (!organisations.getOrganisations().containsKey(name)) {
 			organisations.getOrganisations().put(name, org);
 			organisations.WriteToFile(ctx.getRealPath("."));
+			//ctx.setAttribute("organisations", organisations);
 
 			try {
 				JSON = mapper.writeValueAsString(organisations.getOrganisations());
@@ -166,8 +167,9 @@ public class OrganisationService {
 	public Response editOrganisation(@FormParam("oldName") String oldName, @FormParam("name") String name,
 			@FormParam("description") String description, @FormParam("logo") String logo) {
 		Organisations organisations = (Organisations) ctx.getAttribute("organisations");
-
+		Logger l = new Logger();
 		User user = (User) request.getSession().getAttribute("currentUser");
+		l.append(user.toString());
 		if(user.getRole().equals(Role.USER)){
 			return Response.status(400).entity("Error 403 : Access denied !").build();
 		}
@@ -182,13 +184,17 @@ public class OrganisationService {
 		}
 
 		Organisation org = organisations.getOrganisations().get(oldName);
+		l.append(org.toString());
+		
 		organisations.getOrganisations().remove(oldName);
 
 		org.setName(name);
 		org.setDescription(description);
 		org.setLogo(makeLogoPath(logo));
-
+		l.append(org.toString());
 		VMs vms = getVMs();
+		l.append(vms.toString());
+		
 		for (VM value : vms.getVms().values()) {
 			if (value.getOrganisation().equals(oldName)) {
 				value.setOrganisation(name);
@@ -196,9 +202,15 @@ public class OrganisationService {
 		}
 
 		Users users = getUsers();
+		l.append(users.toString());
+		
 		for (User value : users.getUsers().values()) {
-			if (value.getOrganisation().equals(oldName)) {
-				value.setOrganisation(name);
+			try {
+				if (value.getOrganisation().equals(oldName)) {
+					value.setOrganisation(name);
+				}
+			}catch(NullPointerException e) {
+				continue;
 			}
 		}
 
@@ -210,16 +222,19 @@ public class OrganisationService {
 		}
 
 		organisations.getOrganisations().put(name, org);
-		ctx.setAttribute("organisations", organisations);
-		ctx.setAttribute("users", users);
-		ctx.setAttribute("discs", discs);
-		ctx.setAttribute("vms", vms);
+		//ctx.setAttribute("organisations", organisations);
+		//ctx.setAttribute("users", users);
+		//ctx.setAttribute("discs", discs);
+		//ctx.setAttribute("vms", vms);
 
 		organisations.WriteToFile(ctx.getRealPath("."));
+		l.append(organisations.toString());
 		ObjectMapper mapper = new ObjectMapper();
 		String JSON = "";
 		try {
-			JSON = mapper.writeValueAsString(organisations);
+			JSON = mapper.writeValueAsString(organisations.getOrganisations());
+			l.append(JSON);
+			l.logAll();
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}

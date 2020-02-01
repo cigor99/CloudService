@@ -1,4 +1,9 @@
 function updateProfile(user){
+	var body = $("#fillBody");
+	body.empty();
+	
+	var header = $("#fillHeader");
+	header.empty();
 	var form = $("#fillEditForm");
 	form.empty();
 	

@@ -13,15 +13,17 @@ import java.io.IOException;
  */
 public class Logger {
 
-	public String line = "";
-	public String path = "";
+	private String line;
+	private String path;
+	private String fileName;
 	
 	
 	
 	public Logger() {
 		super();
 		this.line = "";
-		this.path = "C:\\Users\\Igor\\Desktop";
+		this.path = "C:\\Users\\Igor\\Desktop\\";
+		this.fileName = "log.txt";
 	}
 	
 	public Logger(String path) {
@@ -48,7 +50,7 @@ public class Logger {
 
 	
 	public void preciseLog(String data) {
-		File file = new File(this.path + File.separator +"log.txt");
+		File file = new File(this.path+this.fileName);
         FileWriter fr = null;
         try {
             fr = new FileWriter(file);
@@ -74,5 +76,33 @@ public class Logger {
 		log(line);
 		line = "";
 	}
+
+	public String getLine() {
+		return line;
+	}
+
+	public void setLine(String line) {
+		this.line = line;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+
+	
+	
 	
 }

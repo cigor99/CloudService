@@ -12,163 +12,239 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Path("catServ")
 public class CategoryService {
 
 	@Context
 	HttpServletRequest request;
-	
+
 	@Context
 	ServletContext ctx;
-	
+
 	@GET
 	@Path("/getCategories")
 	@Produces(MediaType.APPLICATION_JSON)
-	public HashMap<String, VMCategory> getCategories()
-	{
+	public Response getCategories() {
+		User curr = (User) request.getSession().getAttribute("currentUser");
+
+		if (curr == null) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		}
+		if (!(curr.getRole().equals(Role.SUPER_ADMIN))) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		}
+
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
-		
-		if(categories == null)
-		{
+
+		if (categories == null) {
 			categories = new VMCategories(ctx.getRealPath("."));
 			ctx.setAttribute("vmCategories", categories);
 		}
-		
-		return categories.getVmCategories();
+
+		ObjectMapper mapper = new ObjectMapper();
+		String JSON = "";
+		try {
+			JSON = mapper.writeValueAsString(categories.getVmCategories());
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return Response.ok(JSON).build();
 	}
-	
+
 	@POST
 	@Path("/addVMCategory")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public HashMap<String, VMCategory> addVMCategory(@FormParam("name") String name, @FormParam("core") String core,@FormParam("ram") String ram,@FormParam("gpu") String gpu)
-	{
-		String[] args = {name, core, ram, gpu};
-		if(Validator.valEmpty(args)) {
-			return null;
+	public Response addVMCategory(@FormParam("name") String name, @FormParam("core") String core,
+			@FormParam("ram") String ram, @FormParam("gpu") String gpu) {
+		User curr = (User) request.getSession().getAttribute("currentUser");
+
+		if (curr == null) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
 		}
-		String[] nums = {core, ram, gpu};
-		if(!Validator.valNumber(nums)) {
-			return null;
+		if (!(curr.getRole().equals(Role.SUPER_ADMIN))) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
 		}
-		String[] pos = {core,ram};
-		if(!Validator.valPositive(pos)) {
-			return null;
+		String[] args = { name, core, ram, gpu };
+		if (Validator.valEmpty(args)) {
+			return Response.status(400).entity("Error 400 : One or more parameters empty !").build();
 		}
+		String[] nums = { core, ram, gpu };
+		if (!Validator.valNumber(nums)) {
+			return Response.status(400)
+					.entity("Error 400 : You must enter a number for cpu/gpu cores and ram capacity !").build();
+		}
+		String[] pos = { core, ram };
+		if (!Validator.valPositive(pos)) {
+			return Response.status(400).entity("Error 400 : Number of CPU cores/Ram capacity must be greater than 0 !")
+					.build();
+		}
+
+		if (Integer.parseInt(gpu) < 0) {
+			return Response.status(400).entity("Error 400 : Number of GPU cores must be equal or greater than 0 !")
+					.build();
+		}
+
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
-		
-		if(categories.getVmCategories().containsKey(name))
-			return null;
-		
+
+		if (categories.getVmCategories().containsKey(name))
+			return Response.status(400).entity("Error 400 : Category with given name already exists!").build();
+
 		VMCategory vmc = new VMCategory(name, Integer.parseInt(core), Integer.parseInt(ram), Integer.parseInt(gpu));
-		
+
 		categories.getVmCategories().put(name, vmc);
-		
-		return categories.getVmCategories();
-		
+		ctx.setAttribute("vmCategories", categories);
+		categories.WriteToFile(ctx.getRealPath("."));
+		ObjectMapper mapper = new ObjectMapper();
+		String JSON = "";
+		try {
+			JSON = mapper.writeValueAsString(categories.getVmCategories());
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return Response.ok(JSON).build();
+
 	}
-	
+
 	@POST
 	@Path("/editVMCategory")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public HashMap<String, VMCategory> editVMCategory(@FormParam("oldName") String oldName, @FormParam("newName") String newName, @FormParam("core") String core,@FormParam("ram") String ram,@FormParam("gpu") String gpu)
-	{
-		String[] args = {oldName, newName, core, gpu, ram};
-		if(Validator.valEmpty(args)) {
-			return null;
+	public Response editVMCategory(@FormParam("oldName") String oldName, @FormParam("newName") String newName,
+			@FormParam("core") String core, @FormParam("ram") String ram, @FormParam("gpu") String gpu) {
+
+		User curr = (User) request.getSession().getAttribute("currentUser");
+
+		if (curr == null) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
 		}
-		String[] nums = {core, ram, gpu};
-		if(!Validator.valNumber(nums)) {
-			return null;
+		if (!(curr.getRole().equals(Role.SUPER_ADMIN))) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
 		}
-		String[] pos = {core,ram};
-		if(!Validator.valPositive(pos)) {
-			return null;
+		String[] args = { oldName, newName, core, gpu, ram };
+		if (Validator.valEmpty(args)) {
+			return Response.status(400).entity("Error 400 : One or more parameters empty !").build();
+		}
+		String[] nums = { core, ram, gpu };
+		if (!Validator.valNumber(nums)) {
+			return Response.status(400)
+					.entity("Error 400 : You must enter a number for cpu/gpu cores and ram capacity !").build();
+		}
+		String[] pos = { core, ram };
+		if (!Validator.valPositive(pos)) {
+			return Response.status(400).entity("Error 400 : Number of CPU cores/Ram capacity must be greater than 0 !")
+					.build();
+		}
+		if (Integer.parseInt(gpu) < 0) {
+			return Response.status(400).entity("Error 400 : Number of GPU cores must be equal or greater than 0 !")
+					.build();
 		}
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
-		
-		if(!newName.equals(oldName))
-		{
-			if(categories.getVmCategories().containsKey(newName))
-				return null;
+
+		if (!newName.equals(oldName)) {
+			if (categories.getVmCategories().containsKey(newName))
+				return Response.status(400).entity("Error 400 : Category with given name already exists!").build();
 		}
-		
+
 		VMCategory vmc = categories.getVmCategories().get(oldName);
-		
+
 		vmc.setName(newName);
 		vmc.setNumCPUCores(Integer.parseInt(core));
 		vmc.setNumGPUCores(Integer.parseInt(gpu));
 		vmc.setRamCapacity(Integer.parseInt(ram));
-		
-		
-		return categories.getVmCategories();
-		
+
+		ctx.setAttribute("vmCategories", categories);
+		categories.WriteToFile(ctx.getRealPath("."));
+		ObjectMapper mapper = new ObjectMapper();
+		String JSON = "";
+		try {
+			JSON = mapper.writeValueAsString(categories.getVmCategories());
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return Response.ok(JSON).build();
+
 	}
-	
-	private HashMap<String, VM> getVMs()
-	{
+
+	private HashMap<String, VM> getVMs() {
 		VMs vms = (VMs) ctx.getAttribute("vms");
-		
-		if(vms == null)
-		{
+
+		if (vms == null) {
 			vms = new VMs(ctx.getRealPath("."));
 			ctx.setAttribute("vms", vms);
 		}
-		
+
 		User curr = (User) request.getSession().getAttribute("currentUser");
-		
-		if(curr.getRole().equals(Role.SUPER_ADMIN))
+
+		if (curr.getRole().equals(Role.SUPER_ADMIN))
 			return vms.getVms();
-		
+
 		Organisations organs = (Organisations) ctx.getAttribute("organisations");
-		
+
 		HashMap<String, VM> orgVM = new HashMap<String, VM>();
-		for(String r : organs.getOrganisations().get(curr.getOrganisation()).getResources()) {
-			if(vms.getVms().containsKey(r))
+		for (String r : organs.getOrganisations().get(curr.getOrganisation()).getResources()) {
+			if (vms.getVms().containsKey(r))
 				orgVM.put(r, vms.getVms().get(r));
 		}
-		
+
 		return orgVM;
 	}
-	
+
 	@POST
 	@Path("/deleteCategory")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public HashMap<String, VMCategory> deleteCategory(@FormParam("oldName") String oldName)
-	{
-		if(oldName.equals("")) {
-			return null;
+	public Response deleteCategory(@FormParam("oldName") String oldName) {
+		User curr = (User) request.getSession().getAttribute("currentUser");
+
+		if (curr == null) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		}
+		if (!(curr.getRole().equals(Role.SUPER_ADMIN))) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		}
+		if (oldName.equals("")) {
+			return Response.status(400).entity("Error 400 : Category name can't be empty !").build();
 		}
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
-		
+
 		VMCategory cat = categories.getVmCategories().get(oldName);
-		
+
 		HashMap<String, VM> vms = getVMs();
-		for(VM vm: vms.values()) {
-			if(vm.getCategory().equals(cat.getName()))
-				return null;
+		for (VM vm : vms.values()) {
+			if (vm.getCategory().equals(cat.getName()))
+				return Response.status(400).entity("Error 400 : Category with given name already exists!").build();
 		}
 		categories.getVmCategories().remove(oldName);
-		
-		return categories.getVmCategories();
-		
+		ctx.setAttribute("vmCategories", categories);
+		categories.WriteToFile(ctx.getRealPath("."));
+		ObjectMapper mapper = new ObjectMapper();
+		String JSON = "";
+		try {
+			JSON = mapper.writeValueAsString(categories.getVmCategories());
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return Response.ok(JSON).build();
+
 	}
-	
+
 	@POST
 	@Path("/getCategory")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public VMCategory getCategory(@FormParam("catName") String catName)
-	{
-		if(catName.equals("")) {
+	public VMCategory getCategory(@FormParam("catName") String catName) {
+		if (catName.equals("")) {
 			return null;
 		}
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
-		
+
 		return categories.getVmCategories().get(catName);
-		
+
 	}
 }

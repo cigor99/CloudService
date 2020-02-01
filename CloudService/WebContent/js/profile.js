@@ -49,7 +49,7 @@ function updateProfile(user){
 	$("#name").val(user.name);
 	$("#surname").val(user.surname);
 	if(user.role != "SUPER_ADMIN")
-		$("#organisation").val(user.organisation.name);
+		$("#organisation").val(user.organisation);
 	
 	// When inputs get into focus, alert disappears
 	$('.input-data').each(function(){
@@ -134,6 +134,7 @@ function updateProfile(user){
 					alert("User with given email already exists!");
 				} else {
 					alert("Profile updated")
+					checkIfLogged();
 				}
 			}
 		});

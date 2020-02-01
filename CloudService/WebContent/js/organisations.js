@@ -34,8 +34,8 @@ $(document).ready(function(e){
 					editOrganisation(response);
 				}
 			},
-			error : function() {
-				alert("Error")
+			error : function(data){
+				alert(data.responseText);
 			}
 		});
 	})
@@ -183,8 +183,8 @@ function addNewOrganisation(){
 			success : function(response){
 				printOrganisations(response);
 			},
-			error : function() {
-				alert("Error")
+			error : function(data) {
+				alert(data.responseText)
 			}
 		});
 	})
@@ -249,6 +249,9 @@ function editOrganisation(organisation){
 				else{
 					getMyOrganisation()
 				}
+			},
+			error : function(data){
+				alert(data.responseText);
 			}
 		});
 	});
@@ -288,6 +291,9 @@ function editOrganisation(organisation){
 					}
 				}else
 					alert("Organisation with given name already exists!")
+			},
+			error : function(data){
+				alert(data.responseText);
 			}
 		});
 		
@@ -302,8 +308,8 @@ function getMyOrganisation(){
 		success : function(response){
 			editOrganisation(response)
 		},
-		error : function() {
-			alert("Error")
+		error : function(data){
+			alert(data.responseText);
 		}
 	});
 }

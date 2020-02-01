@@ -8,7 +8,10 @@ $(document).ready(function(e){
 		
 	//Calls function for viewing profile
 	$('a[href="#viewProfile"]').click(function(){
+		console.log(currentUser.name)
 		updateProfile(currentUser)
+		console.log(currentUser.name)
+		
 	});
 	
 	// Gets map of users form server

@@ -107,11 +107,7 @@ public class Validator {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(valPositive("0"));
-		System.out.println(valPositive("-1"));
-
-		System.out.println(valPositive("1"));
-		String[] a = {"1", "-1"};
+		String[] a = {"-1", "-1", "-110", "-10"};
 		System.out.println(valPositive(a));
 		
 		

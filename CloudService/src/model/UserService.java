@@ -25,9 +25,6 @@ public class UserService {
 	HttpServletRequest request;
 	
 	@Context
-	HttpServletRequest response;
-	
-	@Context
 	ServletContext ctx;
 	
 	@GET

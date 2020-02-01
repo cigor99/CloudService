@@ -13,6 +13,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Path("vmServ")
 public class VMService {
@@ -26,8 +30,13 @@ public class VMService {
 	@GET
 	@Path("/getVMs")
 	@Produces(MediaType.APPLICATION_JSON)
-	public HashMap<String, VM> getVMs()
+	public Response getVMs()
 	{
+		User curr = (User) request.getSession().getAttribute("currentUser");
+		
+		if(curr == null) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		}	
 		VMs vms = (VMs) ctx.getAttribute("vms");
 		
 		if(vms == null)
@@ -35,11 +44,17 @@ public class VMService {
 			vms = new VMs(ctx.getRealPath("."));
 			ctx.setAttribute("vms", vms);
 		}
-		
-		User curr = (User) request.getSession().getAttribute("currentUser");
-		
-		if(curr.getRole().equals(Role.SUPER_ADMIN))
-			return vms.getVms();
+		ObjectMapper mapper = new ObjectMapper();
+		String JSON = "";
+		if(curr.getRole().equals(Role.SUPER_ADMIN)) {
+			try {
+				JSON = mapper.writeValueAsString(vms.getVms());
+			}catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+			return Response.ok(JSON).build();
+		}
+			
 		
 		Organisations organs = (Organisations) ctx.getAttribute("organisations");
 		
@@ -49,36 +64,45 @@ public class VMService {
 				orgVM.put(r, vms.getVms().get(r));
 		}
 		
-		return orgVM;
+		try {
+			JSON = mapper.writeValueAsString(orgVM);
+		}catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return Response.ok(JSON).build();
 	}
 	
 	@POST
 	@Path("/addVM")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public HashMap<String, VM> addVM(VM vm){
+	public Response addVM(VM vm){
+		User curr = (User) request.getSession().getAttribute("currentUser");
+		if(curr == null) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		}
+		if(curr.getRole().equals(Role.USER)) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		}
 		if(vm == null) {
-			return null;
+			return Response.status(400).entity("Error 400 : One or more parameters empty !").build();
+		}
+		if(isVMEmpty(vm)) {
+			return Response.status(400).entity("Error 400 : One or more parameters empty !").build();
 		}
 		ArrayList<Integer> positive = new ArrayList<Integer>();
 		positive.add(vm.getNumCPUCores());
 		positive.add(vm.getRamCapacity());
 		if(vm.getNumGPUCores() < 0) 
-			return null;
+			return Response.status(400).entity("Error 400 : Number of GPU cores must be equal or greater than 0 !").build();
 		if(!Validator.valPositive(positive))
-			return null;
-		String[] args = {vm.getName(), vm.getOrganisation()};
-		if(Validator.valEmpty(args)) {
-			return null;
-		}
+			return Response.status(400).entity("Error 400 : Number of CPU cores/Ram capacity must be greater than 0 !").build();
 		
 		VMs vms = (VMs) ctx.getAttribute("vms");
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
 		if(vms.getVms().containsKey(vm.getName()))
-			return null;
-		
-		vms.getVms().put(vm.getName(), vm);
+			return Response.status(400).entity("Error 400 : Virtual machine with given name already exists!").build();
 		
 		Organisations orgs = (Organisations) ctx.getAttribute("organisations");
 		orgs.getOrganisations().get(vm.getOrganisation()).getResources().add(vm.getName());
@@ -92,37 +116,99 @@ public class VMService {
 				}
 			}
 		}
+		vms.getVms().put(vm.getName(), vm);
+		ctx.setAttribute("vms", vms);
+		ctx.setAttribute("organisations", orgs);
+		ctx.setAttribute("discs", discs);
+		vms.WriteToFile(ctx.getRealPath("."));
+		ObjectMapper mapper = new ObjectMapper();
+		String JSON = "";
+		if(curr.getRole().equals(Role.SUPER_ADMIN)) {
+			try {
+				JSON = mapper.writeValueAsString(vms.getVms());
+			}catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+			return Response.ok(JSON).build();
+		}
 		
-		return getVMs();
+		HashMap<String, VM> orgVM = new HashMap<String, VM>();
+		for(String r : orgs.getOrganisations().get(curr.getOrganisation()).getResources()) {
+			if(vms.getVms().containsKey(r))
+				orgVM.put(r, vms.getVms().get(r));
+		}
 		
+		try {
+			JSON = mapper.writeValueAsString(orgVM);
+		}catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return Response.ok(JSON).build();
+		
+	}
+	
+	private boolean isVMEmpty(Object ob) {
+		boolean ind = true;
+		if(ob instanceof VM) {
+			VM vm = (VM) ob;
+			ind = ind && (vm.getName() == null);
+			ind = ind && (vm.getOrganisation() == null);
+			ind = ind && Validator.valPositive(vm.getNumCPUCores());
+			ind = ind && Validator.valPositive(vm.getRamCapacity());
+			ind = ind && (vm.getNumGPUCores()<0);
+			ind = ind && (vm.getCategory() == null);
+			return ind;
+		}else if(ob instanceof VMWrapper) {
+			VMWrapper vm = (VMWrapper) ob;
+			ind = ind && (vm.getName() == null);
+			ind = ind && (vm.getOrganisation() == null);
+			ind = ind && Validator.valPositive(vm.getNumCPUCores());
+			ind = ind && Validator.valPositive(vm.getRamCapacity());
+			ind = ind && (vm.getNumGPUCores()<0);
+			ind = ind && (vm.getCategory() == null);
+			return ind;
+		}
+		return true;
 	}
 	
 	@POST
 	@Path("/editVM")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public HashMap<String, VM> editVM(VMWrapper vmWrap){
+	public Response editVM(VMWrapper vmWrap){
+		User curr = (User) request.getSession().getAttribute("currentUser");
+		if(curr == null) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		}
+		if(curr.getRole().equals(Role.USER)) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		}
+		
+		if(curr.getRole().equals(Role.ADMIN)) {
+			if(curr.getOrganisation().equals(vmWrap.getOrganisation())) {
+				return Response.status(400).entity("Error 403 : Access denied !").build();
+			}
+		}
 		if(vmWrap == null) {
-			return null;
+			return Response.status(400).entity("Error 400 : One or more parameters empty !").build();
+		}
+		if(isVMEmpty(vmWrap)) {
+			return Response.status(400).entity("Error 400 : One or more parameters empty !").build();
 		}
 		ArrayList<Integer> positive = new ArrayList<Integer>();
 		positive.add(vmWrap.getNumCPUCores());
 		positive.add(vmWrap.getRamCapacity());
 		if(vmWrap.getNumGPUCores() < 0) 
-			return null;
+			return Response.status(400).entity("Error 400 : Number of GPU cores must be equal or greater than 0 !").build();
 		if(!Validator.valPositive(positive))
-			return null;
-		String[] args = {vmWrap.getName(), vmWrap.getOrganisation(), vmWrap.getOldName()};
-		if(Validator.valEmpty(args)) {
-			return null;
-		}
+			return Response.status(400).entity("Error 400 : Number of CPU cores/Ram capacity must be greater than 0 !").build();
 		
 		VMs vms = (VMs) ctx.getAttribute("vms");
 		Discs discs = (Discs) ctx.getAttribute("discs");
 		
 		if(!vmWrap.getOldName().equals(vmWrap.getName())) {
 			if(vms.getVms().containsKey(vmWrap.getName()))
-				return null;
+				return Response.status(400).entity("Error 400 : Virtual machine with given name already exists!").build();
 		}
 		
 		VM vm = vms.getVms().get(vmWrap.getName());
@@ -150,29 +236,65 @@ public class VMService {
 		
 		vms.getVms().remove(vmWrap.getOldName());
 		vms.getVms().put(vm.getName(),vm);
+		Organisations orgs = (Organisations) ctx.getAttribute("organisations");
 		
 		if(!vmWrap.getOldName().equals(vmWrap.getName())) {
-			Organisations orgs = (Organisations) ctx.getAttribute("organisations");
 			orgs.getOrganisations().get(vmWrap.getOrganisation()).getResources().remove(vm.getName());
 			orgs.getOrganisations().get(vmWrap.getOrganisation()).getResources().add(vm.getName());
 		}
 		
-		return getVMs();
+		ctx.setAttribute("vms", vms);
+		ctx.setAttribute("organisations", orgs);
+		ctx.setAttribute("discs", discs);
+		vms.WriteToFile(ctx.getRealPath("."));
+		ObjectMapper mapper = new ObjectMapper();
+		String JSON = "";
+		if(curr.getRole().equals(Role.SUPER_ADMIN)) {
+			try {
+				JSON = mapper.writeValueAsString(vms.getVms());
+			}catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+			return Response.ok(JSON).build();
+		}
+		
+		HashMap<String, VM> orgVM = new HashMap<String, VM>();
+		for(String r : orgs.getOrganisations().get(curr.getOrganisation()).getResources()) {
+			if(vms.getVms().containsKey(r))
+				orgVM.put(r, vms.getVms().get(r));
+		}
+		
+		try {
+			JSON = mapper.writeValueAsString(orgVM);
+		}catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return Response.ok(JSON).build();
 		
 	}
+	
+	/////POTREBNA POMOC=============================================================================================================================
 	
 	@POST
 	@Path("/deleteVM")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public HashMap<String, VM> deleteVM(@FormParam("oldName") String oldName, @FormParam("organisation") String organisation){
+	public Response deleteVM(@FormParam("oldName") String oldName, @FormParam("organisation") String organisation){
+		
+		User curr = (User) request.getSession().getAttribute("currentUser");
+		
+		if(curr == null) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		}
+		if(curr.getRole().equals(Role.USER)) {
+			return Response.status(400).entity("Error 403 : Access denied !").build();
+		}
 		
 		String[] args = {oldName, organisation};
 		if(Validator.valEmpty(args)) {
-			return null;
+			return Response.status(400).entity("Error 400 : One or more parameters empty !").build();
 		}
 		
-		System.out.println("Uso");
 		VMs vms = (VMs) ctx.getAttribute("vms");
 		
 		VM vm = vms.getVms().get(oldName);		
@@ -187,6 +309,8 @@ public class VMService {
 		for(String d : vm.getDiscs()) {
 			discs.getDiscs().get(d).setVmName(null);
 		}
+		
+		
 		
 		return getVMs();
 		

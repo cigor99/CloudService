@@ -349,7 +349,8 @@ function editVM(vm){
 	table.append(row6)
 	table.append(row7)
 	table.append(row8)
-	table.append(checkBox)
+	if(currentUser.role == "ADMIN")
+		table.append(checkBox)
 	table.append(row10)
 	
 	if(vm.activityList[vm.activityList.length - 1].offTime == ""){

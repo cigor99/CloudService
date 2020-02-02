@@ -240,21 +240,23 @@ public class VMService {
 		vm.setNumGPUCores(vmWrap.getNumGPUCores());
 		vm.setRamCapacity(vmWrap.getRamCapacity());
 		
-		if(vmWrap.isChecked()) {
-			if(!(vm.getActivityList().get(vm.getActivityList().size()-1).getOffTime()).equals("")) {
-				Activity a = new Activity();
-				a.setOnTime(new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new Date()));
-				a.setOffTime("");
-				vm.getActivityList().add(a);
+		if(curr.getRole().equals(Role.ADMIN)) {
+			if(vmWrap.isChecked()) {
+				if(!(vm.getActivityList().get(vm.getActivityList().size()-1).getOffTime()).equals("")) {
+					Activity a = new Activity();
+					a.setOnTime(new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new Date()));
+					a.setOffTime("");
+					vm.getActivityList().add(a);
+				}
+			}
+			
+			if(!vmWrap.isChecked()) {
+				if((vm.getActivityList().get(vm.getActivityList().size()-1).getOffTime()).equals("")) {
+					vm.getActivityList().get(vm.getActivityList().size()-1).setOffTime(new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new Date()));
+				}
 			}
 		}
-		
-		if(!vmWrap.isChecked()) {
-			if((vm.getActivityList().get(vm.getActivityList().size()-1).getOffTime()).equals("")) {
-				vm.getActivityList().get(vm.getActivityList().size()-1).setOffTime(new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new Date()));
-			}
-		}
-		
+
 		vms.getVms().remove(vmWrap.getOldName());
 		vms.getVms().put(vm.getName(),vm);
 		Organisations orgs = (Organisations) ctx.getAttribute("organisations");
@@ -414,6 +416,25 @@ public class VMService {
 		}
 		
 		return fillterVMs;
+	}
+	
+	@GET
+	@Path("/getMonthlyBill")
+	@Produces(MediaType.APPLICATION_JSON)
+	public int getMonthlyBill()
+	{
+		User curr = (User) request.getSession().getAttribute("currentUser");
+		
+		Organisations orgs = (Organisations) ctx.getAttribute("organisations");
+		
+		Organisation myOrganisation = orgs.getOrganisations().get(curr.getOrganisation());
+		
+		VMs vms = (VMs) ctx.getAttribute("vms");
+		
+		for(String vm : vms.getVms().keySet()) {
+			return 100;
+		}
+		return 0;
 	}
 	
 	private static Integer from(String from) {

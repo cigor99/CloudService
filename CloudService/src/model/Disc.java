@@ -30,7 +30,7 @@ public class Disc extends Resource {
 
 	@Override
 	public String toString() {
-		return "Disc [type=" + type + ", capacity=" + capacity + ", vmName=" + vmName + "]";
+		return "Disc NAME: = "+ this.getName()+ "[type=" + type + ", capacity=" + capacity + ", vmName=" + vmName + "]";
 	}
 
 

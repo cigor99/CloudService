@@ -245,22 +245,22 @@ function editOrganisation(organisation){
 	// Calls function for printing
 	$("#discardOrg").click(function(e){
 		e.preventDefault();
-		$.ajax({
-			type : "GET",
-			url : "rest/orgServ/listOrganisations",
-			dataType : "json",
-			success : function(response){
-				$("#edit").empty();
-				if(currentUser.role == "SUPER_ADMIN")
+		if(currentUser.role == "SUPER_ADMIN"){
+			$.ajax({
+				type : "GET",
+				url : "rest/orgServ/listOrganisations",
+				dataType : "json",
+				success : function(response){
+					$("#edit").empty();
 					printOrganisations(response);
-				else{
-					getMyOrganisation()
+				},
+				error : function(data){
+					alert(data.responseText);
 				}
-			},
-			error : function(data){
-				alert(data.responseText);
-			}
-		});
+			});
+		}else{
+			getMyOrganisation();
+		}
 	});
 	
 	// Edits data for selected organisation

@@ -67,56 +67,41 @@ public class DiscService {
 		}
 	}
 
-	// KO OVDE SME I STA SME
 	@GET
 	@Path("/getVMs")
 	@Produces(MediaType.APPLICATION_JSON)
-	public HashMap<String, VM> getVMs()
-	{
-		
+	public HashMap<String, VM> getVMs() {
+
 		User curr = (User) request.getSession().getAttribute("currentUser");
-		
-		if(curr == null) {
-			return null;//Response.status(400).entity("Error 403 : Access denied !").build();
-		}
-		
+
+		Logger l = new Logger("DiscService_getVMs.txt");
+		l.append(curr.toString());
+
 		VMs vms = (VMs) ctx.getAttribute("vms");
-		
-		if(vms == null)
-		{
+		l.append(vms.toString());
+		l.preciseLog(l.getLine());
+		if (vms == null) {
 			vms = new VMs(ctx.getRealPath("."));
 			ctx.setAttribute("vms", vms);
 		}
-		if(curr.getRole().equals(Role.SUPER_ADMIN)) {
+		if (curr.getRole().equals(Role.SUPER_ADMIN)) {
 			return vms.getVms();
 		}
-		/*
-		ObjectMapper mapper = new ObjectMapper();
-		String JSON = "";
-		if(curr.getRole().equals(Role.SUPER_ADMIN)) {
-			try {
-				JSON = mapper.writeValueAsString(vms.getVms());
-			}catch (JsonProcessingException e) {
-				e.printStackTrace();
-			}
-			return Response.ok(JSON).build();
-		}*/
+	
 		Organisations organs = (Organisations) ctx.getAttribute("organisations");
-		
+		l.append("ORGANS: \n" + organs.toString());
 		HashMap<String, VM> orgVM = new HashMap<String, VM>();
-		for(String r : organs.getOrganisations().get(curr.getOrganisation()).getResources()) {
-			if(vms.getVms().containsKey(r))
+		for (String r : organs.getOrganisations().get(curr.getOrganisation()).getResources()) {
+			l.append(r);
+			
+			if (vms.getVms().containsKey(r))
 				orgVM.put(r, vms.getVms().get(r));
 		}
+		l.append("RETRUNS: \n");
+		l.append(""+orgVM);
+		l.logAll();
 		return orgVM;
-		/*
-		try {
-			JSON = mapper.writeValueAsString(orgVM);
-		}catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-		return Response.ok(JSON).build();
-		*/
+
 	}
 
 	@POST
@@ -126,7 +111,7 @@ public class DiscService {
 	public Response addDisc(@FormParam("name") String name, @FormParam("discType") String discType,
 			@FormParam("capacity") String capacity, @FormParam("vmName") String vmName) {
 		User curr = (User) request.getSession().getAttribute("currentUser");
-
+		Logger l = new Logger("addDISC.txt");
 		if (curr == null) {
 			return Response.status(400).entity("Error 403 : Access denied !").build();
 		}
@@ -162,9 +147,10 @@ public class DiscService {
 			disc = new Disc(name, curr.getOrganisation(), dt, Integer.parseInt(capacity), vmName);
 			organs.getOrganisations().get(curr.getOrganisation()).getResources().add(name);
 		}
+		l.append(disc.toString());
 
 		discs.getDiscs().put(name, disc);
-		ctx.setAttribute("discs", discs);
+		// ctx.setAttribute("discs", discs);
 		discs.WriteToFile(ctx.getRealPath("."));
 		ObjectMapper mapper = new ObjectMapper();
 		String JSON = "";
@@ -176,10 +162,12 @@ public class DiscService {
 			}
 			return Response.ok(JSON).build();
 		}
-		HashMap<String, VM> vms = getVMs(); /////////////////// JE L MOZE OVO PREKO CTX
-
+		
+		HashMap<String, VM> vms = getVMs();
+		l.append(vms.toString());
 		vms.get(vmName).getDiscs().add(name);
-
+		l.append(vms.toString());
+		l.preciseLog(l.getLine());
 		HashMap<String, Disc> available = new HashMap<String, Disc>();
 		for (Disc d : discs.getDiscs().values()) {
 			if (d.getOrganisation().equals(curr.getOrganisation())) {
@@ -220,6 +208,7 @@ public class DiscService {
 		if (!Validator.valPositive(capacity)) {
 			return Response.status(400).entity("Error 400 : Disc capacity must be greater than 0 !").build();
 		}
+
 		Discs discs = (Discs) ctx.getAttribute("discs");
 
 		Organisations orgs = (Organisations) ctx.getAttribute("organisations");
@@ -239,7 +228,7 @@ public class DiscService {
 
 		d.setCapacity(Integer.parseInt(capacity));
 
-		d.setVmName(newName);
+		d.setVmName(newVMname);
 
 		// izmenjen u discs
 		discs.getDiscs().remove(oldName);
@@ -250,24 +239,46 @@ public class DiscService {
 		o.getResources().remove(oldName);
 		o.getResources().add(newName);
 
+		Logger l = new Logger("DiscService_editDisc.txt");
+		l.append(d.toString());
+		
 		// izmenjen u vm
 		HashMap<String, VM> vms = getVMs();
+		l.append(vms.toString());
+		l.preciseLog(l.getLine());
 		vms.get(oldVMname).getDiscs().remove(oldName);
+		l.append("AFTER REMOVE: \n" +vms.toString());
 		vms.get(newVMname).getDiscs().add(newName);
-		
-		
-		ctx.setAttribute("discs", discs);
+		l.append("AFTER ADD: \n" + vms.toString());
+		l.preciseLog(l.getLine());
+		// ctx.setAttribute("discs", discs);
 		discs.WriteToFile(ctx.getRealPath("."));
 		ObjectMapper mapper = new ObjectMapper();
 		String JSON = "";
+		if (curr.getRole().equals(Role.SUPER_ADMIN)) {
+			try {
+				JSON = mapper.writeValueAsString(discs.getDiscs());
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+			return Response.ok(JSON).build();
+		}
+		
+		HashMap<String, Disc> available = new HashMap<String, Disc>();
+		for (Disc d2 : discs.getDiscs().values()) {
+			if (d2.getOrganisation().equals(curr.getOrganisation())) {
+				available.put(d2.getName(), d2);
+			}
+
+		}
 		try {
-			JSON = mapper.writeValueAsString(discs.getDiscs());
+			JSON = mapper.writeValueAsString(available);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
 		return Response.ok(JSON).build();
-
 	}
+
 
 	@POST
 	@Path("/deleteDisc")
@@ -296,7 +307,7 @@ public class DiscService {
 		discs.getDiscs().remove(oldName);
 		ctx.setAttribute("discs", discs);
 		discs.WriteToFile(ctx.getRealPath("."));
-		
+
 		// obrisan iz resources
 		Organisation o = orgs.getOrganisations().get(d.getOrganisation());
 		o.getResources().remove(oldName);

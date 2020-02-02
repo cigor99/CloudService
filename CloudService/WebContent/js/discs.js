@@ -152,10 +152,9 @@ function addNewDisc(vms){
 			return
 		
 		if(capacity <= 0){
-			showError($("#capacity"));
-			return
+			showValidate($("#capacity"))
 		}else{
-			hideError($("#capacity"));
+			hideValidate($("#capacity"))
 		}
 		
 			
@@ -262,6 +261,8 @@ function editDisc(disc){
 	
 	form.append(table)
 	
+	console.log(disc.vmName);
+	
 	$("#save").click(function(e){
 		e.preventDefault()
 		var name = $("#name").val()
@@ -281,6 +282,11 @@ function editDisc(disc){
         }else{
         	hideValidate($("#capacity"));
         }
+		if(capacity <= 0){
+			showValidate($("#capacity"))
+		}else{
+			hideValidate($("#capacity"))
+		}
 		
 		if(!name || !capacity)
 			return
@@ -299,7 +305,7 @@ function editDisc(disc){
 			},
 			success : function(response){
 				if(response==undefined)
-					alert("Disc with given name already exists!")
+					alert(" exists!")
 				else
 					printDiscs(response)
 			},
@@ -308,7 +314,7 @@ function editDisc(disc){
 			}
 			
 		});
-	})
+	});
 	
 	$("#discard").click(function(e){
 		e.preventDefault();

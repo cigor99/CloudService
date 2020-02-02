@@ -63,7 +63,7 @@ public class Validator {
 	}
 	
 	public static boolean valPositive(int i) {
-		return i<0;
+		return i>0;
 	}
 	
 	public static boolean valPositive(List<Integer> args) {

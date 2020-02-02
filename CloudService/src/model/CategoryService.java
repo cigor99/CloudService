@@ -247,4 +247,18 @@ public class CategoryService {
 		return categories.getVmCategories().get(catName);
 
 	}
+	
+
+	@GET
+	@Path("/getCategoriesUnsafe")
+	@Produces(MediaType.APPLICATION_JSON)
+	public HashMap<String, VMCategory> getCategoriesUnsafe() {
+		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
+
+		if (categories == null) {
+			categories = new VMCategories(ctx.getRealPath("."));
+			ctx.setAttribute("vmCategories", categories);
+		}
+		return categories.getVmCategories();
+	}
 }

@@ -122,9 +122,9 @@ public class VMService {
 			}
 		}
 		vms.getVms().put(vm.getName(), vm);
-		ctx.setAttribute("vms", vms);
-		ctx.setAttribute("organisations", orgs);
-		ctx.setAttribute("discs", discs);
+		//ctx.setAttribute("vms", vms);
+		//ctx.setAttribute("organisations", orgs);
+		//ctx.setAttribute("discs", discs);
 		vms.WriteToFile(ctx.getRealPath("."));
 		ObjectMapper mapper = new ObjectMapper();
 		String JSON = "";
@@ -160,7 +160,7 @@ public class VMService {
 			ind = ind && (vm.getOrganisation() == null);
 			ind = ind && Validator.valPositive(vm.getNumCPUCores());
 			ind = ind && Validator.valPositive(vm.getRamCapacity());
-			ind = ind && (vm.getNumGPUCores()<0);
+			ind = ind && (vm.getNumGPUCores()>0);
 			ind = ind && (vm.getCategory() == null);
 			return ind;
 		}else if(ob instanceof VMWrapper) {
@@ -169,7 +169,7 @@ public class VMService {
 			ind = ind && (vm.getOrganisation() == null);
 			ind = ind && Validator.valPositive(vm.getNumCPUCores());
 			ind = ind && Validator.valPositive(vm.getRamCapacity());
-			ind = ind && (vm.getNumGPUCores()<0);
+			ind = ind && (vm.getNumGPUCores()>0);
 			ind = ind && (vm.getCategory() == null);
 			return ind;
 		}
@@ -189,8 +189,8 @@ public class VMService {
 			return Response.status(400).entity("Error 403 : Access denied !").build();
 		}
 		
-		/*if(curr.getRole().equals(Role.ADMIN)) {
-			if(curr.getOrganisation().equals(vmWrap.getOrganisation())) {
+		if(curr.getRole().equals(Role.ADMIN)) {
+			if(!(curr.getOrganisation().equals(vmWrap.getOrganisation()))) { // JE L VALJA OVO
 				return Response.status(400).entity("Error 403 : Access denied !").build();
 			}
 		}
@@ -207,7 +207,7 @@ public class VMService {
 			return Response.status(400).entity("Error 400 : Number of GPU cores must be equal or greater than 0 !").build();
 		if(!Validator.valPositive(positive))
 			return Response.status(400).entity("Error 400 : Number of CPU cores/Ram capacity must be greater than 0 !").build();
-		*/
+		
 		
 		VMs vms = (VMs) ctx.getAttribute("vms");
 		Discs discs = (Discs) ctx.getAttribute("discs");
@@ -217,7 +217,7 @@ public class VMService {
 				return Response.status(400).entity("Error 400 : Virtual machine with given name already exists!").build();
 		}
 		
-		VM vm = vms.getVms().get(vmWrap.getName());
+		VM vm = vms.getVms().get(vmWrap.getOldName());
 		
 		if (vm.getDiscs() != null) {
 			if(vmWrap.getDiscs() != null) {
@@ -266,9 +266,9 @@ public class VMService {
 			orgs.getOrganisations().get(vmWrap.getOrganisation()).getResources().add(vm.getName());
 		}
 		
-		ctx.setAttribute("vms", vms);
-		ctx.setAttribute("organisations", orgs);
-		ctx.setAttribute("discs", discs);
+		//ctx.setAttribute("vms", vms);
+		//ctx.setAttribute("organisations", orgs);
+		//ctx.setAttribute("discs", discs);
 		vms.WriteToFile(ctx.getRealPath("."));
 		ObjectMapper mapper = new ObjectMapper();
 		String JSON = "";

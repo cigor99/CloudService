@@ -263,7 +263,7 @@ function editVM(vm){
 	row4.append("<td>Category</td>")
 	$.ajax({
 		type : 'GET',
-		url : "rest/catServ/getCategories", ///////////////DA L SAM SMEO OVO DA MENJAM
+		url : "rest/catServ/getCategoriesUnsafe",
 		contentType : "application/json",
 		success : function(response){
 			$.each(response, function(key, value){
@@ -275,7 +275,7 @@ function editVM(vm){
 			selectCategory.trigger("change")
 		},
 		error : function(data){
-			alert(data.responseText);
+			alert("GRESKA U GET_CATEGORIES_UNSAFE");
 		}
 	});
 	

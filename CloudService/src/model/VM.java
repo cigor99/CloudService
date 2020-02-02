@@ -40,10 +40,9 @@ public class VM extends Resource {
 
 	@Override
 	public String toString() {
-		return "VM [category=" + category + ", numCPUCores=" + numCPUCores + ", ramCapacity=" + ramCapacity
+		return "VM "+"NAME: " +this.getName()+ "[ category=" + category + " Organisation: " + this.getOrganisation().toString() +", numCPUCores=" + numCPUCores + ", ramCapacity=" + ramCapacity
 				+ ", numGPUCores=" + numGPUCores + ", discs=" + discs + ", activityList=" + activityList + "]";
 	}
-
 
 
 	public String getCategory() {

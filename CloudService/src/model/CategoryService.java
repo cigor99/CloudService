@@ -85,7 +85,7 @@ public class CategoryService {
 					.build();
 		}
 
-		if (Integer.parseInt(gpu) < 0) {
+		if (Integer.parseInt(gpu) <= 0) {
 			return Response.status(400).entity("Error 400 : Number of GPU cores must be equal or greater than 0 !")
 					.build();
 		}
@@ -117,9 +117,9 @@ public class CategoryService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response editVMCategory(@FormParam("oldName") String oldName, @FormParam("newName") String newName,
 			@FormParam("core") String core, @FormParam("ram") String ram, @FormParam("gpu") String gpu) {
-
+		Logger l = new Logger("CategoryService_editVMCategory.txt");
 		User curr = (User) request.getSession().getAttribute("currentUser");
-
+		l.append("NEWNAME: " +newName);
 		if (curr == null) {
 			return Response.status(400).entity("Error 403 : Access denied !").build();
 		}
@@ -140,7 +140,7 @@ public class CategoryService {
 			return Response.status(400).entity("Error 400 : Number of CPU cores/Ram capacity must be greater than 0 !")
 					.build();
 		}
-		if (Integer.parseInt(gpu) < 0) {
+		if (Integer.parseInt(gpu) <= 0) {
 			return Response.status(400).entity("Error 400 : Number of GPU cores must be equal or greater than 0 !")
 					.build();
 		}
@@ -150,15 +150,19 @@ public class CategoryService {
 			if (categories.getVmCategories().containsKey(newName))
 				return Response.status(400).entity("Error 400 : Category with given name already exists!").build();
 		}
-
+		
 		VMCategory vmc = categories.getVmCategories().get(oldName);
-
-		vmc.setName(newName);
+		l.append("PRE SETOVANJA, GET IZ KATEGORIJE: " + vmc.toString());
+		l.preciseLog(l.getLine());
+		vmc.setName(newName); ///OVDE NULL POINTER
 		vmc.setNumCPUCores(Integer.parseInt(core));
 		vmc.setNumGPUCores(Integer.parseInt(gpu));
 		vmc.setRamCapacity(Integer.parseInt(ram));
-
-		ctx.setAttribute("vmCategories", categories);
+		categories.getVmCategories().remove(oldName);
+		categories.getVmCategories().put(newName, vmc);
+		l.append("POSLE SETOVANJA: " + vmc.toString());
+		l.preciseLog(l.getLine());
+		//ctx.setAttribute("vmCategories", categories);
 		categories.WriteToFile(ctx.getRealPath("."));
 		ObjectMapper mapper = new ObjectMapper();
 		String JSON = "";
@@ -211,13 +215,20 @@ public class CategoryService {
 		if (oldName.equals("")) {
 			return Response.status(400).entity("Error 400 : Category name can't be empty !").build();
 		}
+		Logger l = new Logger("CategoryService_deletecategory.txt");
 		VMCategories categories = (VMCategories) ctx.getAttribute("vmCategories");
-
+		l.append("Categories iz kontexta\n" + categories);
 		VMCategory cat = categories.getVmCategories().get(oldName);
-
+		l.append("Kategorija: \n" + cat);
 		HashMap<String, VM> vms = getVMs();
-		for (VM vm : vms.values()) {
-			if (vm.getCategory().equals(cat.getName()))
+		l.append("VMS IZ GETVMS: " + vms);
+		
+		l.preciseLog(l.getLine());
+		
+		for (VM vm : vms.values()) { 
+			l.append("VM IZ FORA" + vm);
+			l.preciseLog(l.getLine());
+			if (vm.getCategory().equals(cat.getName())) ///OVDE NULL POINTER
 				return Response.status(400).entity("Error 400 : Category with given name already exists!").build();
 		}
 		categories.getVmCategories().remove(oldName);

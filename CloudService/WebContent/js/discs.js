@@ -220,7 +220,7 @@ function editDisc(disc){
 	row3.append("<td>Capacity</td>")
 	
 	if(currentUser.role!="USER")
-		row3.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Capacity is required\" data-error=\"Capacity must be greater or equal to 0\"><input class=\"input-data\" type=\"text\" name=\"capacity\" id=\"capacity\" value = \"" + disc.capacity + "\"></td>")
+		row3.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Capacity must be greater or equal to 0\"><input class=\"input-data\" type=\"text\" name=\"capacity\" id=\"capacity\" value = \"" + disc.capacity + "\"></td>")
 	else
 		row3.append("<td colspan=\"2\"><input class=\"input-data\" type=\"text\" name=\"capacity\" id=\"capacity\" value = \"" + disc.capacity + "\" readonly></td>")
 		

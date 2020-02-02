@@ -75,15 +75,15 @@ function addNewCategory(categories){
 	
 	var row2 = $("<tr></tr>")
 	row2.append("<td>Core number</td>")
-	row2.append("<td><input class=\"input-data\" type=\"number\" min=\"1\" max=\"256\" name=\"core\" id=\"core\"></td>")
+	row2.append("<td  class=\"wrap-input validate-input \" data-validate=\"Number of CPU cores must be greater than 0\"><input class=\"input-data\" type=\"number\" min=\"1\" max=\"256\" name=\"core\" id=\"core\"></td>")
 	
 	var row3 = $("<tr></tr>")
 	row3.append("<td>RAM capacity</td>")
-	row3.append("<td><input class=\"input-data\" type=\"number\" min=\"1\" max=\"256\" name=\"ram\" id=\"ram\"></td>")
+	row3.append("<td  class=\"wrap-input validate-input \" data-validate=\"Ram capacity must be greater than 0\"><input class=\"input-data\" type=\"number\" min=\"1\" max=\"256\" name=\"ram\" id=\"ram\"></td>")
 
 	var row4 = $("<tr></tr>")
 	row4.append("<td>GPU</td>")
-	row4.append("<td><input type=\"number\" min=\"0\" max=\"256\" name=\"gpu\" id=\"gpu\"></td>")
+	row4.append("<td  class=\"wrap-input validate-input \" data-validate=\"Number of GPU cores must be greater or equal to 0\"><input type=\"number\" min=\"0\" max=\"256\" name=\"gpu\" id=\"gpu\"></td>")
 
 	var row5 = $("<tr></tr>")
 	row5.append("<td><input id=\"add\" type=\"submit\" value=\"Add\"></td>");
@@ -130,7 +130,26 @@ function addNewCategory(categories){
 		
 		if(gpu == '')
 			gpu = "0"
+				
+
+		if(core <0 ){
+            showValidate($("#core"));
+        }else{
+        	hideValidate($("#core"));
+        }
 		
+		if(ram < 0){
+            showValidate($("#ram"));
+        }else{
+        	hideValidate($("#ram"));
+        }
+		
+		if(gpu <= 0){
+            showValidate($("#gpu"));
+        }else{
+        	hideValidate($("#gpu"));
+        }
+
 		if(!name || !core || !ram || !gpu)
 			return
 			
@@ -166,15 +185,15 @@ function editVMCategory(category){
 	
 	var row2 = $("<tr></tr>")
 	row2.append("<td>Core number</td>")
-	row2.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Core number is required\" data-error=\"Core number must be greater than 0\"><input class=\"input-data\" type=\"text\" name=\"core\" id=\"core\" value = \"" + category.numCPUCores + "\"></td>")
+	row2.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Core number must be greater than 0\"><input class=\"input-data\" type=\"text\" name=\"core\" id=\"core\" value = \"" + category.numCPUCores + "\"></td>")
 	
 	var row3 = $("<tr></tr>")
 	row3.append("<td>RAM capacity</td>")
-	row3.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"RAM capacity is required\" data-error=\"RAM capacity must be greater or equal to 0\"><input class=\"input-data\" type=\"text\" name=\"ram\" id=\"ram\" value = \"" + category.ramCapacity + "\"></td>")
+	row3.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"RAM capacity must be greater or equal to 0\"><input class=\"input-data\" type=\"text\" name=\"ram\" id=\"ram\" value = \"" + category.ramCapacity + "\"></td>")
 
 	var row4 = $("<tr></tr>")
 	row4.append("<td>GPU</td>")
-	row4.append("<td colspan=\"2\"><input class=\"input-data\" type=\"text\" name=\"gpu\" id=\"gpu\" value = \"" + category.numGPUCores + "\"></td>")
+	row4.append("<td colspan=\"2\" class=\"wrap-input validate-input \" data-validate=\"Number of GPU cores must be greater or equal to 0\"><input class=\"input-data\" type=\"text\" name=\"gpu\" id=\"gpu\" value = \"" + category.numGPUCores + "\"></td>")
 
 	var row5 = $("<tr></tr>")
 	row5.append("<td><input id =\"save\" type=\"button\" value=\"Save Changes\"></td>");
@@ -218,6 +237,24 @@ function editVMCategory(category){
 		
 		if(gpu == '')
 			gpu = "0"
+				
+		if(core <0 ){
+            showValidate($("#core"));
+        }else{
+        	hideValidate($("#core"));
+        }
+		
+		if(ram < 0){
+            showValidate($("#ram"));
+        }else{
+        	hideValidate($("#ram"));
+        }
+		
+		if(gpu <= 0){
+            showValidate($("#gpu"));
+        }else{
+        	hideValidate($("#gpu"));
+        }
 		
 		if(!name || !core || !ram || !gpu)
 			return

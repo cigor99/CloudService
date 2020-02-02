@@ -17,6 +17,8 @@ public class Activity {
 	
 	public Activity() {
 		super();
+		this.offTime = "";
+		this.onTime = "";
 	}
 	public Activity(String onTime, String offTime) {
 		super();

@@ -1,5 +1,20 @@
 var currentUser;
-
+$.ajax({
+	type: 'GET',
+	url: "rest/userServ/getCurrentUser",
+	success : function(response){
+		if(response == undefined){
+			alert("You have to log in");
+			$(location).attr('href', "login.html");
+		}else{
+			currentUser=response
+		}
+		
+	},
+	error:function(){
+		alert("Error")
+	}
+});
 
 var selectOrg = $("<select colspan=\"2\" name=\"orgName\" id=\"orgName\" </select>");
 
@@ -16,6 +31,8 @@ var checkBox = $("<tr><td><input type=\"checkbox\"  id=\"check\" name=\"check\" 
 var currentCat;
 
 $(document).ready(function(e){
+	checkIfLoggedVM()
+	
 	
 	$.ajax({
 		type : 'GET',
@@ -61,6 +78,9 @@ function printVMs(vms){
 	header.append("<th>Num CPU Cores</th>")
 	header.append("<th>Ram</th>")
 	header.append("<th>Num GPU Cores</th>")
+	console.log(currentUser);
+	checkIfLoggedVM()
+	console.log(currentUser)
 	if(currentUser.role=="SUPER_ADMIN")
 		header.append("<th>Organisation</th>")
 	
@@ -353,14 +373,14 @@ function editVM(vm){
 		table.append(checkBox)
 	table.append(row10)
 	
-	if(vm.activityList[vm.activityList.length - 1].offTime == ""){
-		$('#check').prop("checked", true)
-		console.log($('#check').is(":checked"))
+	if(vm.activityList.length != 0){
+		if(vm.activityList[vm.activityList.length - 1].offTime == ""){
+			$('#check').prop("checked", true)
+			console.log($('#check').is(":checked"))
+		}
+		else
+			$('#check').prop('checked', false);
 	}
-	else
-		$('#check').prop('checked', false);
-	
-	
 	form.append(table)
 	
 	$("#save").click(function(e){
@@ -518,7 +538,7 @@ function addNewVM(vms){
 	row4.append("<td>Category</td>")
 	$.ajax({
 		type : 'GET',
-		url : "rest/catServ/getCategories",
+		url : "rest/catServ/getCategoriesUnsafe",
 		contentType : "application/json",
 		success : function(response){
 			$.each(response, function(key, value){
@@ -649,5 +669,24 @@ function addNewVM(vms){
 			
 		});
 	})
+}
+
+function checkIfLoggedVM(){
+	$.ajax({
+		type: 'GET',
+		url: "rest/userServ/getCurrentUser",
+		success : function(response){
+			if(response == undefined){
+				alert("You have to log in");
+				$(location).attr('href', "login.html");
+			}else{
+				currentUser=response
+			}
+			
+		},
+		error:function(){
+			alert("Error")
+		}
+	});
 }
 

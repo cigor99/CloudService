@@ -1,15 +1,17 @@
 var currentUser;
 
 
-var selectOrg = $("<select name=\"orgName\" id=\"orgName\" </select>");
+var selectOrg = $("<select colspan=\"2\" name=\"orgName\" id=\"orgName\" </select>");
 
-var selectCategory = $("<select name=\"category\" id=\"category\" </select>")
+var selectCategory = $("<select colspan=\"2\" name=\"category\" id=\"category\" </select>")
 
-var core = $("<td><input type=\"text\" name=\"core\" id=\"core\" readonly ></td>")
+var core = $("<td colspan=\"2\"><input type=\"text\" name=\"core\" id=\"core\" readonly ></td>")
 	
-var ram = $("<td><input type=\"text\" name=\"ram\" id=\"ram\" readonly ></td>")
+var ram = $("<td colspan=\"2\"><input type=\"text\" name=\"ram\" id=\"ram\" readonly ></td>")
 	
-var gpu = $("<td><input type=\"text\" name=\"gpu\" id=\"gpu\" readonly ></td>")
+var gpu = $("<td colspan=\"2\"><input type=\"text\" name=\"gpu\" id=\"gpu\" readonly ></td>")
+
+var checkBox = $("<tr><td><input type=\"checkbox\"  id=\"check\" name=\"check\" > On/Off</td></tr>")
 
 var currentCat;
 
@@ -235,7 +237,7 @@ function editVM(vm){
 	var row3 = $("<tr></tr>")
 	row3.append("<td>Discs</td>")
 	
-	var selectDisc = $("<select name=\"disc\" id=\"disc\" multiple=\"multiple\"</select>")
+	var selectDisc = $("<select colspan=\"2\" name=\"disc\" id=\"disc\" multiple=\"multiple\"</select>")
 	
 	$.ajax({
 		type : 'POST',
@@ -280,23 +282,46 @@ function editVM(vm){
 		
 	row4.append(selectCategory);
 	
-	
+	//aktivnosti
+	var aktivnostiTable =$("<table></table>")
 	var row5 = $("<tr></tr>")
-	row5.append("<td>Core number</td>")
-	row5.append(core)
+	var aktivnostiHeader = $("<thead class=\"thead-dark\"></thead>")
+	aktivnostiHeader.append("<th>Activity start</th>")
+	aktivnostiHeader.append("<th>Activity end</th>")
+	var aktivnostBody =$("<tbody></tbody>")
 	
+	for (let i = 0; i < vm.activityList.length; ++i) {
+		var row = $("<tr></tr>")
+		row.append("<td>" + vm.activityList[i].onTime + "</td>");
+		row.append("<td>" + vm.activityList[i].offTime + "</td>");
+		aktivnostBody.append(row)
+	}
+	
+	aktivnostiTable.append(aktivnostiHeader);
+	aktivnostiTable.append(aktivnostBody)
+	
+	var proba = $("<td colspan=\"2\"</td>")
+	proba.append(aktivnostiTable)
+	row5.append(proba)
+			
 	var row6 = $("<tr></tr>")
-	row6.append("<td>Ram capacity</td>")
-	row6.append(ram)
+	row6.append("<td>Core number</td>")
+	row6.append(core)
 	
 	var row7 = $("<tr></tr>")
-	row7.append("<td>GPU</td>")
-	row7.append(gpu)
+	row7.append("<td>Ram capacity</td>")
+	row7.append(ram)
 	
 	var row8 = $("<tr></tr>")
-	row8.append("<td><input id=\"save\" type=\"button\" value=\"Save\"></td>");
-	row8.append("<td><input id=\"discard\" type=\"button\" value=\"Discard\"></td>");
-	row8.append("<td><input id=\"delete\" type=\"button\" value=\"Delete\"></td>");
+	row8.append("<td>GPU</td>")
+	row8.append(gpu)
+	
+	
+	
+	var row10 = $("<tr></tr>")
+	row10.append("<td><input id=\"save\" type=\"button\" value=\"Save\"></td>");
+	row10.append("<td><input id=\"discard\" type=\"button\" value=\"Discard\"></td>");
+	row10.append("<td><input id=\"delete\" type=\"button\" value=\"Delete\"></td>");
 
 	selectCategory.on("change",function(){
 		var catName = selectCategory.val()
@@ -324,12 +349,23 @@ function editVM(vm){
 	table.append(row6)
 	table.append(row7)
 	table.append(row8)
+	table.append(checkBox)
+	table.append(row10)
+	
+	if(vm.activityList[vm.activityList.length - 1].offTime == ""){
+		$('#check').prop("checked", true)
+		console.log($('#check').is(":checked"))
+	}
+	else
+		$('#check').prop('checked', false);
+	
 	
 	form.append(table)
 	
 	$("#save").click(function(e){
 		e.preventDefault()
 		var oldName = vm.name
+		var check = $('#check').is(":checked")
 		var vmWrap = {
 				name : $("#name").val(),
 				organisation : vm.organisation,
@@ -338,8 +374,9 @@ function editVM(vm){
 				ramCapacity : $("#ram").val(),
 				numGPUCores : $("#gpu").val(),
 				discs : $("#disc").val(),
-				activityList : null,
-				oldName : oldName
+				activityList : vm.activityList,
+				oldName : oldName,
+				checked : check
 		}
 		
 		if($("#name").val() == ''){

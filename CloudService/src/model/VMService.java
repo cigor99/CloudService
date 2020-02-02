@@ -1,10 +1,15 @@
 package model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
+import javax.print.attribute.standard.DateTimeAtCompleted;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.DateFormatter;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -184,7 +189,7 @@ public class VMService {
 			return Response.status(400).entity("Error 403 : Access denied !").build();
 		}
 		
-		if(curr.getRole().equals(Role.ADMIN)) {
+		/*if(curr.getRole().equals(Role.ADMIN)) {
 			if(curr.getOrganisation().equals(vmWrap.getOrganisation())) {
 				return Response.status(400).entity("Error 403 : Access denied !").build();
 			}
@@ -202,6 +207,7 @@ public class VMService {
 			return Response.status(400).entity("Error 400 : Number of GPU cores must be equal or greater than 0 !").build();
 		if(!Validator.valPositive(positive))
 			return Response.status(400).entity("Error 400 : Number of CPU cores/Ram capacity must be greater than 0 !").build();
+		*/
 		
 		VMs vms = (VMs) ctx.getAttribute("vms");
 		Discs discs = (Discs) ctx.getAttribute("discs");
@@ -233,6 +239,21 @@ public class VMService {
 		vm.setNumCPUCores(vmWrap.getNumCPUCores());
 		vm.setNumGPUCores(vmWrap.getNumGPUCores());
 		vm.setRamCapacity(vmWrap.getRamCapacity());
+		
+		if(vmWrap.isChecked()) {
+			if(!(vm.getActivityList().get(vm.getActivityList().size()-1).getOffTime()).equals("")) {
+				Activity a = new Activity();
+				a.setOnTime(new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new Date()));
+				a.setOffTime("");
+				vm.getActivityList().add(a);
+			}
+		}
+		
+		if(!vmWrap.isChecked()) {
+			if((vm.getActivityList().get(vm.getActivityList().size()-1).getOffTime()).equals("")) {
+				vm.getActivityList().get(vm.getActivityList().size()-1).setOffTime(new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new Date()));
+			}
+		}
 		
 		vms.getVms().remove(vmWrap.getOldName());
 		vms.getVms().put(vm.getName(),vm);

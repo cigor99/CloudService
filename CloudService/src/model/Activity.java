@@ -3,34 +3,36 @@
  */
 package model;
 
-import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * @author Ksenija
  *
  */
 public class Activity {
-	private Date onTime;
-	private Date offTime;
+	private static DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+	private String onTime;
+	private String offTime;
 	
 	public Activity() {
 		super();
 	}
-	public Activity(Date onTime, Date offTime) {
+	public Activity(String onTime, String offTime) {
 		super();
 		this.onTime = onTime;
 		this.offTime = offTime;
 	}
-	public Date getOnTime() {
+	public String getOnTime() {
 		return onTime;
 	}
-	public void setOnTime(Date onTime) {
+	public void setOnTime(String onTime) {
 		this.onTime = onTime;
 	}
-	public Date getOffTime() {
+	public String getOffTime() {
 		return offTime;
 	}
-	public void setOffTime(Date offTime) {
+	public void setOffTime(String offTime) {
 		this.offTime = offTime;
 	}
 	

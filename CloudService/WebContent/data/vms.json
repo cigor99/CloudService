@@ -7,6 +7,12 @@
     "discs": [
       "Disc3"
     ],
+    "activityList": [
+      {
+        "onTime": "16.1.2020 10:00",
+        "offTime": "16.1.2020 18:00"
+      }
+    ],
     "name": "VM2",
     "organisation": "Organisation2"
   },
@@ -18,6 +24,12 @@
     "discs": [
       "Disc1",
       "Disc2"
+    ],
+    "activityList": [
+      {
+        "onTime": "10.1.2020 14:00",
+        "offTime": "12.1.2020 16:30"
+      }
     ],
     "name": "VM1",
     "organisation": "Organisation1"

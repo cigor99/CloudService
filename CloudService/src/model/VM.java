@@ -18,7 +18,7 @@ public class VM extends Resource {
 	private int numGPUCores;
 	
 	private ArrayList<String> discs;
-	private ArrayList<Activity> activityList;
+	private ArrayList<Activity> activityList = new ArrayList<>();
 	
 	public VM() {
 	}

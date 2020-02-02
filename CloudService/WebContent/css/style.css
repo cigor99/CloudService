@@ -1267,6 +1267,16 @@ pre {
   border-color: #233242; 
 }
 
+/*
+nas red
+*/
+
+.redObojen {
+  color: #f2f4f5 !important;
+  background-color: #233242 !important;
+  border-color: #233242 !important; 
+}
+
 .table .thead-light th {
   color: #4F5467;
   background-color: #e9ecef;
@@ -6949,6 +6959,11 @@ html[dir="ltr"] body .p-l-0 {
   position: relative;
   transition: 0.2s ease-in;
   display: none; }
+  
+.myLogo{
+	width: 100px !important;
+	height: 50px !important;
+}
 
 .page-wrapper > .container-fluid {
   padding: 20px;

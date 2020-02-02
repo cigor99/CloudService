@@ -159,7 +159,7 @@ public class VMService {
 		boolean ind = true;
 		if (ob instanceof VM) {
 			VM vm = (VM) ob;
-			ind = ind && (vm.getName() == null);
+			ind = ind && (vm.getName() == null || vm.getName().trim().length() == 0);
 			ind = ind && (vm.getOrganisation() == null);
 			ind = ind && Validator.valPositive(vm.getNumCPUCores());
 			ind = ind && Validator.valPositive(vm.getRamCapacity());
@@ -324,20 +324,20 @@ public class VMService {
 		if (Validator.valEmpty(args)) {
 			return Response.status(400).entity("Error 400 : One or more parameters empty !").build();
 		}
-		Logger l = new Logger("VMService_deleteVM.txt");
+		//Logger l = new Logger("VMService_deleteVM.txt");
 		VMs vms = (VMs) ctx.getAttribute("vms");
-		l.append("VMS IZ KONTEXTA: " + vms);
+		//l.append("VMS IZ KONTEXTA: " + vms);
 		VM vm = vms.getVms().get(oldName);
-		l.append("VM IZ VMS:" + vm);
+		//l.append("VM IZ VMS:" + vm);
 		vms.getVms().remove(oldName);
-		l.append("VMS POSLE IZBACIVANJA" + vms);
+		//l.append("VMS POSLE IZBACIVANJA" + vms);
 		Organisations orgs = (Organisations) ctx.getAttribute("organisations");
-		l.append("ORGANIZACIJE IZ KONTEXTA: " + orgs);
+		//l.append("ORGANIZACIJE IZ KONTEXTA: " + orgs);
 		orgs.getOrganisations().get(organisation).getResources().remove(oldName);
-		l.append("ORGS POSLE IZVBACIVANJA: " + orgs);
+		//l.append("ORGS POSLE IZVBACIVANJA: " + orgs);
 		Discs discs = (Discs) ctx.getAttribute("discs");
-		l.append("DISKOVI IZ KONTEKSTA: " + discs);
-		l.preciseLog(l.getLine());
+		//l.append("DISKOVI IZ KONTEKSTA: " + discs);
+		//l.preciseLog(l.getLine());
 		if(vm.getDiscs() != null) {
 		//try {
 			for (String d : vm.getDiscs()) {
@@ -455,24 +455,6 @@ public class VMService {
 		}
 
 		return fillterVMs;
-	}
-
-	@GET
-	@Path("/getMonthlyBill")
-	@Produces(MediaType.APPLICATION_JSON)
-	public int getMonthlyBill() {
-		User curr = (User) request.getSession().getAttribute("currentUser");
-
-		Organisations orgs = (Organisations) ctx.getAttribute("organisations");
-
-		Organisation myOrganisation = orgs.getOrganisations().get(curr.getOrganisation());
-
-		VMs vms = (VMs) ctx.getAttribute("vms");
-
-		for (String vm : vms.getVms().keySet()) {
-			return 100;
-		}
-		return 0;
 	}
 
 	private static Integer from(String from) {

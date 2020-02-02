@@ -198,10 +198,10 @@ public class UserService {
 		
 		User curr = (User) request.getSession().getAttribute("currentUser");
 		if(curr == null) {
-			return Response.status(400).entity("Error 403 : Access denied !").build();
+			return Response.status(403).entity("Error 403 : Access denied no user logged !").build();
 		}
 		if(curr.getRole()==Role.USER) {
-			return Response.status(400).entity("Error 403 : Access denied !").build();
+			return Response.status(403).entity("Error 403 : Access denied !").build();
 		}
 		String[] args = {email, password, name, organisation, surname, role};
 		if(Validator.valEmpty(args)) {
@@ -372,13 +372,13 @@ public class UserService {
 	public Response updateProfile(@FormParam("oldEmail") String oldEmail, @FormParam("email") String email,@FormParam("password") String password, @FormParam("name") String name,@FormParam("surname") String surname){		
 		User curr = (User) request.getSession().getAttribute("currentUser");
 		if(curr == null) {
-			return Response.status(400).entity("Error 403 : Access denied !").build();
+			return Response.status(403).entity("Error 403 : Access denied !").build();
 		}
 		String[] args = {email, password, name, surname};
 		if(Validator.valEmpty(args)) {
 			return Response.status(400).entity("Error 400 : One or more parameters empty !").build();
 		}
-		if(!Validator.valEmail(email)) {
+		if(curr.getRole() != Role.SUPER_ADMIN && !Validator.valEmail(email)) {
 			return Response.status(400).entity("Error 400 : Invalid email entry !").build();
 		}
 		Users users = (Users)ctx.getAttribute("users");

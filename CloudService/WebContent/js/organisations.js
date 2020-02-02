@@ -68,7 +68,7 @@ function printOrganisations(organisations){
 		body.append(row)
 	});
 	
-	body.append('<tr><td><input type="submit" id ="dodajOrg" value="Add new Organisation"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>')
+	body.append('<tr><td><input type="submit" id ="dodajOrg" value="Add new Organisation"></td><td>&nbsp;</td><td>&nbsp;</td></tr>')
 	
 	// When clicking on a table row
 	// Open edit menu for that row

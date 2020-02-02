@@ -3,7 +3,12 @@
  */
 package model;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -167,9 +172,9 @@ public class OrganisationService {
 	public Response editOrganisation(@FormParam("oldName") String oldName, @FormParam("name") String name,
 			@FormParam("description") String description, @FormParam("logo") String logo) {
 		Organisations organisations = (Organisations) ctx.getAttribute("organisations");
-		Logger l = new Logger();
+		//Logger l = new Logger();
 		User user = (User) request.getSession().getAttribute("currentUser");
-		l.append(user.toString());
+		//l.append(user.toString());
 		if(user.getRole().equals(Role.USER)){
 			return Response.status(400).entity("Error 403 : Access denied !").build();
 		}
@@ -184,16 +189,16 @@ public class OrganisationService {
 		}
 
 		Organisation org = organisations.getOrganisations().get(oldName);
-		l.append(org.toString());
+		//l.append(org.toString());
 		
 		organisations.getOrganisations().remove(oldName);
 
 		org.setName(name);
 		org.setDescription(description);
 		org.setLogo(makeLogoPath(logo));
-		l.append(org.toString());
+		//l.append(org.toString());
 		VMs vms = getVMs();
-		l.append(vms.toString());
+		//l.append(vms.toString());
 		
 		for (VM value : vms.getVms().values()) {
 			if (value.getOrganisation().equals(oldName)) {
@@ -202,7 +207,7 @@ public class OrganisationService {
 		}
 
 		Users users = getUsers();
-		l.append(users.toString());
+		//l.append(users.toString());
 		
 		for (User value : users.getUsers().values()) {
 			try {
@@ -228,19 +233,134 @@ public class OrganisationService {
 		//ctx.setAttribute("vms", vms);
 
 		organisations.WriteToFile(ctx.getRealPath("."));
-		l.append(organisations.toString());
+		//l.append(organisations.toString());
 		ObjectMapper mapper = new ObjectMapper();
 		String JSON = "";
 		try {
 			JSON = mapper.writeValueAsString(organisations.getOrganisations());
-			l.append(JSON);
-			l.logAll();
+			//l.append(JSON);
+			//l.logAll();
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
 		return Response.ok(JSON).build();
 	}
+	
+	@POST
+	@Path("/getMonthlyBill")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getMonthlyBill(@FormParam("startDate") String start, @FormParam("endDate") String end)
+	{
+		DateFormat form = new SimpleDateFormat("yyyy-MM-dd");
+		Date startDate;
+		Date endDate;
+		
+		try {
+			startDate = form.parse(start);
+			endDate = form.parse(end);
+		} catch (ParseException e1) {
+			return Response.status(400).entity("Error 400 : Dates not formatted correctly !").build();
+		}
+		
+		User curr = (User) request.getSession().getAttribute("currentUser");
+		
+		if(curr == null) {
+			return Response.status(403).entity("Error 403 : Access denied!").build();
+		}
+		
+		
+		if(!curr.getRole().equals(Role.ADMIN)) {
+			return Response.status(403).entity("Error 403 : Access denied !").build();
+		}
+		
+		Organisations orgs = (Organisations) ctx.getAttribute("organisations");
+		
+		Organisation myOrganisation = orgs.getOrganisations().get(curr.getOrganisation());
+		
+		VMs vms = (VMs) ctx.getAttribute("vms");
+		Discs discs = (Discs) ctx.getAttribute("discs");
+		
+		BillWrap billWrap = new BillWrap();
+		
+		DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+		
+		double totalBill = 0.0;
+		
+		for(String r : myOrganisation.getResources()) {
+			if(vms.getVms().containsKey(r)) {
+				//racunanje
+				VM vm = vms.getVms().get(r);
+				//cena po satu
+				Double hourPrice = vm.getNumCPUCores()*0.03472 + vm.getRamCapacity()*0.021 + vm.getNumGPUCores()*0.00139;
+				
+				//koliko sati je bila aktivna 
+				long hoursActive = 0;
+				for(Activity a : vm.getActivityList()) {
+					//zavrsena je aktivnost
+					if(!a.getOffTime().equals("")) {
+						Date onDate = null;
+						try {
+							onDate = formatter.parse(a.getOnTime());
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+						Date offDate = null;
+						try {
+							offDate = formatter.parse(a.getOffTime());
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+						//dati Evi
+						if(onDate.after(startDate) && offDate.before(endDate)) {
+							double diff = Math.ceil((offDate.getTime()-onDate.getTime()) / (60*60*1000));
+							hoursActive += diff;
+						}
+						
+					}
+				}
+				double vmTotal = Math.round((hourPrice*hoursActive)*100.0)/100.0;
+				totalBill += vmTotal;
+				billWrap.getVmBills().put(r,vmTotal);
+			}else {
+				double discDays = (endDate.getTime() - startDate.getTime())/(1000*60*60*24);
+				double discPrice = 0;
+				Disc d = discs.getDiscs().get(r);
+				if(d.getType().equals(DiscType.HDD)) {
+					discPrice = discDays * 0.003 * d.getCapacity();
+				}else
+				{
+					discPrice = discDays * 0.01 * d.getCapacity();
+				}
+				totalBill += discPrice;
+				billWrap.getDiscBills().put(r,discPrice);
+			}
+		}
+		
+		totalBill = Math.round(totalBill*100.0)/100.0;
+		
+		billWrap.setTotalBill(totalBill);
+		
+		String JSON = "";
+		
+		ObjectMapper mapper = new ObjectMapper();
+		
+		try {
+			JSON = mapper.writeValueAsString(billWrap);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
 
+		return Response.ok(JSON).build();
+	}
+
+	@GET
+	@Path("/listOrganisationsUnsafe")
+	@Produces(MediaType.APPLICATION_JSON)
+	public HashMap<String, Organisation> listOrganisationsUnsafe() {
+		return getOrganisations().getOrganisations();
+	}
+	
 	private VMs getVMs() {
 		VMs vms = (VMs) ctx.getAttribute("vms");
 		if (vms == null) {

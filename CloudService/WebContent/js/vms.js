@@ -583,12 +583,20 @@ function addNewVM(vms){
 	
 	
 	
-	// When inputs with these classes get into focus, alert disappears
+	// When inputs get into focus, alert disappears
 	$('.input-data').each(function(){
-        $(this).focus(function(){
-           hideValidate(this);
-        });
-    });
+		$(this).focus(function(){
+	           hideValidate(this);
+	    });
+	});
+	
+	//// When inputs lose focus, and are empty alert appears
+	$('.input-data').each(function(){
+		$(this).focusout(function(){
+	           if(($("#"+this.id + "")).val()=="")
+	        	   showValidate(this)
+	     });
+	});
 	
 
 	selectOrg.on("change",function(){
@@ -648,7 +656,9 @@ function addNewVM(vms){
         	hideValidate($("#name"));
         }
 		
-		if(!$("#name"))
+		var name = $("#name").val()
+		
+		if(!name)
 			return
 			
 		$.ajax({

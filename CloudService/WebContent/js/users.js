@@ -8,10 +8,7 @@ $(document).ready(function(e){
 		
 	//Calls function for viewing profile
 	$('a[href="#viewProfile"]').click(function(){
-		console.log(currentUser.name)
-		updateProfile(currentUser)
-		console.log(currentUser.name)
-		
+		updateProfile(currentUser);
 	});
 	
 	// Gets map of users form server
@@ -25,7 +22,7 @@ $(document).ready(function(e){
 				printUsers(response);
 			},
 			error : function() {
-				alert("Error")
+				alert("Error in get Users")
 			}
 		});
 	}); 
@@ -100,13 +97,13 @@ function printUsers(users){
 		e.preventDefault();
 		$.ajax({
 			type : 'GET',
-			url : "rest/orgServ/listOrganisations",
+			url : "rest/orgServ/listOrganisationsUnsafe",
 			dataType : "json",
 			success : function(response){
 				addNewUser(response);
 			},
 			error : function() {
-				alert("Error")
+				alert("Error in add User")
 			}
 		});
 		
@@ -236,7 +233,6 @@ function addNewUser(organisations){
 		$.ajax({
 			type : "POST",
 			url : "rest/userServ/addNewUser",
-			dataType : "json",
 			data : {
 				"email" : email,
 	        	"password" : password,
@@ -257,6 +253,21 @@ function addNewUser(organisations){
 			}
 		});
 	});
+	
+	$("#cancel").click(function(e){
+		e.preventDefault();
+		$.ajax({
+			type : 'GET',
+			url : "rest/userServ/getUsers",
+			dataType : "json",
+			success : function(response){
+				printUsers(response);
+			},
+			error : function() {
+				alert("Error: Cancel failed")
+			}
+		});
+	})
 }
 //Receives user to edit
 //Opens menu for editing
@@ -294,6 +305,11 @@ function editUser(user){
 	var option2 = $("<option value=\"Admin\">Admin</option>")
 	select.append(option2)
 	row6.append(select);
+	if (user.role == "ADMIN") {
+		select.val("Admin")
+	} else {
+		select.val("User")
+	}
 	
 	var row7 = $("<tr></tr>")
 	row7.append("<td><input id =\"editUser\" type=\"button\" value=\"Save Changes\"></td>");
@@ -305,8 +321,7 @@ function editUser(user){
 	table.append(row3)
 	table.append(row4)
 	table.append(row5)
-	if(currentUser.role!="ADMIN")
-		table.append(row6)
+	table.append(row6)
 	table.append(row7)
 	
 	forma.append(table)

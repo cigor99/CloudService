@@ -135,12 +135,21 @@ function updateProfile(user){
 	        	"surname" : surname
 			},
 			success : function(response){
-				if (response == undefined) {
-					alert("User with given email already exists!");
-				} else {
-					alert("Profile updated")
-					checkIfLogged();
-				}
+				alert("Changes saved !")
+				$.ajax({
+					type : 'GET',
+					url : "rest/userServ/getCurrentUser",
+					dataType : "json",
+					success : function(response){
+						currentUser = response
+					},
+					error : function(response) {
+						alert(response.responseText)
+					}
+				})
+			},
+			error : function(response) {
+				alert(response.responseText)
 			}
 		});
 	});

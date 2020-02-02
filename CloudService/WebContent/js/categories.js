@@ -11,8 +11,8 @@ $(document).ready(function(e){
 			success : function(response){
 				printCategories(response)
 			},
-			error : function(){
-				alert("Error")
+			error : function(response){
+				alert(response.responseText)
 			}
 		})
 	});
@@ -132,19 +132,19 @@ function addNewCategory(categories){
 			gpu = "0"
 				
 
-		if(core <0 ){
+		if(core <0 || ram == "" ){
             showValidate($("#core"));
         }else{
         	hideValidate($("#core"));
         }
 		
-		if(ram < 0){
+		if(ram < 0 || ram == ""){
             showValidate($("#ram"));
         }else{
         	hideValidate($("#ram"));
         }
 		
-		if(gpu <= 0){
+		if(gpu < 0){
             showValidate($("#gpu"));
         }else{
         	hideValidate($("#gpu"));
@@ -164,10 +164,10 @@ function addNewCategory(categories){
 				"gpu" : gpu
 			},
 			success : function(response){
-				if(response==undefined)
-					alert("VM Category with given name already exists!")
-				else
-					printCategories(response)
+				printCategories(response)
+			},
+			error : function(response) {
+				alert(response.responseText)
 			}
 		});
 	})
@@ -250,7 +250,7 @@ function editVMCategory(category){
         	hideValidate($("#ram"));
         }
 		
-		if(gpu <= 0){
+		if(gpu < 0){
             showValidate($("#gpu"));
         }else{
         	hideValidate($("#gpu"));
@@ -271,10 +271,10 @@ function editVMCategory(category){
 				"gpu" : gpu
 			},
 			success : function(response){
-				if(response==undefined)
-					alert("VM Category with given name already exists!")
-				else
-					printCategories(response)
+				printCategories(response)
+			},
+			error : function(response) {
+				alert(response.responseText)
 			}
 		});
 	})
@@ -288,8 +288,8 @@ function editVMCategory(category){
 			success : function(response){
 				printCategories(response)
 			},
-			error : function(){
-				alert("Error")
+			error : function(response) {
+				alert(response.responseText)
 			}
 		})
 	});
@@ -305,13 +305,10 @@ function editVMCategory(category){
 				"oldName" : oldName
 			},
 			success : function(response){
-				if(response==undefined)
-					alert("VM category has VMs attached to it")
-				else
-					printCategories(response)
+				printCategories(response)
 			},
-			error : function(){
-				alert("Error")
+			error : function(response){
+				alert(response.responseText)
 			}
 		});
 	});

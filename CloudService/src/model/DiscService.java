@@ -195,7 +195,7 @@ public class DiscService {
 	@Path("/editDisc")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public Response editVMCategory(@FormParam("oldName") String oldName, @FormParam("newName") String newName,
+	public Response editDisc(@FormParam("oldName") String oldName, @FormParam("newName") String newName,
 			@FormParam("discType") String discType, @FormParam("capacity") String capacity,
 			@FormParam("oldVMname") String oldVMname, @FormParam("newVMname") String newVMname, @FormParam("orgName") String organisation) {
 		User curr = (User) request.getSession().getAttribute("currentUser");
@@ -235,7 +235,10 @@ public class DiscService {
 
 		d.setCapacity(Integer.parseInt(capacity));
 
-		d.setVmName(newVMname);
+		if(newVMname.equals(""))
+			d.setVmName(null);
+		else
+			d.setVmName(newVMname);
 
 		// izmenjen u discs
 		discs.getDiscs().remove(oldName);
@@ -249,8 +252,8 @@ public class DiscService {
 			orgs.WriteToFile(ctx.getRealPath("."));
 		}
 
-		Logger l = new Logger("DiscService_editDisc.txt");
-		l.append(d.toString());
+		//Logger l = new Logger("DiscService_editDisc.txt");
+		//l.append(d.toString());
 		
 		// izmenjen u vm
 		HashMap<String, VM> vms = getVMs();
@@ -303,7 +306,7 @@ public class DiscService {
 	@Path("/deleteDisc")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public Response deleteCategory(@FormParam("oldName") String oldName) {
+	public Response deleteDisc(@FormParam("oldName") String oldName) {
 		User curr = (User) request.getSession().getAttribute("currentUser");
 
 		if (curr == null) {

@@ -319,9 +319,9 @@ function editDisc(disc){
 					var selectVM = $("<select name=\"vmName\" id=\"vmName\"></select>");
 					selectVM.empty()
 					var option3 = $("<option></option>");
-					option3.append("")
+					selectVM.append("<option></option>")
 					$.each(response, function(key, value){
-						
+						var option3 = $("<option></option>");
 						option3.append(key);
 						selectVM.append(option3);
 					});

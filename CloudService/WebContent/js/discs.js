@@ -1,5 +1,6 @@
 var currentUser;
 
+var selectOrg = $("<select colspan=\"2\" name=\"orgName\" id=\"orgName\" </select>");
 $(document).ready(function(e){
 
 	$('a[href="#viewDiscs"]').click(function(){
@@ -99,14 +100,60 @@ function addNewDisc(vms){
 	row3.append("<td>Capacity</td>")
 	row3.append("<td class=\"wrap-input validate-input \" data-validate=\"Capacity is required\"  data-error=\"Core number must be greater than 0\"><input class=\"input-data\" type=\"number\" name=\"capacity\" id=\"capacity\"></td>")
 
+	selectOrg.empty()
+	var rowOrg = $("<tr></tr>")
+	rowOrg.append("<td>Organisation</td>")
+	
+	if(currentUser.role=="ADMIN"){
+		$.ajax({
+			type : 'GET',
+			url : "rest/orgServ/getMyOrg",
+			contentType : "application/json",
+			success : function(response){
+				var option1 = $("<option></option>");
+				option1.append(response.name);
+				selectOrg.append(option1);
+				rowOrg.append(selectOrg);
+				selectOrg.trigger("change")
+			},
+			error : function(data){
+				alert(data.responseText);
+			}
+			
+		});
+	}
+	
+	if(currentUser.role=="SUPER_ADMIN"){
+		$.ajax({
+			type : 'GET',
+			url : "rest/orgServ/listOrganisations",
+			contentType : "application/json",
+			success : function(response){
+				$.each(response, function(key, value){
+					var option1 = $("<option></option>");
+					option1.append(key);
+					selectOrg.append(option1);
+				});
+				rowOrg.append(selectOrg);
+				selectOrg.trigger("change")
+			},
+			error : function(data){
+				alert(data.responseText);
+			}
+			
+		});
+	}
+	$("#orgName").val($("#orgName option:first").val())
+	
 	var row4 = $("<tr></tr>")
 	row4.append("<td>VM</td>");
+	
 	var selectVM = $("<select name=\"vmName\" id=\"vmName\"></select>");
-	$.each(vms, function(key, value){
+	/*$.each(vms, function(key, value){
 		var option = $("<option></option>");
 		option.append(key);
 		selectVM.append(option);
-	});
+	});*/
 	row4.append(selectVM);
 
 	var row5 = $("<tr></tr>")
@@ -115,6 +162,7 @@ function addNewDisc(vms){
 	table.append(row1)
 	table.append(row2)
 	table.append(row3)
+	table.append(rowOrg)
 	table.append(row4)
 	table.append(row5)
 	
@@ -128,6 +176,28 @@ function addNewDisc(vms){
         });
     });
 	
+	selectOrg.on("change",function(){
+		var orgName = selectOrg.val()
+		console.log(orgName);
+		$.ajax({
+			type : 'POST',
+			url : "rest/vmServ/getOrgVMs",
+			dataType : "json",
+			data : {
+				"orgName" : orgName
+			},
+			success : function(response){
+				selectVM.empty()
+				var option3 = $("<option></option>");
+				option3.append("")
+				$.each(response, function(key, value){
+					
+					option3.append(key);
+					selectVM.append(option3);
+				});
+			}
+		})
+	})
 	
 	$("#add").click(function(e){
 		e.preventDefault()
@@ -135,6 +205,7 @@ function addNewDisc(vms){
 		var discType = $("#discType").val()
 		var capacity = $("#capacity").val()
 		var vmName = $("#vmName").val()
+		var orgName = selectOrg.val();
 		
 		if(name == ''){
             showValidate($("#name"));
@@ -157,6 +228,11 @@ function addNewDisc(vms){
 			hideValidate($("#capacity"))
 		}
 		
+		if(orgName == ''){
+            showValidate($("#orgName"));
+        }else{
+        	hideValidate($("#orgName"));
+        }
 			
 		$.ajax({
 			type : 'POST',
@@ -166,7 +242,8 @@ function addNewDisc(vms){
 				"name" : name,
 				"discType" : discType,
 				"capacity" : capacity,
-				"vmName" : vmName
+				"vmName" : vmName,
+				"orgName" : orgName
 			},
 			success : function(response){
 				if(response==undefined)
@@ -224,6 +301,13 @@ function editDisc(disc){
 	else
 		row3.append("<td colspan=\"2\"><input class=\"input-data\" type=\"text\" name=\"capacity\" id=\"capacity\" value = \"" + disc.capacity + "\" readonly></td>")
 		
+		
+	
+	var rowOrg = $("<tr></tr>")
+	rowOrg.append("<td>Organisation</td>")
+	
+	rowOrg.append("<td colspan=\"2\"><input class=\"input-data\" type=\"text\" name=\"orgN\" id=\"orgN\" value = \"" + disc.organisation + "\" readonly></td>")
+	
 	var row4 = $("<tr></tr>")
 	row4.append("<td>VM</td>")
 	
@@ -233,10 +317,13 @@ function editDisc(disc){
 			success : function(response){
 				//$.each(response, function(key,value){
 					var selectVM = $("<select name=\"vmName\" id=\"vmName\"></select>");
+					selectVM.empty()
+					var option3 = $("<option></option>");
+					option3.append("")
 					$.each(response, function(key, value){
-						var option = $("<option></option>");
-						option.append(key);
-						selectVM.append(option);
+						
+						option3.append(key);
+						selectVM.append(option3);
 					});
 					//row4.append(selectVM);
 				//});
@@ -256,6 +343,7 @@ function editDisc(disc){
 	table.append(row1)
 	table.append(row2)
 	table.append(row3)
+	table.append(rowOrg)
 	table.append(row4)
 	table.append(row5)
 	
@@ -270,6 +358,7 @@ function editDisc(disc){
 		var capacity = $("#capacity").val()
 		var newVMname = $("#vmName").val()
 		var oldVMname = disc.vmName;
+		var orgName =  $("#orgN").val()
 		
 		if(name == ''){
             showValidate($("#name"));
@@ -301,7 +390,8 @@ function editDisc(disc){
 				"discType" : discType,
 				"capacity" : capacity,
 				"oldVMname" : oldVMname,
-				"newVMname" : newVMname
+				"newVMname" : newVMname,
+				"orgName" : orgName
 			},
 			success : function(response){
 				if(response==undefined)

@@ -53,8 +53,10 @@ public class DiscService {
 		} else {
 			HashMap<String, Disc> available = new HashMap<String, Disc>();
 			for (Disc d : discs.getDiscs().values()) {
-				if (d.getOrganisation().equals(curr.getOrganisation())) {
-					available.put(d.getName(), d);
+				if(!(d.getOrganisation()==null)) {
+					if (d.getOrganisation().equals(curr.getOrganisation())) {
+						available.put(d.getName(), d);
+					}
 				}
 
 			}
@@ -74,12 +76,10 @@ public class DiscService {
 
 		User curr = (User) request.getSession().getAttribute("currentUser");
 
-		Logger l = new Logger("DiscService_getVMs.txt");
-		l.append(curr.toString());
+
 
 		VMs vms = (VMs) ctx.getAttribute("vms");
-		l.append(vms.toString());
-		l.preciseLog(l.getLine());
+
 		if (vms == null) {
 			vms = new VMs(ctx.getRealPath("."));
 			ctx.setAttribute("vms", vms);
@@ -89,17 +89,15 @@ public class DiscService {
 		}
 	
 		Organisations organs = (Organisations) ctx.getAttribute("organisations");
-		l.append("ORGANS: \n" + organs.toString());
+
 		HashMap<String, VM> orgVM = new HashMap<String, VM>();
 		for (String r : organs.getOrganisations().get(curr.getOrganisation()).getResources()) {
-			l.append(r);
+		
 			
 			if (vms.getVms().containsKey(r))
 				orgVM.put(r, vms.getVms().get(r));
 		}
-		l.append("RETRUNS: \n");
-		l.append(""+orgVM);
-		l.logAll();
+
 		return orgVM;
 
 	}
@@ -109,7 +107,7 @@ public class DiscService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response addDisc(@FormParam("name") String name, @FormParam("discType") String discType,
-			@FormParam("capacity") String capacity, @FormParam("vmName") String vmName) {
+			@FormParam("capacity") String capacity, @FormParam("vmName") String vmName, @FormParam("orgName") String organisation) {
 		User curr = (User) request.getSession().getAttribute("currentUser");
 		Logger l = new Logger("addDISC.txt");
 		if (curr == null) {
@@ -118,7 +116,7 @@ public class DiscService {
 		if (curr.getRole().equals(Role.USER)) {
 			return Response.status(400).entity("Error 403 : Access denied !").build();
 		}
-		String[] args = { capacity, discType, name, vmName };
+		String[] args = { capacity, discType, name };
 		if (Validator.valEmpty(args)) {
 			return Response.status(400).entity("Error 400 : One or more parameters empty !").build();
 		}
@@ -142,10 +140,19 @@ public class DiscService {
 
 		Disc disc = null;
 		if (curr.getRole().equals(Role.SUPER_ADMIN))
-			disc = new Disc(name, null, dt, Integer.parseInt(capacity), vmName);
+			if(vmName.equals("")) {
+				disc = new Disc(name, organisation, dt, Integer.parseInt(capacity), null);
+			}else {
+				disc = new Disc(name, organisation, dt, Integer.parseInt(capacity), vmName);
+			}
 		else {
-			disc = new Disc(name, curr.getOrganisation(), dt, Integer.parseInt(capacity), vmName);
-			organs.getOrganisations().get(curr.getOrganisation()).getResources().add(name);
+			if(vmName.equals("")) {
+				disc = new Disc(name, curr.getOrganisation(), dt, Integer.parseInt(capacity), null);
+				organs.getOrganisations().get(curr.getOrganisation()).getResources().add(name);
+			}else {
+				disc = new Disc(name, curr.getOrganisation(), dt, Integer.parseInt(capacity), vmName);
+				organs.getOrganisations().get(curr.getOrganisation()).getResources().add(name);
+			}
 		}
 		l.append(disc.toString());
 
@@ -190,7 +197,7 @@ public class DiscService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response editVMCategory(@FormParam("oldName") String oldName, @FormParam("newName") String newName,
 			@FormParam("discType") String discType, @FormParam("capacity") String capacity,
-			@FormParam("oldVMname") String oldVMname, @FormParam("newVMname") String newVMname) {
+			@FormParam("oldVMname") String oldVMname, @FormParam("newVMname") String newVMname, @FormParam("orgName") String organisation) {
 		User curr = (User) request.getSession().getAttribute("currentUser");
 		if (curr == null) {
 			return Response.status(400).entity("Error 403 : Access denied !").build();
@@ -198,7 +205,7 @@ public class DiscService {
 		if (curr.getRole().equals(Role.USER)) {
 			return Response.status(400).entity("Error 403 : Access denied !").build();
 		}
-		String[] args = { capacity, discType, newName, oldName, newVMname, oldVMname };
+		String[] args = { capacity, discType, newName, oldName};
 		if (Validator.valEmpty(args)) {
 			return Response.status(400).entity("Error 400 : One or more parameters empty !").build();
 		}
@@ -235,23 +242,35 @@ public class DiscService {
 		discs.getDiscs().put(newName, d);
 
 		// izmenjen u org resources
-		Organisation o = orgs.getOrganisations().get(d.getOrganisation());
-		o.getResources().remove(oldName);
-		o.getResources().add(newName);
+		if(d.getOrganisation() != null) {
+			Organisation o = orgs.getOrganisations().get(organisation);
+			o.getResources().remove(oldName);
+			o.getResources().add(newName);
+			orgs.WriteToFile(ctx.getRealPath("."));
+		}
 
 		Logger l = new Logger("DiscService_editDisc.txt");
 		l.append(d.toString());
 		
 		// izmenjen u vm
 		HashMap<String, VM> vms = getVMs();
-		l.append(vms.toString());
-		l.preciseLog(l.getLine());
-		vms.get(oldVMname).getDiscs().remove(oldName);
-		l.append("AFTER REMOVE: \n" +vms.toString());
-		vms.get(newVMname).getDiscs().add(newName);
-		l.append("AFTER ADD: \n" + vms.toString());
-		l.preciseLog(l.getLine());
-		// ctx.setAttribute("discs", discs);
+		
+		if(vms.get(oldName) != null) {
+			vms.get(oldVMname).getDiscs().remove(oldName);
+		}
+		if(newVMname != null) {
+			if(!(newVMname.equals(""))) {
+				vms.get(newVMname).getDiscs().add(newName);
+				try {
+					VMs sav = (VMs) ctx.getAttribute("vms");
+					sav.WriteToFile(ctx.getRealPath("."));
+				}catch (Exception e) {
+					System.out.println("do nothing");
+				}
+			}
+		}
+		
+
 		discs.WriteToFile(ctx.getRealPath("."));
 		ObjectMapper mapper = new ObjectMapper();
 		String JSON = "";
@@ -305,17 +324,32 @@ public class DiscService {
 
 		// obrisan iz diskova
 		discs.getDiscs().remove(oldName);
-		ctx.setAttribute("discs", discs);
 		discs.WriteToFile(ctx.getRealPath("."));
 
 		// obrisan iz resources
 		Organisation o = orgs.getOrganisations().get(d.getOrganisation());
-		o.getResources().remove(oldName);
+		if(o != null){
+			o.getResources().remove(oldName);
+			orgs.WriteToFile(ctx.getRealPath("."));
+		}
 
 		// obrisan iz vm
 		HashMap<String, VM> vms = getVMs();
-		vms.get(d.getVmName()).getDiscs().remove(oldName);
-
+		if(d.getVmName() != null) {
+			if(!(d.getVmName().equals(""))) {
+				if(vms.get(d.getVmName()) != null) {
+					vms.get(d.getVmName()).getDiscs().remove(oldName);
+					try {
+						VMs sav = (VMs) ctx.getAttribute("vms");
+						sav.WriteToFile(ctx.getRealPath("."));
+					}catch (Exception e) {
+						System.out.println("do nothing");
+					}
+				}
+			}
+		}
+		
+		
 		ObjectMapper mapper = new ObjectMapper();
 		String JSON = "";
 		try {

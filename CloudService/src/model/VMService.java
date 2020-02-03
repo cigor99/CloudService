@@ -492,4 +492,27 @@ public class VMService {
 		}
 		return true;
 	}
+	
+	@POST
+	@Path("/getOrgVMs")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public HashMap<String, VM> getOrgVMs(@FormParam("orgName") String orgName){
+		if(orgName.equals("")) {
+			return null;
+		}
+		VMs vms = (VMs) ctx.getAttribute("vms");
+		if (vms == null) {
+			vms = new VMs(ctx.getRealPath("."));
+			ctx.setAttribute("vms", vms);
+		}
+		
+		HashMap<String, VM> orgVMs = new HashMap<String, VM>();
+		for(VM v : vms.getVms().values()) {
+			if(v.getOrganisation().equals(orgName)) {
+				orgVMs.put(v.getName(), v);
+			}
+		}
+		return orgVMs;
+	};
 }

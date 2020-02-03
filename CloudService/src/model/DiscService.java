@@ -109,7 +109,7 @@ public class DiscService {
 	public Response addDisc(@FormParam("name") String name, @FormParam("discType") String discType,
 			@FormParam("capacity") String capacity, @FormParam("vmName") String vmName, @FormParam("orgName") String organisation) {
 		User curr = (User) request.getSession().getAttribute("currentUser");
-		Logger l = new Logger("addDISC.txt");
+		
 		if (curr == null) {
 			return Response.status(400).entity("Error 403 : Access denied !").build();
 		}
@@ -154,7 +154,7 @@ public class DiscService {
 				organs.getOrganisations().get(curr.getOrganisation()).getResources().add(name);
 			}
 		}
-		l.append(disc.toString());
+		
 
 		discs.getDiscs().put(name, disc);
 		// ctx.setAttribute("discs", discs);
@@ -171,10 +171,10 @@ public class DiscService {
 		}
 		
 		HashMap<String, VM> vms = getVMs();
-		l.append(vms.toString());
+		
 		vms.get(vmName).getDiscs().add(name);
-		l.append(vms.toString());
-		l.preciseLog(l.getLine());
+		
+		
 		HashMap<String, Disc> available = new HashMap<String, Disc>();
 		for (Disc d : discs.getDiscs().values()) {
 			if (d.getOrganisation().equals(curr.getOrganisation())) {

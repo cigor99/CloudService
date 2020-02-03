@@ -22,14 +22,14 @@ public class Logger {
 	public Logger() {
 		super();
 		this.line = "";
-		this.path = "C:\\Users\\Igor\\Desktop\\Logs\\";
+		this.path = "";
 		this.fileName = "log.txt";
 	}
 	
 	public Logger(String fileName) {
 		this.fileName = fileName;
 		this.line = "";
-		this.path = "C:\\Users\\Igor\\Desktop\\Logs\\";
+		this.path = "";
 	}
 
 	public static void log(String data) {

@@ -189,7 +189,7 @@ function addNewDisc(vms){
 			success : function(response){
 				selectVM.empty()
 				var option3 = $("<option></option>");
-				option3.append("")
+				selectVM.append("<option></option>")
 				$.each(response, function(key, value){
 					
 					option3.append(key);
@@ -204,7 +204,7 @@ function addNewDisc(vms){
 		var name = $("#name").val()
 		var discType = $("#discType").val()
 		var capacity = $("#capacity").val()
-		var vmName = $("#vmName").val()
+		var vmName = selectVM.val()
 		var orgName = selectOrg.val();
 		
 		if(name == ''){

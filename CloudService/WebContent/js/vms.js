@@ -171,6 +171,9 @@ function printVMs(vms){
 				if(currentUser.role=="ADMIN")
 					body.append("<tr><td><input type=\"submit\" id=\"addVM\" name=\"addVM\" value=\"Add new VM\"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
 
+			},
+			error : function(response){
+				alert(response.responseText)
 			}
 		})
 		

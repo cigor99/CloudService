@@ -332,6 +332,7 @@ public class OrganisationService {
 				{
 					discPrice = discDays * 0.01 * d.getCapacity();
 				}
+				discPrice = Math.round(discPrice*100.00)/100.00;
 				totalBill += discPrice;
 				billWrap.getDiscBills().put(r,discPrice);
 			}
